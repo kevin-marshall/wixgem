@@ -1,5 +1,5 @@
 require './WindowsInstaller.rb'
-require 'systemu'
+#require 'systemu'
 
 def execute(cmd)
   status, stdout, stderr = systemu(cmd)

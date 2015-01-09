@@ -26,8 +26,8 @@ Gem::Specification.new do |s|
 	s.files         = Dir["LICENSE","README.md","lib/**/*"]
 	s.license       = 'Apache 2.0'
 	s.require_path  = 'lib'
-    s.add_development_dependency 'bundler', '~> 0.1.0', '>= 1.5.1'
-	s.add_development_dependency 'rake', '~> 0.1.0', '>= 0.9.6'
-	s.add_development_dependency 'rspec', '~> 0.1.0', '>= 3.1.3'
+    s.add_development_dependency 'bundler'
+	s.add_development_dependency 'rake'
+	s.add_development_dependency 'rspec'
 	s.add_development_dependency 'dev_tasks'
 end

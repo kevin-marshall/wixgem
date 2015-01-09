@@ -5,4 +5,6 @@ Encoding.default_internal=Encoding::UTF_8
 
 # Specify your gem's dependencies in sample.gemspec
 gem 'rake'
+gem 'dev_tasks'
 gem 'bundler'
+

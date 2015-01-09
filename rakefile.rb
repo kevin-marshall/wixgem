@@ -2,6 +2,7 @@ require 'dev_tasks'
 
 CLEAN.include('test')
 
+DEV[:files][:source].include('test_files/**/*')
 DEV[:svn_exports]['OpenSource/WixToolset/3.8'] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.8'
 
 WIX_PATH = ENV['WIX']

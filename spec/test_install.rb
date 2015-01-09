@@ -1,6 +1,6 @@
 require './WindowsInstaller.rb'
-require 'dev_tasks'
 require './admin.rb'
+require './spec/execute.rb'
 
 def execute(cmd)
   command = Command.new(cmd)
@@ -9,9 +9,15 @@ def execute(cmd)
   raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
 end
 
-def test_msi(msi_file, arg2)
+def product_name(msi_file, arg2)
   product_name = File.basename(msi_file, File.extname(msi_file))
   product_name = arg2[:product_name] if(arg2.kind_of?(Hash) && arg2.has_key?(:product_name))
+  
+  return product_name
+end
+
+def test_msi(msi_file, arg2)
+  product_name = product_name(msi_file, arg2)
 	
   msi_info = WindowsInstaller.msi_records(msi_file)
   #puts msi_info.to_s
@@ -50,7 +56,7 @@ def test_install(name, msi_file, arg2, callback=nil)
 	
   if(admin?)
 	while(WindowsInstaller.installed?(product_name))
-	  execute("msiexec.exe /quiet /x #{WindowsInstaller.product_code(product_name)}")
+	  execute("msiexec.exe /quiet /x #{WindowsInstaller.product_code?(product_name)}")
 	end
     raise "#{name}: Uninstall #{product_name} before running tests" if(WindowsInstaller.installed?(product_name))
     

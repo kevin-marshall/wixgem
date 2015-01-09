@@ -146,9 +146,9 @@ class Wix
  
 	output_absolute_path = File.absolute_path(output)
 
-    #dir = 'tmp_dir'
-	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))
-	Dir.mktmpdir do |dir|
+    dir = 'tmp_dir'
+	FileUtils.rm_rf(dir) if(Dir.exists?(dir))
+	#Dir.mktmpdir do |dir|
 	  copy_install_files(dir, input)
 	  
 	  wxs_file = "#{basename}.wxs"	    
@@ -156,7 +156,7 @@ class Wix
 		create_wxs_file(wxs_file, input, ext)
 		create_output(wxs_file, output_absolute_path)
 	  end
-    end
+    #end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
   end

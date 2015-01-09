@@ -9,14 +9,20 @@ class WindowsInstaller
 	  }
 	  return false
 	end
-	
-	def self.version(product_name)
+
+	def self.product_code_installed?(product_code)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
-	  info = product_info(installer, product_code(product_name, installer))
+	  installer.Products.each { |prod_code| return true if (product_code == prod_code) }
+	  return false
+	end
+	
+	def self.version?(product_name)
+	  installer = WIN32OLE.new('WindowsInstaller.Installer')
+	  info = product_info(installer, product_code?(product_name, installer))
 	  return info['VersionString']
 	end
 
-	def self.product_code(product_name, installer = nil)
+	def self.product_code?(product_name, installer = nil)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer') if(installer.nil?)
 	  installer.Products.each { |prod_code|
 		name = installer.ProductInfo(prod_code, "ProductName")
@@ -25,6 +31,7 @@ class WindowsInstaller
 	  raise "Failed to find product code for product: #{product_name}"
 	end
 
+    private
 	def self.product_info(installer, code)
 	  raise 'Windows installer cannot be nil' if(installer.nil?)
 	  hash = Hash.new
@@ -51,9 +58,10 @@ class WindowsInstaller
 	  return hash
 	end
 	
+	public
 	def self.dump_info(product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
-	  properties = product_info(installer, product_code(product_name, installer))
+	  properties = product_info(installer, product_code?(product_name, installer))
 	  properties.each { |id, value| puts "#{id}: #{value}" }
 	end
 
@@ -93,7 +101,7 @@ class WindowsInstaller
 	def self.dump_product(product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
 	  # only one session per process!
-	  session = installer.OpenProduct(product_code(product_name, installer))
+	  session = installer.OpenProduct(product_code?(product_name, installer))
 	  db = session.Database
 			
 	  sql_query = "SELECT * FROM `Property`"

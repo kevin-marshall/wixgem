@@ -9,16 +9,18 @@ def execute(cmd)
 end
 
 def admin?
-  `net session`
+  %x[net session]
   return true if $?.to_i==0
   return false
 end
 
-def test_install(name, msi_file, arg2)
-  msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
+def get_product_name(msi_file, arg2)
+  product_name = File.basename(msi_file, File.extname(msi_file))
+  product_name = arg2[:product_name] if(arg2.kind_of?(Hash) && arg2.has_key?(:product_name))
+end
 
-    product_name = File.basename(msi_file, File.extname(msi_file))
-	product_name = arg2[:product_name] if(arg2.kind_of?(Hash) && arg2.has_key?(:product_name))
+def test_msi(msi_file, arg2)
+    product_name = get_product_name(msi_file, arg2)
 	
 	msi_info = WindowsInstaller.msi_records(msi_file)
 
@@ -34,7 +36,15 @@ def test_install(name, msi_file, arg2)
 	expected_product_version = '1.0.0.0'
     expected_product_version = arg2[:version] if(arg2.kind_of?(Hash) && arg2.has_key?(:version))
     raise "Invalid product version #{msi_info['ProductVersion']}" if(msi_info['ProductVersion'] != expected_product_version)
+end
 
+def test_install(name, msi_file, arg2)
+  msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
+
+  test_msi(msi_file, arg2)
+  
+  product_name = get_product_name(msi_file, arg2)
+	
 	if(admin?)
 		begin
 			while(WindowsInstaller.installed?(product_name))

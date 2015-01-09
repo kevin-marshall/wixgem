@@ -48,7 +48,7 @@ def test_msi(msi_file, arg2)
   raise "Invalid Manufacturer #{msi_info['Manufacturer']}" if(msi_info['Manufacturer'] != expected_manufacturer)
 end
 
-def test_install(name, msi_file, arg2)
+def test_install(name, msi_file, arg2, arg3=nil)
   msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
 
   test_msi(msi_file, arg2)
@@ -75,13 +75,7 @@ def test_install(name, msi_file, arg2)
 	  raise "#{name}: relative_install_dir is empty" if(relative_install_dir.length == 0)
 	  raise "#{name}: Product name #{msi_info['ProductName']} is not installed" unless(WindowsInstaller.installed?(msi_info['ProductName']))
 
-	  files = arg2
-	  files = arg2[:files] if(arg2.kind_of?(Hash))
-
-	  files.each { |file| 
-	    full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
-		raise "#{name}: #{full_path} not installed." unless(File.exists?(full_path))
-	  }
+	  eval arg3
 		
 	  execute("msiexec.exe /quiet /x #{msi_file}")
 	ensure

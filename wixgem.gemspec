@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= "0.0.13"
+	s.version		= "0.0.14"
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.\n\nNote: This gem currently does not handle registration of COM objects or registry entries.'
 	s.authors		= ["Kevin Marshall"]

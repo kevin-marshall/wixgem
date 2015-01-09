@@ -1,4 +1,5 @@
 require 'dev_tasks'
+require './admin.rb'
 
 CLEAN.include('test')
 
@@ -8,12 +9,6 @@ DEV[:svn_exports]['OpenSource/WixToolset/3.8'] = 'https://deps.googlecode.com/sv
 WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8"
 
 Text.replace_text_in_glob 'spec/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
-
-def admin?
-  `net session`
-  return true if $?==0
-  return false
-end
 
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'

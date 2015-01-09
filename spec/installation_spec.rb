@@ -2,7 +2,8 @@ require 'rspec'
 require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
-require './spec/test_files.rb'
+require './spec/test_files_exist.rb'
+require 'json'
 
 describe 'Installation' do    
   test_arguments = {
@@ -11,9 +12,9 @@ describe 'Installation' do
 	test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
 	test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
 	test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
-	test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
+	test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
 	test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	test8: ['test/wixgem_install_test8.msi', {map_path: {'test_files/' => ''}, files: Dir.glob("test_files/**/*")}]
+	test8: ['test/wixgem_install_test8.msi', {modify_install_path: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")}]
   }
 
   test_arguments.each { |key, value| 
@@ -23,9 +24,9 @@ describe 'Installation' do
 	end
     
 	it "should install and uninstall: #{value[0]}" do
-	  run_test = "test_files(#{value[1]})"
-	  run_test = value[2] if(value.length == 3)
-	  test_install(key, value[0], value[1], run_test) 
+	  execute = "test_files_exist('#{value[0]}', #{value[1]})"
+	  execute = value[2] if(value.length == 3)
+	  test_install(key, value[0], value[1], execute) 
 	end
   }
 

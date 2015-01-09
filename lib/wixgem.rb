@@ -58,11 +58,14 @@ class Wix
 	
 	files.each do |file| 
 	  if(File.file?(file))
-	    install_path = "#{directory}/#{file}"
+   	    install_path = file
+        if(input.kind_of?(Hash) && input.has_key?(:modify_install_path))
+          input[:modify_install_path].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
+        end
+
+   	    install_path = "#{directory}/#{install_path}"
 		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
 		FileUtils.cp(file, install_path)
-#	  else if(!Dir.exists?(file) && !File.exists?(file))
-#	    raise "File: '#{file}' does not exist!"
 	  end
 	end
   end

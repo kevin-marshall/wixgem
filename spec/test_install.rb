@@ -1,26 +1,17 @@
 require './WindowsInstaller.rb'
 require 'dev_tasks'
+require './admin.rb'
 
 def execute(cmd)
   command = Command.new(cmd)
   command.execute
-  puts "" unless(command[:exit_code] == 0)
+  
   raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
 end
 
-def admin?
-  `net session`
-  return true if $?.to_i==0
-  return false
-end
-
-def get_product_name(msi_file, arg2)
+def test_msi(msi_file, arg2)
   product_name = File.basename(msi_file, File.extname(msi_file))
   product_name = arg2[:product_name] if(arg2.kind_of?(Hash) && arg2.has_key?(:product_name))
-end
-
-def test_msi(msi_file, arg2)
-  product_name = get_product_name(msi_file, arg2)
 	
   msi_info = WindowsInstaller.msi_records(msi_file)
   #puts msi_info.to_s
@@ -48,38 +39,31 @@ def test_msi(msi_file, arg2)
   raise "Invalid Manufacturer #{msi_info['Manufacturer']}" if(msi_info['Manufacturer'] != expected_manufacturer)
 end
 
-def test_install(name, msi_file, arg2, arg3=nil)
+def test_install(name, msi_file, arg2, callback=nil)
   msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
 
   test_msi(msi_file, arg2)
   
-  product_name = get_product_name(msi_file, arg2)
-  manufacturer = ''
-  manufacturer = arg2[:manufacturer] if(arg2.kind_of?(Hash) && arg2.has_key?(:manufacturer))
+  msi_info = WindowsInstaller.msi_records(msi_file)
+
+  product_name = msi_info['ProductName']
 	
   if(admin?)
-    begin
-	  while(WindowsInstaller.installed?(product_name))
-	    execute("msiexec.exe /quiet /x #{msi_file}")
-	  end
-	  raise "#{name}: Unable to completely uninstall #{product_name}" if(WindowsInstaller.installed?(product_name))
-
+	while(WindowsInstaller.installed?(product_name))
+	  execute("msiexec.exe /quiet /x #{WindowsInstaller.product_code(product_name)}")
+	end
+    raise "#{name}: Uninstall #{product_name} before running tests" if(WindowsInstaller.installed?(product_name))
+    
+	begin
 	  execute("msiexec.exe /i #{msi_file}")
 	  #WindowsInstaller.dump_info(product_name)
 			
-	  relative_install_dir = product_name
-	  raise "#{name}: relative_install_dir should be set to the product name" if(relative_install_dir.length == 0)
+	  raise "#{name}: Product name #{product_name} is not installed" unless(WindowsInstaller.installed?(product_name))
 
-
-	  relative_install_dir = "#{manufacturer}/#{relative_install_dir}" if(manufacturer.length > 0)
-	  raise "#{name}: relative_install_dir is empty" if(relative_install_dir.length == 0)
-	  raise "#{name}: Product name #{msi_info['ProductName']} is not installed" unless(WindowsInstaller.installed?(msi_info['ProductName']))
-
-	  eval arg3
-		
-	  execute("msiexec.exe /quiet /x #{msi_file}")
+	  eval callback unless(callback == nil)
 	ensure
-	  exectute("msiexec.exe /quiet /x #{msi_file}") if(WindowsInstaller.installed?(product_name))
+	  execute("msiexec.exe /quiet /x #{msi_file}") if(WindowsInstaller.installed?(product_name))
+	  raise "Failed to uninstall product #{product_name}" if(WindowsInstaller.installed?(product_name))
 	end
   end
 end

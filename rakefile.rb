@@ -5,8 +5,7 @@ CLEAN.include('test')
 DEV[:files][:source].include('test_files/**/*')
 DEV[:svn_exports]['OpenSource/WixToolset/3.8'] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.8'
 
-WIX_PATH = ENV['WIX']
-WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8" if(ENV['WIX'].nil?)
+WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8"
 
 Text.replace_text_in_glob 'spec/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
 

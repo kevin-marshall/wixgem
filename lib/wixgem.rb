@@ -9,7 +9,6 @@ class Wix
   end
   
   def self.install_path
-    @install_path = ENV['WIX'] if(@install_path.nil?)
 	return @install_path
   end
 

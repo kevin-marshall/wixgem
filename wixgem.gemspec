@@ -33,6 +33,6 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'bundler', '~> 0.1.0', '>= 1.5.1'
 	s.add_development_dependency 'rake', '~> 0.1.0', '>= 0.9.6'
 	s.add_development_dependency 'rspec', '~> 0.1.0', '>= 3.1.3'
-	s.add_development_dependency 'dev', '~> 0.1.0', '>= 1.0.214'
+	s.add_development_dependency 'dev_tasks'
     s.add_development_dependency 'systemu', '~> 0.1.0', '>= 2.5.2'
 end

@@ -44,38 +44,38 @@ def test_install(name, msi_file, arg2)
   test_msi(msi_file, arg2)
   
   product_name = get_product_name(msi_file, arg2)
+  manufacturer = ''
+  manufacturer = arg2[:manufacturer] if(arg2.kind_of?(Hash) && arg2.has_key?(:manufacturer))
 	
-	if(admin?)
-		begin
-			while(WindowsInstaller.installed?(product_name))
-			  execute("msiexec.exe /quiet /x #{msi_file}")
-			end
-			raise "#{name}: Unable to completely uninstall #{product_name}" if(WindowsInstaller.installed?(product_name))
+  if(admin?)
+    begin
+	  while(WindowsInstaller.installed?(product_name))
+	    execute("msiexec.exe /quiet /x #{msi_file}")
+	  end
+	  raise "#{name}: Unable to completely uninstall #{product_name}" if(WindowsInstaller.installed?(product_name))
 
-			execute("msiexec.exe /i #{msi_file}")
-			#WindowsInstaller.dump_info(product_name)
+	  execute("msiexec.exe /i #{msi_file}")
+	  #WindowsInstaller.dump_info(product_name)
 			
-			relative_install_dir = product_name
-			raise "#{name}: relative_install_dir should be set to the product name" if(relative_install_dir.length == 0)
+	  relative_install_dir = product_name
+	  raise "#{name}: relative_install_dir should be set to the product name" if(relative_install_dir.length == 0)
 
-			manufacturer = ''
-			manufacturer = arg2[:manufacturer] if(arg2.kind_of?(Hash) && arg2.has_key?(:manufacturer))
 
-			relative_install_dir = "#{manufacturer}/#{relative_install_dir}" if(manufacturer.length > 0)
-			raise "#{name}: relative_install_dir is empty" if(relative_install_dir.length == 0)
-			raise "#{name}: Product name #{msi_info['ProductName']} is not installed" unless(WindowsInstaller.installed?(msi_info['ProductName']))
+	  relative_install_dir = "#{manufacturer}/#{relative_install_dir}" if(manufacturer.length > 0)
+	  raise "#{name}: relative_install_dir is empty" if(relative_install_dir.length == 0)
+	  raise "#{name}: Product name #{msi_info['ProductName']} is not installed" unless(WindowsInstaller.installed?(msi_info['ProductName']))
 
-			files = arg2
-			files = arg2[:files] if(arg2.kind_of?(Hash))
+	  files = arg2
+	  files = arg2[:files] if(arg2.kind_of?(Hash))
 
-			files.each { |file| 
-			  full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
-			  raise "#{name}: #{full_path} not installed." unless(File.exists?(full_path))
-			}
+	  files.each { |file| 
+	    full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
+		raise "#{name}: #{full_path} not installed." unless(File.exists?(full_path))
+	  }
 		
-			execute("msiexec.exe /quiet /x #{msi_file}")
-		ensure
-			exectute("msiexec.exe /quiet /x #{msi_file}") if(WindowsInstaller.installed?(product_name))
-		end
+	  execute("msiexec.exe /quiet /x #{msi_file}")
+	ensure
+	  exectute("msiexec.exe /quiet /x #{msi_file}") if(WindowsInstaller.installed?(product_name))
 	end
+  end
 end

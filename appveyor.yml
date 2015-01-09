@@ -1,13 +1,7 @@
 version: "{build}"
 
 install:
-  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
-  - ruby --version
-  - gem --version
-  - gem install bundler --quiet --no-ri --no-rdoc
-  - bundler --version
-  - bundle install
-build: off
+  - gem install dev_tasks --quiet --no-ri --no-rdocbuild: off
 test_script:
   - bundle exec rake spec
   - rspec

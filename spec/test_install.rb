@@ -2,9 +2,11 @@ require './WindowsInstaller.rb'
 #require 'systemu'
 
 def execute(cmd)
-  status, stdout, stderr = systemu(cmd)
-  puts "" unless(status == 0)
-  raise "Failed: #{cmd} Status: #{status}\nStdout: #{stdout}\nStderr: #{stderr}" unless(status == 0)
+  #status, stdout, stderr = systemu(cmd)
+  command = Command.new(cmd)
+  command.execute
+  puts "" unless(command[:exit_code] == 0)
+  raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
 end
 
 def admin?

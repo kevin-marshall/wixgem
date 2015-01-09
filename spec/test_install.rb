@@ -33,14 +33,18 @@ def test_msi(msi_file, arg2)
     expected = arg2[:product_code].upcase
 	raise "ProductCode is #{msi_info['ProductCode']} expected #{expected}" unless(expected == msi_info['ProductCode'])
   end
-	
+
+  if(arg2.kind_of?(Hash) && arg2.has_key?(:upgrade_code))
+    expected = arg2[:upgrade_code].upcase
+	raise "UpgradeCode is #{msi_info['UpgradeCode']} expected #{expected}" unless(expected == msi_info['UpgradeCode'])
+  end
+  
   expected_product_version = '1.0.0.0'
   expected_product_version = arg2[:version] if(arg2.kind_of?(Hash) && arg2.has_key?(:version))
   raise "Invalid product version #{msi_info['ProductVersion']}" if(msi_info['ProductVersion'] != expected_product_version)
 
   expected_manufacturer = 'Not Set'
   expected_manufacturer = arg2[:manufacturer] if(arg2.kind_of?(Hash) && arg2.has_key?(:manufacturer))
-  puts "#{expected_manufacturer} = #{msi_info['Manufacturer']} = #{msi_info['Manufacturer'] != expected_manufacturer}"
   raise "Invalid Manufacturer #{msi_info['Manufacturer']}" if(msi_info['Manufacturer'] != expected_manufacturer)
 end
 

@@ -8,9 +8,10 @@ describe 'Installation' do
     test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
 	test2: ['test/wixgem_install_test2.msi', {manufacturer: 'musco', files: ['Gemfile']}], 
 	test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
-	test4: ['test/wixgem_install_test5.msi', {version: '1.1.2.3', files: ['Gemfile']}],
-	test5: ['test/wixgem_install_test6.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
-	test6: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}]
+	test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
+	test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
+	test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
+	test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}]
   }
 
   test_arguments.each { |key, value| 

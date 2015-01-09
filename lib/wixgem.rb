@@ -85,6 +85,9 @@ class Wix
 
 	product_code = ''
 	product_code = input[:product_code] if(input.kind_of?(Hash) && input.has_key?(:product_code))
+
+	upgrade_code = ''
+	upgrade_code = input[:upgrade_code] if(input.kind_of?(Hash) && input.has_key?(:upgrade_code))
 	
 	wxs_text = File.read(wxs_file)
 
@@ -96,6 +99,7 @@ class Wix
 
 	wxs_text = wxs_text.gsub(/Version=\"1.0.0.0\"/) { |s| s = "Version=\"#{product_version}\"" } unless(product_version.empty?)
 	wxs_text = wxs_text.gsub(/Product Id=\"[^\"]+\"/) { |s| s = "Product Id=\"#{product_code}\"" } unless(product_code.empty?)
+	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 
 	install_path = '[ProgramFilesFolder][ProductName]'
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')

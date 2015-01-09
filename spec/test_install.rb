@@ -2,7 +2,6 @@ require './WindowsInstaller.rb'
 require 'dev_tasks'
 
 def execute(cmd)
-  #status, stdout, stderr = systemu(cmd)
   command = Command.new(cmd)
   command.execute
   puts "" unless(command[:exit_code] == 0)

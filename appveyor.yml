@@ -1,7 +1,9 @@
 version: "{build}"
 
 install:
-  - gem install dev_tasks --quiet --no-ri --no-rdocbuild: off
+  - gem install dev_tasks --quiet --no-ri --no-rdoc
+
+build: off
 test_script:
   - bundle exec rake spec
   - rspec

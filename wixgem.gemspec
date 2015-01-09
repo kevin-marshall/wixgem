@@ -13,12 +13,9 @@
 #   limitations under the License.
 #
 #
-require 'semver'
-v = SemVer.find
-
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= "#{v.major}.#{v.minor}.#{v.patch}"
+	s.version		= "0.0.13"
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.\n\nNote: This gem currently does not handle registration of COM objects or registry entries.'
 	s.authors		= ["Kevin Marshall"]
@@ -29,7 +26,6 @@ Gem::Specification.new do |s|
 	s.files         = Dir["LICENSE","README.md","lib/**/*"]
 	s.license       = 'Apache 2.0'
 	s.require_path  = 'lib'
-    s.add_development_dependency 'semver', '~> 0.1.0', '>= 1.0.1'
     s.add_development_dependency 'bundler', '~> 0.1.0', '>= 1.5.1'
 	s.add_development_dependency 'rake', '~> 0.1.0', '>= 0.9.6'
 	s.add_development_dependency 'rspec', '~> 0.1.0', '>= 3.1.3'

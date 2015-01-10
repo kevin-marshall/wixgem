@@ -3,15 +3,20 @@ require 'SecureRandom'
 require 'tmpdir.rb'
 
 class Wix
-  def self.install_path=(value)
-    raise "WIX path '#{value}' does not exist" unless(Dir.exists?(value))
-	@install_path = value
+  def self.install_path=(path)
+    @install_path = path
+  end
+  def self.install_path
+    return @install_path
   end
   
-  def self.install_path
-	return @install_path
+  def self.debug=(bool)
+    @debug = bool
   end
-
+  def self.debug
+    return @debug
+  end
+  
   def self.make_mergemodule(output, input)
     gem_dir = File.dirname(__FILE__)
     apply_wix_template(output, input, "#{gem_dir}/templates/mergemodule.wxs")
@@ -22,7 +27,37 @@ class Wix
     apply_wix_template(output, input, "#{gem_dir}/templates/Install.wxs")
   end
   
-  private      
+  private   
+  def self.manage_upgrade(wxs_text, input)
+ 	if(input.kind_of?(Hash) && 
+	   input.has_key?(:remove_existing_products) && 
+	   input[:remove_existing_products])
+
+	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
+	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
+	   
+	  upgrade = "
+        <Upgrade Id=\"#{input[:upgrade_code]}\">
+          <UpgradeVersion Minimum=\"#{input[:version]}\"
+                      OnlyDetect='yes'
+                      Property='NEWPRODUCTFOUND' />
+          <UpgradeVersion Minimum='1.0.0'
+                      IncludeMinimum='yes'
+                      Maximum=\"#{input[:version]}\"
+                      IncludeMaximum='no'
+                      Property='UPGRADEFOUND' />
+        </Upgrade>
+		<CustomAction"	  
+	  wxs_text = wxs_text.gsub(/<CustomAction/, upgrade)
+
+	  remove_existing_products = "	<RemoveExistingProducts After='InstallValidate' />
+		</InstallExecuteSequence>"
+	  wxs_text = wxs_text.gsub(/<\/InstallExecuteSequence>/, remove_existing_products)
+	end
+	
+	return wxs_text
+  end  
+  
   def self.manage_msm_files(wxs_text)
 	indent_merge = '			'
 	indent_directory = '		'
@@ -47,7 +82,7 @@ class Wix
 	directory_element = "<Directory Id='TARGETDIR' Name='SourceDir'>\n#{merge_ids}#{indent_directory}</Directory>"
 	wxs_text = wxs_text.gsub('<Directory Id="TARGETDIR" Name="SourceDir" />', directory_element)
 	
-	wxs_text = wxs_text.gsub(/\s+<\/Feature>/, "\n#{merge_refs}</Feature>")
+	wxs_text = wxs_text.gsub(/\s+<\/Feature>/, "\n#{merge_refs}        </Feature>")
 
 	return wxs_text
   end
@@ -71,11 +106,14 @@ class Wix
   end
 
   def self.create_wxs_file(wxs_file, input, ext)
+	@debug = input[:debug] if(input.kind_of?(Hash) && input.has_key?(:debug))
+
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
 	
 	stdout = %x[\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\"]
 	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
+	
 	
 	product_name = File.basename(wxs_file, '.wxs')
     product_name = input[:product_name] if(input.kind_of?(Hash) && input.has_key?(:product_name))
@@ -122,6 +160,7 @@ class Wix
 	</Product>"	
 	wxs_text = wxs_text.gsub(/<\/Product>/) { |s| s = custom_action }
 
+	wxs_text = manage_upgrade(wxs_text,input)
 	wxs_text = manage_msm_files(wxs_text)
 		
 	File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
@@ -146,9 +185,7 @@ class Wix
  
 	output_absolute_path = File.absolute_path(output)
 
-    dir = 'tmp_dir'
-	FileUtils.rm_rf(dir) if(Dir.exists?(dir))
-	#Dir.mktmpdir do |dir|
+	Dir.mktmpdir do |dir|
 	  copy_install_files(dir, input)
 	  
 	  wxs_file = "#{basename}.wxs"	    
@@ -156,7 +193,8 @@ class Wix
 		create_wxs_file(wxs_file, input, ext)
 		create_output(wxs_file, output_absolute_path)
 	  end
-    #end
+	  FileUtils.cp(wxs_file, output_absolute_path.gsub(ext,'.wxs')) if(@debug)
+    end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
   end

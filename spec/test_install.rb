@@ -2,14 +2,7 @@ require './WindowsInstaller.rb'
 require './admin.rb'
 require './spec/execute.rb'
 
-def execute(cmd)
-  command = Command.new(cmd)
-  command.execute
-  
-  raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
-end
-
-def product_name(msi_file, arg2)
+def get_product_name(msi_file, arg2)
   product_name = File.basename(msi_file, File.extname(msi_file))
   product_name = arg2[:product_name] if(arg2.kind_of?(Hash) && arg2.has_key?(:product_name))
   
@@ -17,7 +10,7 @@ def product_name(msi_file, arg2)
 end
 
 def test_msi(msi_file, arg2)
-  product_name = product_name(msi_file, arg2)
+  product_name = get_product_name(msi_file, arg2)
 	
   msi_info = WindowsInstaller.msi_records(msi_file)
   #puts msi_info.to_s

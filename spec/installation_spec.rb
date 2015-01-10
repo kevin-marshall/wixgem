@@ -6,6 +6,7 @@ require './spec/test_files_exist.rb'
 require 'json'
 
 describe 'Wixgem' do
+  #Wix.debug = true
   describe 'Installation' do
     test_arguments = {
       test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],

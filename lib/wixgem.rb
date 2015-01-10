@@ -3,6 +3,10 @@ require 'SecureRandom'
 require 'tmpdir.rb'
 
 class Wix
+  def self.initialize
+    @install_path = ''
+	@debug = false
+  end
   def self.install_path=(path)
     @install_path = path
   end
@@ -106,7 +110,7 @@ class Wix
   end
 
   def self.create_wxs_file(wxs_file, input, ext)
-	@debug = input[:debug] if(input.kind_of?(Hash) && input.has_key?(:debug))
+	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
 
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
@@ -190,9 +194,9 @@ class Wix
 	  wxs_file = "#{basename}.wxs"	    
 	  Dir.chdir(dir) do |current_dir|
 		create_wxs_file(wxs_file, input, ext)
-		create_output(wxs_file, output_absolute_path)
+	    create_output(wxs_file, output_absolute_path)
 	  end
-	  FileUtils.cp(wxs_file, output_absolute_path.gsub(ext,'.wxs')) if(@debug)
+	  FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(@debug)
     end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))

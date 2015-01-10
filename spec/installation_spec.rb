@@ -15,7 +15,7 @@ describe 'Wixgem' do
 	  test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
 	  test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	  test8: ['test/wixgem_install_test8.msi', {modify_install_path: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")}]
+	  test8: ['test/wixgem_install_test8.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")}]
     }
 
     test_arguments.each { |key, value| 

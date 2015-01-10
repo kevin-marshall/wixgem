@@ -3,14 +3,12 @@ def files(data)
   if(data.kind_of?(Hash))
     files = data[:files] 
   
-    if(data.has_key?(:modify_install_path))
-      modify_paths = data[:modify_install_path]
+    if(data.has_key?(:modify_file_paths))
+      modify_paths = data[:modify_file_paths]
       files.each_index do |index|
-	    puts "OldPath: #{files[index]}"
 	    file_path = files[index]
 	    modify_paths.each { |regex, replacement_string| file_path = file_path.gsub(regex, replacement_string) }
 	    files[index] = file_path
-	    puts "NewPath: #{files[index]}"
 	  end
     end
   end

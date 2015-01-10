@@ -9,6 +9,22 @@ wixgem can be installed by the single command
 ## Usage
 The wix toolset must be installed.
 
+## Simple usage
+
+``
+  require 'wixgem'
+	
+  WIX_TOOLSET_ROOT='path to root of Wix toolset'
+  Wix.install_path = WIX_TOOLSET_ROOT
+
+  # Installation example  
+  Wix.make_installation('wixgem_install_test1.msi', ['rakefile.rb']])
+  
+  # Mergemodule example
+  Wix.make_mergemodule('wixgem_install_test1.msi', ['rakefile.rb']])
+```
+  
+  
 In a rakefile define an installation task:
 
 ```

@@ -94,8 +94,8 @@ class Wix
 	files.each do |file| 
 	  if(File.file?(file))
    	    install_path = file
-        if(input.kind_of?(Hash) && input.has_key?(:modify_install_path))
-          input[:modify_install_path].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
+        if(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
+          input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
         end
 
    	    install_path = "#{directory}/#{install_path}"
@@ -113,8 +113,7 @@ class Wix
 	
 	stdout = %x[\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\"]
 	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
-	
-	
+		
 	product_name = File.basename(wxs_file, '.wxs')
     product_name = input[:product_name] if(input.kind_of?(Hash) && input.has_key?(:product_name))
 	

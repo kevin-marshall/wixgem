@@ -33,10 +33,9 @@ class Wix
   end
   
   private   
-  def self.manage_upgrade(wxs_text, input)
-    xml_doc = REXML::Document.new(wxs_text)
+  def self.manage_upgrade(xml_doc, input)
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return wxs_text if(product.length == 0)
+	return xml_doc if(product.length == 0)
 
     manufacturer = 'Not Set'
     manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
@@ -57,12 +56,10 @@ class Wix
 	  install_and_execute[0].add_element 'RemoveExistingProducts', { 'After'=>'InstallValidate' }
 	end
 	
-	return xml_doc.to_s
+	return xml_doc
   end  
 
-  def self.manage_custom_actions(wxs_text, input)
-    xml_doc = REXML::Document.new(wxs_text)
-	
+  def self.manage_custom_actions(xml_doc, input)
     manufacturer = 'Not Set'
     manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
 	
@@ -70,19 +67,17 @@ class Wix
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
 
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return wxs_text if(product.length == 0)
+	return xml_doc if(product.length == 0)
 	
 	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{install_path}", 'Return' => 'check'}
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
 	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
 
-	return xml_doc.to_s
+	return xml_doc
   end
   
-  def self.manage_msm_files(wxs_text)
-    xml_doc = REXML::Document.new(wxs_text)
-	
+  def self.manage_msm_files(xml_doc)	
 	merge_modules = {}
 	component_group = REXML::XPath.match(xml_doc, '//Wix/Fragment/ComponentGroup')
 	component_group.each { |component_group|
@@ -104,7 +99,7 @@ class Wix
 	  component_group[0].delete_element(component)
     }
 	
-	return xml_doc.to_s
+	return xml_doc
   end
   
   def self.copy_install_files(directory, input)
@@ -161,11 +156,17 @@ class Wix
 	wxs_text = wxs_text.gsub(/Product Id=\"[^\"]+\"/) { |s| s = "Product Id=\"#{product_code}\"" } unless(product_code.empty?)
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 	
-	wxs_text = manage_custom_actions(wxs_text, input)
-	wxs_text = manage_upgrade(wxs_text,input)
-	wxs_text = manage_msm_files(wxs_text)
+	xml_doc = REXML::Document.new(wxs_text)
+	xml_doc = manage_custom_actions(xml_doc, input)
+	xml_doc = manage_upgrade(xml_doc,input)
+	xml_doc = manage_msm_files(xml_doc)
 	
-	File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
+	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	
+    #formatter = REXML::Formatters::Pretty.new(2)
+    #formatter.compact = true # This is the magic line that does what you need!
+	#wxs_text = ''
+	#formatter.write(xml, wxs_text)
+	#File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
   end
 
   def self.create_output(wxs_file, output)

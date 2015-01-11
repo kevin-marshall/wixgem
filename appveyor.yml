@@ -6,7 +6,6 @@ install:
   
 build: off
 test_script:
-  - svn info
   - rake
 
 branches:

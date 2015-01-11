@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'SecureRandom'
 require 'tmpdir.rb'
+require 'rexml/document'
 
 class Wix
   def self.initialize
@@ -74,6 +75,7 @@ class Wix
 	id = 1
 	file = 2
 	wxs_text.scan(/(?<component><Component Id=\"(?<id>[^\"]+)\".+Source=\"(?<file>.+\.msm)\".+Component>)/m) { |match|
+	  puts "here"
 	  merge_id = match[id].gsub('cmp','merge')
 	  merge_ids = "#{merge_ids}#{indent_merge}<Merge Id='#{merge_id}' Language='1033' SourceFile='#{match[file]}' DiskId='1' />\n"
 	  merge_refs = "#{indent_merge}#{merge_refs}<MergeRef Id='#{merge_id}' />\n#{indent_merge}"
@@ -90,7 +92,37 @@ class Wix
 
 	return wxs_text
   end
- 
+
+  def self.manage_msm_files1(wxs_text)
+    #xml_data = File.read(wxs_file)
+    xml_doc = REXML::Document.new(wxs_text)
+	
+	merge_modules = {}
+	component_group = REXML::XPath.match(xml_doc, '//Wix/Fragment/ComponentGroup')
+	component_group.each { |component_group|
+	  component_group.each_element('Component') { |component|
+	    component.each_element('File') { |file|
+		  merge_modules[component] = file if(File.extname(file.attributes['Source']) == '.msm')
+		}
+	  }
+	}
+	
+	directory_root = REXML::XPath.match(xml_doc, '//Wix/Product/Directory')
+	default_feature = REXML::XPath.match(xml_doc, '//Wix/Product/Feature')
+
+	merge_modules.each { |component,file|	
+	  id = component.attributes['Id'].gsub('cmp','merge')
+	  directory_root[0].add_element 'Merge', { 'Id' => id, 'SourceFile' => file.attributes['Source'], 'Language' => '1033', 'DiskId' => '1'}
+	  default_feature[0].add_element 'MergeRef', { 'Id' => id }
+	  
+	  component_group[0].delete_element(component)
+    }
+	
+	File.open("C:/tmp/kevin.xml", 'w') { |f| f.puts(xml_doc.to_s) }	
+	return xml_doc.to_s
+	return wxs_text
+  end
+  
   def self.copy_install_files(directory, input)
     files = input
 	files = input[:files] if(input.kind_of?(Hash))
@@ -110,7 +142,7 @@ class Wix
   end
 
   def self.create_wxs_file(wxs_file, input, ext)
-	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
+  	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
 
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
@@ -164,7 +196,7 @@ class Wix
 	wxs_text = wxs_text.gsub(/<\/Product>/) { |s| s = custom_action }
 
 	wxs_text = manage_upgrade(wxs_text,input)
-	wxs_text = manage_msm_files(wxs_text)
+	wxs_text = manage_msm_files1(wxs_text)
 		
 	File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
   end

@@ -6,7 +6,7 @@ install:
   
 build: off
 test_script:
-  - set PATH = %PATH%;C:\Program Files (x86)\Subversion\bin
+  - set Path = %Path%;C:\Program Files (x86)\Subversion\bin
   - set
   - svn help
   - rake

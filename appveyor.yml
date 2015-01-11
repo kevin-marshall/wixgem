@@ -1,6 +1,7 @@
 version: "{build}"
 
 install:
+  - choco install svn
   - gem install dev_tasks --version 1.0.28 --quiet --no-ri --no-rdoc
   
 build: off

@@ -212,14 +212,16 @@ class Wix
 	  
 	  wxs_file = "#{basename}.wxs"	    
 	  Dir.chdir(dir) do |current_dir|
-		create_wxs_file(wxs_file, input, ext)
-	    create_output(wxs_file, output_absolute_path)
-
-	    if(@debug)
-	      FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") 
-		  wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds"
-		  FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}")
-	    end
+	    begin
+		  create_wxs_file(wxs_file, input, ext)
+	      create_output(wxs_file, output_absolute_path)
+		ensure
+	      if(@debug)
+	        FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") 
+		    wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds"
+		    FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}")
+	      end
+		end
 	  end
     end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')

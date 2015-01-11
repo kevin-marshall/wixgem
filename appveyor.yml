@@ -6,7 +6,8 @@ install:
   
 build: off
 test_script:
-  - rake --trace
+  - svn help
+  - rake
 
 branches:
   only:

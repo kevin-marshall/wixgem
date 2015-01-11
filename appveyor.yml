@@ -7,8 +7,6 @@ build: off
 test_script:
   - svn info
   - rake
-  - bundle exec rake spec
-  - rspec
 
 branches:
   only:

@@ -38,6 +38,9 @@ class Wix
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return wxs_text if(product.length == 0)
 
+    manufacturer = 'Not Set'
+    manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
+	
  	if(input.kind_of?(Hash) && 
 	   input.has_key?(:remove_existing_products) && 
 	   input[:remove_existing_products])
@@ -57,8 +60,11 @@ class Wix
 	return xml_doc.to_s
   end  
 
-  def self.manage_custom_actions(wxs_text, manufacturer)
+  def self.manage_custom_actions(wxs_text, input)
     xml_doc = REXML::Document.new(wxs_text)
+	
+    manufacturer = 'Not Set'
+    manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
 	
 	install_path = '[ProgramFilesFolder][ProductName]'
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
@@ -155,7 +161,7 @@ class Wix
 	wxs_text = wxs_text.gsub(/Product Id=\"[^\"]+\"/) { |s| s = "Product Id=\"#{product_code}\"" } unless(product_code.empty?)
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 	
-	wxs_text = manage_custom_actions(wxs_text, manufacturer)
+	wxs_text = manage_custom_actions(wxs_text, input)
 	wxs_text = manage_upgrade(wxs_text,input)
 	wxs_text = manage_msm_files(wxs_text)
 	

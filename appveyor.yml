@@ -4,9 +4,10 @@ install:
   - choco install svn
   - gem install dev_tasks --version 1.0.28 --quiet --no-ri --no-rdoc
   
+environment:
+  Path: %Path%;C:\Program Files (x86)\Subversion\bin
 build: off
 test_script:
-  - set Path = %Path%;C:\Program Files (x86)\Subversion\bin
   - set
   - svn help
   - rake

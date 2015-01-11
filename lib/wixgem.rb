@@ -34,67 +34,47 @@ class Wix
   
   private   
   def self.manage_upgrade(wxs_text, input)
+    xml_doc = REXML::Document.new(wxs_text)
+	product = REXML::XPath.match(xml_doc, '//Wix/Product')
+	return wxs_text if(product.length == 0)
+
  	if(input.kind_of?(Hash) && 
 	   input.has_key?(:remove_existing_products) && 
 	   input[:remove_existing_products])
 
 	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
 	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
-	   
-	  upgrade = "
-        <Upgrade Id=\"#{input[:upgrade_code]}\">
-          <UpgradeVersion Minimum=\"#{input[:version]}\"
-                      OnlyDetect='yes'
-                      Property='NEWPRODUCTFOUND' />
-          <UpgradeVersion Minimum='1.0.0'
-                      IncludeMinimum='yes'
-                      Maximum=\"#{input[:version]}\"
-                      IncludeMaximum='no'
-                      Property='UPGRADEFOUND' />
-        </Upgrade>
-		<CustomAction"	  
-	  wxs_text = wxs_text.gsub(/<CustomAction/, upgrade)
 
-	  remove_existing_products = "	<RemoveExistingProducts After='InstallValidate' />
-		</InstallExecuteSequence>"
-	  wxs_text = wxs_text.gsub(/<\/InstallExecuteSequence>/, remove_existing_products)
+	
+	  upgrade = product[0].add_element 'Upgrade', { 'Id' => input[:upgrade_code] }
+	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWPRODUCTFOUND' }
+	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '1.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'UPGRADEFOUND' }
+
+	  install_and_execute = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
+	  install_and_execute[0].add_element 'RemoveExistingProducts', { 'After'=>'InstallValidate' }
 	end
 	
-	return wxs_text
+	return xml_doc.to_s
   end  
+
+  def self.manage_custom_actions(wxs_text, manufacturer)
+    xml_doc = REXML::Document.new(wxs_text)
+	
+	install_path = '[ProgramFilesFolder][ProductName]'
+	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
+
+	product = REXML::XPath.match(xml_doc, '//Wix/Product')
+	return wxs_text if(product.length == 0)
+	
+	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{install_path}", 'Return' => 'check'}
+
+	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
+	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
+
+	return xml_doc.to_s
+  end
   
   def self.manage_msm_files(wxs_text)
-	indent_merge = '			'
-	indent_directory = '		'
-	
-	merge_ids = ''
-	merge_refs = ''
-	remove_components = []
-	
-	component = 0
-	id = 1
-	file = 2
-	wxs_text.scan(/(?<component><Component Id=\"(?<id>[^\"]+)\".+Source=\"(?<file>.+\.msm)\".+Component>)/m) { |match|
-	  puts "here"
-	  merge_id = match[id].gsub('cmp','merge')
-	  merge_ids = "#{merge_ids}#{indent_merge}<Merge Id='#{merge_id}' Language='1033' SourceFile='#{match[file]}' DiskId='1' />\n"
-	  merge_refs = "#{indent_merge}#{merge_refs}<MergeRef Id='#{merge_id}' />\n#{indent_merge}"
-
-	  remove_components.insert(remove_components.length, match[component])
-	}
-	
-	remove_components.each { |cmp| wxs_text = wxs_text.gsub(cmp, '') }
-	
-	directory_element = "<Directory Id='TARGETDIR' Name='SourceDir'>\n#{merge_ids}#{indent_directory}</Directory>"
-	wxs_text = wxs_text.gsub('<Directory Id="TARGETDIR" Name="SourceDir" />', directory_element)
-	
-	wxs_text = wxs_text.gsub(/\s+<\/Feature>/, "\n#{merge_refs}        </Feature>")
-
-	return wxs_text
-  end
-
-  def self.manage_msm_files1(wxs_text)
-    #xml_data = File.read(wxs_file)
     xml_doc = REXML::Document.new(wxs_text)
 	
 	merge_modules = {}
@@ -118,9 +98,7 @@ class Wix
 	  component_group[0].delete_element(component)
     }
 	
-	File.open("C:/tmp/kevin.xml", 'w') { |f| f.puts(xml_doc.to_s) }	
 	return xml_doc.to_s
-	return wxs_text
   end
   
   def self.copy_install_files(directory, input)
@@ -176,28 +154,11 @@ class Wix
 	wxs_text = wxs_text.gsub(/Version=\"1.0.0.0\"/) { |s| s = "Version=\"#{product_version}\"" } unless(product_version.empty?)
 	wxs_text = wxs_text.gsub(/Product Id=\"[^\"]+\"/) { |s| s = "Product Id=\"#{product_code}\"" } unless(product_code.empty?)
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
-
-	install_path = '[ProgramFilesFolder][ProductName]'
-	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
 	
-	custom_action = "
-        <CustomAction Id='SetTARGETDIR' Property='TARGETDIR' Value='#{install_path}' Execute='firstSequence' />
-
-		<InstallUISequence>
-			<!-- Set TARGETDIR if it wasn't set on the command line -->
-			<Custom Action='SetTARGETDIR' Before='CostFinalize'>TARGETDIR=\"\"</Custom>
-		</InstallUISequence>
-
-		<InstallExecuteSequence>
-			<!-- Set TARGETDIR if it wasn't set on the command line -->
-			<Custom Action='SetTARGETDIR' Before='CostFinalize'>TARGETDIR=\"\"</Custom>
-		</InstallExecuteSequence>
-	</Product>"	
-	wxs_text = wxs_text.gsub(/<\/Product>/) { |s| s = custom_action }
-
+	wxs_text = manage_custom_actions(wxs_text, manufacturer)
 	wxs_text = manage_upgrade(wxs_text,input)
-	wxs_text = manage_msm_files1(wxs_text)
-		
+	wxs_text = manage_msm_files(wxs_text)
+	
 	File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
   end
 

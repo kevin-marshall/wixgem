@@ -5,6 +5,7 @@ install:
   
 build: off
 test_script:
+  - rake
   - bundle exec rake spec
   - rspec
 
@@ -17,5 +18,5 @@ environment:
   DEV_ROOT: 'C:'
   matrix:
     - ruby_version: "193"
-    - ruby_version: "200"
-    - ruby_version: "200-x64"
+    - ruby_version: "220"
+    - ruby_version: "220-x64"

@@ -217,9 +217,9 @@ class Wix
 	      create_output(wxs_file, output_absolute_path)
 		ensure
 	      if(@debug)
-	        FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") 
+	        FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?(wxs_file))
 		    wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds"
-		    FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}")
+		    FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}") if(File.exists?(wix_cmds_file))
 	      end
 		end
 	  end

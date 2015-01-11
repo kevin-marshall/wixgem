@@ -38,14 +38,22 @@ describe 'Wixgem' do
   describe 'Packaging excptions' do 
     exception_test_arguments = {
       test1: ['test/wixgem_install_test1.msi', nil],
-      test1: ['test/wixgem_install_test1.msi', []],
-      test2: ['test/wixgem_install_test1.msi', ['does_not_exist.txt']]
+      test2: ['test/wixgem_install_test1.msi', []],
+      test3: ['test/wixgem_install_test1.msi', ['does_not_exist.txt']]
     }
   
     exception_test_arguments.each { |key, value|
-	  it "should raise an exception" do
+	  it "#{key} should raise an exception" do
 	    expect { Wix.make_installation(value[0], value[1]) }.to raise_error
 	  end
     }
+  end	
+  
+  describe 'includding vb6 files' do 
+	it "the wix's heat command should contain the -svb6 flag" do
+      Wix.make_installation('test/wixgem_install_vb6_files.msi', {manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
+	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.wix_cmds')
+	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
+	end
   end	
 end

@@ -46,7 +46,6 @@ class Wix
 
 	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
 	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
-
 	
 	  upgrade = product[0].add_element 'Upgrade', { 'Id' => input[:upgrade_code] }
 	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWPRODUCTFOUND' }
@@ -106,6 +105,9 @@ class Wix
     files = input
 	files = input[:files] if(input.kind_of?(Hash))
 	
+	raise 'No files were given to wixgem' if(files.length == 0)
+	
+	missing_files = []
 	files.each do |file| 
 	  if(File.file?(file))
    	    install_path = file
@@ -116,17 +118,27 @@ class Wix
    	    install_path = "#{directory}/#{install_path}"
 		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
 		FileUtils.cp(file, install_path)
+	  elsif(!File.exists?(file))
+	    missing_files.insert(missing_files.length, file)
 	  end
+	end
+	
+	if(missing_files.length > 0)
+	  missing_files_str = ''
+	  missing_files.each { |f| msg = "#{missing_files_str}, #{f}" }
+	  raise "Missing files: #{missing_files_str}" 
 	end
   end
 
   def self.create_wxs_file(wxs_file, input, ext)
-  	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
-
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
+
+	wix_cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
+	wix_cmd = wix_cmd.gsub(/-srd/, '-svb6 -srd') if(input.kind_of?(Hash) && input.has_key?(:has_vb6_files))
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'w') { |f| f.puts wix_cmd } if(@debug)
 	
-	stdout = %x[\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\"]
+	stdout = %x[#{wix_cmd}]
 	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
 		
 	product_name = File.basename(wxs_file, '.wxs')
@@ -170,18 +182,24 @@ class Wix
   end
 
   def self.create_output(wxs_file, output)
-    wixobj_file = "#{File.basename(wxs_file)}.wixobj"
+    wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	stdout = %x[\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"]
+	wix_cmd = "\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\""
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'a') { |f| f.puts wix_cmd } if(@debug)
+	stdout = %x[#{wix_cmd}]
 	raise "#{stdout}\nFailed to generate .wixobj file" unless(File.exists?(wixobj_file))
 
-    stdout = %x[\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"]
+	wix_cmd = "\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\""
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'a') { |f| f.puts wix_cmd } if(@debug)
+    stdout = %x[#{wix_cmd}]	
 	raise "#{stdout}\nFailed to generate #{output} file" unless(File.exists?(output))
   end
 
   def self.apply_wix_template(output, input, template)
     raise 'WIX path is not set!' if(install_path.nil?)
- 
+
+  	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
+	
 	ext = File.extname(output)
   	basename = File.basename(output, ext)
 	FileUtils.rm(output) if(File.exists?(output))
@@ -195,8 +213,13 @@ class Wix
 	  Dir.chdir(dir) do |current_dir|
 		create_wxs_file(wxs_file, input, ext)
 	    create_output(wxs_file, output_absolute_path)
+
+	    if(@debug)
+	      FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") 
+		  wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds"
+		  FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}")
+	    end
 	  end
-	  FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(@debug)
     end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))

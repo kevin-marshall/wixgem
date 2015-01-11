@@ -199,7 +199,7 @@ class Wix
     raise 'WIX path is not set!' if(install_path.nil?)
 
   	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
-	Fileutils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
+	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
 	
 	ext = File.extname(output)
   	basename = File.basename(output, ext)

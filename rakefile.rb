@@ -9,6 +9,7 @@ DEV[:svn_exports]['OpenSource/WixToolset/3.9'] = 'https://deps.googlecode.com/sv
 WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8"
 
 Text.replace_text_in_glob 'spec/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
+Text.replace_text_in_glob 'lib/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
 
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'

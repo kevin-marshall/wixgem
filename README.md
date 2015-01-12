@@ -21,6 +21,8 @@ Wix.make_installation('Product.msi', {product_name: 'productname',
                        version: '1.1.0.0'
                        upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}',
                        files: ['rakefile.rb'] }	
+					   
+Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")})					   
 ```
   
 #### Merge Module

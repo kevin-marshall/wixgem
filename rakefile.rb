@@ -1,12 +1,10 @@
-ENV['Path'] = "#{ENV['Path']};C:\Program Files (x86)\Subversion\bin" if(Dir.exists?('C:\Program Files (x86)\Subversion\bin'))
-
 require 'dev_tasks'
 require './admin.rb'
 
 CLEAN.include('test')
 
 DEV[:files][:source].include('test_files/**/*')
-DEV[:svn_exports]['OpenSource/WixToolset/3.8'] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.8'
+DEV[:svn_exports]['OpenSource/WixToolset/3.9'] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.9'
 
 WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8"
 

@@ -3,13 +3,13 @@ require './admin.rb'
 
 CLEAN.include('test')
 
+WIX_DEP_PATH='OpenSource/WixToolset/3.9'
 DEV[:files][:source].include('test_files/**/*')
-DEV[:svn_exports]['OpenSource/WixToolset/3.9'] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.9'
+DEV[:svn_exports][WIX_DEP_PATH] = 'https://deps.googlecode.com/svn/trunk/WixToolset/3.9'
 
-WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.8"
+WIX_PATH = "#{Environment.dev_root}/dep/#{WIX_DEP_PATH}"
 
-Text.replace_text_in_glob 'spec/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
-Text.replace_text_in_glob 'lib/*.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
+Text.replace_text_in_glob './spec/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
 
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'

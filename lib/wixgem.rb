@@ -125,7 +125,7 @@ class Wix
 
     if(@debug)	
 	  longest_path = files.max { |a, b| a.length <=> b.length }
-	  File.open('installation_files.txt', 'w') do |f| 
+	  File.open('./installation_files.txt', 'w') do |f| 
 	    f.printf("%-#{longest_path.length}s %s" % ['File path', 'Installation Path'])
 	    files.each do |file| 
 	      if(File.file?(file))
@@ -239,7 +239,9 @@ class Wix
 	      end
 		end
 	  end
-    end
+		    
+	  FileUtils.mv('installation_files.txt', "#{File.dirname(output_absolute_path)}/#{File.basename(wxs_file,'.wxs')}_paths.txt") if(File.exists?('installation_files.txt'))
+	end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
   end

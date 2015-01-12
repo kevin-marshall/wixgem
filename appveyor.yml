@@ -2,16 +2,19 @@ version: "{build}"
 
 install:
   - choco install svn
+  - ps: $env:PATH = "C:\Program Files (x86)\Subversion\bin;" + $env:PATH
   - gem install dev_tasks --version 1.0.28 --quiet --no-ri --no-rdoc
   
 build: off
 
 test_script:
+  - set
   - rake
 
 branches:
   only:
   - master
+  
 skip_tags: true
   
 environment:

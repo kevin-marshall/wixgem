@@ -122,6 +122,22 @@ class Wix
 	    missing_files.insert(missing_files.length, file)
 	  end
 	end
+
+    if(@debug)	
+	  longest_path = files.max { |a, b| a.length <=> b.length }
+	  File.open('installation_files.txt', 'w') do |f| 
+	    f.printf("%-#{longest_path.length}s %s" % ['File path', 'Installation Path'])
+	    files.each do |file| 
+	      if(File.file?(file))
+   	        install_path = file
+            if(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
+              input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
+            end
+	        f.printf("%-#{longest_path.length}s %s" % [file, install_path])
+          end
+		end
+	  end
+	end
 	
 	if(missing_files.length > 0)
 	  missing_files_str = ''

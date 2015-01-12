@@ -1,3 +1,5 @@
+ENV['Path'] = "#{ENV['Path']};C:\Program Files (x86)\Subversion\bin" if(Dir.exists?('C:\Program Files (x86)\Subversion\bin'))
+
 require 'dev_tasks'
 require './admin.rb'
 

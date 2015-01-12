@@ -8,7 +8,6 @@ install:
 build: off
 
 test_script:
-  - set
   - rake
 
 branches:

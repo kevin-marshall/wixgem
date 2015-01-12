@@ -1,68 +1,58 @@
-# wixgem
-Simple Ruby interface to facilitate creating and compiling simple windows installation files 
+# Wixgem
+Ruby gem to facilitate automate constructing Windows installation files 
 with the Wix Toolset.
 
 ## Installation
-wixgem can be installed by the single command
+Wixgem can be installed by the single command
  gem install wixgem
 
-## Usage
-The wix toolset must be installed.
+## Example Usage
+#### Dependencies
+The [WiX Toolset](http://wixtoolset.org) must be installed.
 
-## Simple usage
-
-``
-  require 'wixgem'
+#### Installation
+```ruby
+require 'wixgem'
 	
-  WIX_TOOLSET_ROOT='path to root of Wix toolset'
-  Wix.install_path = WIX_TOOLSET_ROOT
+WIX_TOOLSET_ROOT='path to root of Wix toolset'
+Wix.make_installation('Product.msi', ['rakefile.rb']])
 
-  # Installation example  
-  Wix.make_installation('wixgem_install_test1.msi', ['rakefile.rb']])
-  
-  # Mergemodule example
-  Wix.make_mergemodule('wixgem_install_test1.msi', ['rakefile.rb']])
+Wix.make_installation('Product.msi', {product_name: 'productname',
+                       version: '1.1.0.0'
+                       upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}',
+                       files: ['rakefile.rb'] }	
 ```
   
-  
-In a rakefile define an installation task:
-
-```
-  require 'wixgem'
+#### Merge Module
+```ruby
+require 'wixgem'
 	
-  WIX_TOOLSET_ROOT='path to root of Wix toolset'
-
-  task :create_installation_files do
-    FileUtils.mkpath('./install_files/directory')
-    sleep(1)
-    File.open('./install_files/file1.txt', 'w') { |f| f.write('Hello World') }
-    File.open('./install_files/directory/file2.txt', 'w') { |f| f.write('Hello World') }
-  end
-
-  desc "Generate an installation msi file"
-  task :installation => [:create_installation_files] do	  
-    Wix.install_path = WIX_TOOLSET_ROOT
-
-    installation_files = Dir.glob('./install_files/**/*')
-    Wix.make_installation("./example.msi",  
-      { 
-	    manufacturer: 'Company', version: "1.0.0", 
-	    product_code: '{69d12c6c-63be-43e4-92ff-e31ec3c86dc0}', 
-	    upgrade_code: '{a62c35a7-6a6d-4392-822b-f6aca7eef88b}', 
-	    files: installation_files
-	  } 
-	)
-  end
-
-  task :mergemodule => [:create_installation_files] do
-    installation_files = Dir.glob('./install_files/**/*')
-  
-    Wix.install_path = WIX_TOOLSET_ROOT
-    Wix.make_mergemodule('./example.msm', installation_files)
-  end
-
-  task :default => [:installation]
+WIX_TOOLSET_ROOT='path to root of Wix toolset'
+Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
 ```
+
+An example rakefile.rb is included in the example directory of the gem.
+
+## Documenation
+
+Wixgem will generate an installation or merge module from an array of files. The Wixgem also supports a 
+small set of optional arguments allowing the developer to customize the generated installation file. 
+
+#### Optional input hash arguments
+* **product_name**: String specifing the product name of the installation.
+* **manufacturer**: String specifing the manufacturer of the installation.
+* **version**:      String specifing the version of the installation. i.e. '1.1.0.0'
+* **product_code**: Is a string GUID used to uniquely identify each version of the installation. i.e.' {4528ae5a-c7fa-40a6-a70e-ac8135f1114c}'
+* **upgrade_code**: Is a string GUID used to identify all installed versions of the product. It is important to 
+                 properly address the upgrade code before shipping the first version of a product.
+* **files**:        A string array of file paths to be added to the installation.
+* **modify_file_paths**: A hash of regex objects to replacement string pairs. The regular expressions are applied to
+                      the file paths having the effect of changing the relative location of the files in the 
+					  installation.
+* **has_vb6_files**: Required if installation contains any ocx's or dll's compiled with Visual Basic 6.
+* **remove_existing_products**: A boolean value. If the value is true the installation will remove all existing 
+                             installations of the product before installing the product.
+                  
 
 ## License
 Copyright 2013-2014 Kevin Marshall
@@ -78,4 +68,3 @@ Copyright 2013-2014 Kevin Marshall
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-

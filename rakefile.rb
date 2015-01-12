@@ -15,3 +15,6 @@ puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 puts 'Running as non administrator will not be able to run the installer'
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 end
+
+# Yard command line for realtime feed back of Readme.md modifications
+# yard server --reload

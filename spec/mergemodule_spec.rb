@@ -10,10 +10,10 @@ Wix.debug=true
 describe 'Wixgem' do
   describe 'Merge Module' do    
     test_arguments = {
-      #test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
-	  #test2: ['test/wixgem_merge_test2.msm', {files: ['Gemfile']}],
-	  #test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
-	  #test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/**/*")]
+      test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
+	  test2: ['test/wixgem_merge_test2.msm', {files: ['Gemfile']}],
+	  test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
+	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/**/*")]
     }
   
     test_arguments.each { |key, value| 
@@ -34,6 +34,7 @@ describe 'Wixgem' do
 	  end
     }
   end  
+  
   if(admin?)
     describe 'Multiple merge Module' do 
       msi_file='test\\wixgem_multiple_merge_test1.msi'

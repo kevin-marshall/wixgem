@@ -22,14 +22,14 @@ class Wix
     return @debug
   end
   
-  def self.make_mergemodule(output, input)
+  def self.make_mergemodule(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output, input, "#{gem_dir}/templates/mergemodule.wxs")
+    apply_wix_template(output_file, input, "#{gem_dir}/templates/mergemodule.wxs")
   end
   
-  def self.make_installation(output, input)
+  def self.make_installation(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output, input, "#{gem_dir}/templates/Install.wxs")
+    apply_wix_template(output_file, input, "#{gem_dir}/templates/Install.wxs")
   end
   
   private   

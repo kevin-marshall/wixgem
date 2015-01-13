@@ -3,8 +3,7 @@ Ruby gem to facilitate automate constructing Windows installation files
 with the Wix Toolset.
 
 ## Installation
-Wixgem can be installed by the single command
- gem install wixgem
+Wixgem can be installed by the single command: *gem install wixgem*
 
 ## Example Usage
 #### Dependencies
@@ -31,8 +30,8 @@ require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
 Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
-```
 
+```
 An example rakefile.rb is included in the example directory of the gem.
 
 ## Documenation
@@ -49,8 +48,7 @@ small set of optional arguments allowing the developer to customize the generate
                  properly address the upgrade code before shipping the first version of a product.
 * **files**:        A string array of file paths to be added to the installation.
 * **modify_file_paths**: A hash of regex objects to replacement string pairs. The regular expressions are applied to
-                      the file paths having the effect of changing the relative location of the files in the 
-					  installation.
+                      the file paths allowing the developer to modify the relative location of the files in the installation.
 * **has_vb6_files**: Required if installation contains any ocx's or dll's compiled with Visual Basic 6.
 * **remove_existing_products**: A boolean value. If the value is true the installation will remove all existing 
                              installations of the product before installing the product.

@@ -10,7 +10,7 @@ DEV[:svn_exports]["OpenSource/WixToolset/#{WIX_VERSION}"] = "https://deps.google
 
 WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/#{WIX_VERSION}"
 
-#Text.replace_in_glob './spec/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
+Text.replace_text_in_glob './spec/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
 
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'

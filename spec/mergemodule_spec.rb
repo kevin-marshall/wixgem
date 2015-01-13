@@ -13,7 +13,8 @@ describe 'Wixgem' do
       test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
 	  test2: ['test/wixgem_merge_test2.msm', {files: ['Gemfile']}],
 	  test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
-	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/**/*")]
+	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/**/*")],
+	  test5: ['test/wixgem_merge_test5.msm', {debug: true, files: Dir.glob("test_files/**/*")}]
     }
   
     test_arguments.each { |key, value| 
@@ -31,6 +32,14 @@ describe 'Wixgem' do
     
 	  it "should install and uninstall: #{install_file}" do
 	    test_install(key, install_file, value[1]) 
+	  end
+	  
+	  if(key == 'test5')
+	    it "should produce the debug files" do
+	      expect(File.exists?("#{key}.wxs")).to be(true)
+	      expect(File.exists?("#{key}.wix_cmds.txt")).to be(true)
+	      expect(File.exists?("#{key}_paths.txt")).to be(true)
+		end
 	  end
     }
   end  

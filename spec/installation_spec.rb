@@ -49,10 +49,10 @@ describe 'Wixgem' do
     }
   end	
   
-  describe 'includding vb6 files' do 
+  describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
       Wix.make_installation('test/wixgem_install_vb6_files.msi', {manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
-	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.wix_cmds')
+	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.msi.wix_cmds.txt')
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end
   end	

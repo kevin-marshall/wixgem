@@ -34,14 +34,13 @@ describe 'Wixgem' do
 	    test_install(key, install_file, value[1]) 
 	  end
 	  
-	  if(key == 'test5')
-	    puts "HERE"
-	    it "should produce the debug files" do
-	      expect(File.exists?("#{key}.wxs")).to be(true)
-	      expect(File.exists?("#{key}.wix_cmds.txt")).to be(true)
-	      expect(File.exists?("#{key}_paths.txt")).to be(true)
+	  it "should produce the debug files" do
+	    if(key == :test5)
+	      expect(File.exists?("#{value[0]}.wxs")).to be(true)
+	      expect(File.exists?("#{value[0]}.wix_cmds.txt")).to be(true)
+	      expect(File.exists?("#{value[0]}_paths.txt")).to be(true)
 		end
-	  end
+     end
     }
   end  
   

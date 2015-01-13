@@ -153,7 +153,7 @@ class Wix
 
 	wix_cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
 	wix_cmd = wix_cmd.gsub(/-srd/, '-svb6 -srd') if(input.kind_of?(Hash) && input.has_key?(:has_vb6_files))
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'w') { |f| f.puts wix_cmd } if(@debug)
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'w') { |f| f.puts wix_cmd } if(@debug)
 	
 	stdout = %x[#{wix_cmd}]
 	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
@@ -202,12 +202,12 @@ class Wix
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
 	wix_cmd = "\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\""
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'a') { |f| f.puts wix_cmd } if(@debug)
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'a') { |f| f.puts wix_cmd } if(@debug)
 	stdout = %x[#{wix_cmd}]
 	raise "#{stdout}\nFailed to generate .wixobj file" unless(File.exists?(wixobj_file))
 
 	wix_cmd = "\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\""
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds", 'a') { |f| f.puts wix_cmd } if(@debug)
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'a') { |f| f.puts wix_cmd } if(@debug)
     stdout = %x[#{wix_cmd}]	
 	raise "#{stdout}\nFailed to generate #{output} file" unless(File.exists?(output))
   end
@@ -234,14 +234,14 @@ class Wix
 	      create_output(wxs_file, output_absolute_path)
 		ensure
 	      if(@debug)
-	        FileUtils.cp("#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?(wxs_file))
-		    wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds"
-		    FileUtils.cp(wix_cmds_file, "#{File.dirname(output_absolute_path)}/#{wix_cmds_file}") if(File.exists?(wix_cmds_file))
+	        FileUtils.cp(wxs_file, "#{output_absolute_path}.wxs") if(File.exists?(wxs_file))
+		    wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt"
+		    FileUtils.cp(wix_cmds_file, "#{output_absolute_path}.wix_cmds.txt") if(File.exists?(wix_cmds_file))
 	      end
 		end
 	  end
 		    
-	  FileUtils.mv('installation_files.txt', "#{File.dirname(output_absolute_path)}/#{File.basename(wxs_file,'.wxs')}_paths.txt") if(File.exists?('installation_files.txt'))
+	  FileUtils.mv('installation_files.txt', "#{output_absolute_path}_paths.txt") if(File.exists?('installation_files.txt'))
 	end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))

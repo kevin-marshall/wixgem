@@ -35,6 +35,7 @@ describe 'Wixgem' do
 	  end
 	  
 	  if(key == 'test5')
+	    puts "HERE"
 	    it "should produce the debug files" do
 	      expect(File.exists?("#{key}.wxs")).to be(true)
 	      expect(File.exists?("#{key}.wix_cmds.txt")).to be(true)

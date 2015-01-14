@@ -3,12 +3,12 @@ require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
 require './spec/test_files_exist.rb'
-require 'json'
 
 describe 'Wixgem' do
   #Wix.debug = true
   describe 'Installation' do
     test_arguments = {
+      test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
       test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
 	  test2: ['test/wixgem_install_test2.msi', {manufacturer: 'musco', files: ['Gemfile']}], 
 	  test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
@@ -18,7 +18,7 @@ describe 'Wixgem' do
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
 	  test8: ['test/wixgem_install_test8.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")}]
     }
-
+	
     test_arguments.each { |key, value| 
 	  it "should create an installation file using: #{value[0]}" do
         Wix.make_installation(value[0], value[1])
@@ -49,6 +49,30 @@ describe 'Wixgem' do
     }
   end	
   
+  describe 'Installation of a COM object' do
+	it 'should not be able to instance a COM object' do
+		object = WIN32OLE.new('COMObject.ComClassExample')
+		expect(object.nil?).to eq(true)
+	end
+
+	installation_file = 'test/wixgem_install_com_test1.msi'
+	it "should create an installation file using: #{installation_file}" do
+      Wix.make_installation(installation_file, ['COMObject/bin/COMObject.dll'])
+	  expect(File.exists?(installation_file)).to be(true)	  
+	end
+    
+	WindowsInstaller.install(installation_file)
+
+	it 'should be able to instance a COM object' do
+		object = WIN32OLE.new('COMObject.ComClassExample')
+		expect(object.nil?).to eq(false)
+		puts "Text: #{object.GetText}"
+		expect(object.GetText).to eq('Hello World')
+	end
+	
+	WindowsInstaller.uninstall(installation_file)
+end
+  
   describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
       Wix.make_installation('test/wixgem_install_vb6_files.msi', {manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
@@ -56,4 +80,5 @@ describe 'Wixgem' do
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end
   end	
+
 end

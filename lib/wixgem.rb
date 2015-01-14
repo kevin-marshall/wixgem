@@ -159,9 +159,10 @@ class Wix
 
 	wix_cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
 	wix_cmd = wix_cmd.gsub(/-srd/, '-svb6 -srd') if(input.kind_of?(Hash) && input.has_key?(:has_vb6_files))
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'w') { |f| f.puts wix_cmd } if(@debug)
 	
 	stdout = %x[#{wix_cmd}]
+
+	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'w') { |f| f.puts wix_cmd } if(@debug)
 	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
 		
 	product_name = File.basename(wxs_file, '.wxs')

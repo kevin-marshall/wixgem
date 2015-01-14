@@ -1,4 +1,5 @@
 require 'win32ole'
+require 'dev_tasks'
 
 class WindowsInstaller
 	def self.installed?(product_name)
@@ -10,6 +11,14 @@ class WindowsInstaller
 	  return false
 	end
 
+	def self.install(msi)
+	  raise "#{msi} is already installed" if(WindowsInstaller.installed?(msi))
+	end
+
+	def self.uninstall(msi)
+	  execute("msiexec.exe /quiet /x #{msi}") if(File.exists?(msi))
+    end
+	
 	def self.product_code_installed?(product_code)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
 	  installer.Products.each { |prod_code| return true if (product_code == prod_code) }
@@ -120,4 +129,11 @@ class WindowsInstaller
 	  installer = nil
 	  puts ''
 	end	
+
+    def execute(cmd)
+      command = Command.new(cmd)
+      command.execute
+  
+      raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
+    end
 end

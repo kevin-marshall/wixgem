@@ -141,9 +141,9 @@ class Wix
 	end
 	
 	if(missing_files.length > 0)
-	  msg = ''
-	  missing_files.each { |f| msg = "#{missing_files_str}, #{f}" }
-	  raise "Missing files: #{msg}" 
+	  missing_files_str = ''
+	  missing_files.each { |f| missing_files_str = "#{missing_files_str}, #{f}" }
+	  raise "Wixgem missing files: #{missing_files_str}" 
 	end
   end
 

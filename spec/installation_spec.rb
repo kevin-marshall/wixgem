@@ -48,31 +48,7 @@ describe 'Wixgem' do
 	  end
     }
   end	
-  
-  describe 'Installation of a COM object' do
-	it 'should not be able to instance a COM object' do
-		object = WIN32OLE.new('COMObject.ComClassExample')
-		expect(object.nil?).to eq(true)
-	end
-
-	installation_file = 'test/wixgem_install_com_test1.msi'
-	it "should create an installation file using: #{installation_file}" do
-      Wix.make_installation(installation_file, ['COMObject/bin/COMObject.dll'])
-	  expect(File.exists?(installation_file)).to be(true)	  
-	end
     
-	WindowsInstaller.install(installation_file)
-
-	it 'should be able to instance a COM object' do
-		object = WIN32OLE.new('COMObject.ComClassExample')
-		expect(object.nil?).to eq(false)
-		puts "Text: #{object.GetText}"
-		expect(object.GetText).to eq('Hello World')
-	end
-	
-	WindowsInstaller.uninstall(installation_file)
-end
-  
   describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
       Wix.make_installation('test/wixgem_install_vb6_files.msi', {manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})

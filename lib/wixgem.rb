@@ -58,6 +58,24 @@ class Wix
 	return xml_doc
   end  
 
+  def self.manage_com_files(xml_doc)
+	component_groups = REXML::XPath.match(xml_doc, '//Wix/Fragment/ComponentGroup')
+	return xml_doc if(component_groups.nil?)
+
+	com_dlls = {}
+	component_groups.each do |component_group|
+ 	  component_group.each_element do |component|
+	    classes = component.get_elements('Class')
+		if((classes.length == 1) && (classes[0].attributes["Context"] == 'InprocServer32'))
+		  files = component.get_elements('File')
+		  files[0].add_attribute('Assembly','.net')
+		end
+	  end
+	end
+	
+	return xml_doc
+  end  
+
   def self.manage_custom_actions(xml_doc, input)
     manufacturer = 'Not Set'
     manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
@@ -68,11 +86,13 @@ class Wix
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)
 	
-	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{install_path}", 'Return' => 'check'}
+	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Return' => 'check'}
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
-	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
+	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
 
+	admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
+	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
 	return xml_doc
   end
   
@@ -195,6 +215,7 @@ class Wix
 	xml_doc = REXML::Document.new(wxs_text)
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)
+	xml_doc = manage_com_files(xml_doc)
 	xml_doc = manage_msm_files(xml_doc)
 	
 	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	

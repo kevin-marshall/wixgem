@@ -1,6 +1,8 @@
 require 'open3'
 require 'hash'
 
+module Wixgem
+
 class Command < Hash
   def initialize(cmd)
    self[:command]=cmd
@@ -21,4 +23,6 @@ class Command < Hash
 	
 	raise self[:error] unless((self[:exit_code] == 0) || self[:ignore_exit_code])
   end
+end
+
 end

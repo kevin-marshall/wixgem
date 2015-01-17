@@ -137,3 +137,4 @@ class WindowsInstaller
       raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
     end
 end
+

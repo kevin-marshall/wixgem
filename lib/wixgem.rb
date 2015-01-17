@@ -6,6 +6,8 @@ require 'tmpdir.rb'
 require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
 
+module Wixgem
+
 class Wix
   def self.initialize
     @install_path = ''
@@ -282,4 +284,6 @@ class Wix
 	
 	end_logger if(@debug)
   end
+end
+
 end

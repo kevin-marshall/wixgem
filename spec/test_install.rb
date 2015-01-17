@@ -51,8 +51,8 @@ def test_install(name, msi_file, arg2, callback=nil)
   product_name = msi_info['ProductName']
 	
   if(admin?)
-	while(WindowsInstaller.installed?(product_name))
-	  WindowsInstaller.uninstall(product_name)
+	while(Wixgem::WindowsInstaller.installed?(product_name))
+	  Wixgem::WindowsInstaller.uninstall(product_name)
 	end
     raise "#{name}: Uninstall #{product_name} before running tests" if(WindowsInstaller.installed?(product_name))
     

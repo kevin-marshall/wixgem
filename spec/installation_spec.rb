@@ -5,7 +5,7 @@ require './spec/test_install.rb'
 require './spec/test_files_exist.rb'
 
 describe 'Wixgem' do
-  #Wix.debug = true
+  #Wixgem::Wix.debug = true
   describe 'Installation' do
     test_arguments = {
       test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
@@ -21,7 +21,7 @@ describe 'Wixgem' do
 	
     test_arguments.each { |key, value| 
 	  it "should create an installation file using: #{value[0]}" do
-        Wix.make_installation(value[0], value[1])
+        Wixgem::Wix.make_installation(value[0], value[1])
 	    expect(File.exists?(value[0])).to be(true)	  
 	  end
     
@@ -44,14 +44,14 @@ describe 'Wixgem' do
   
     exception_test_arguments.each { |key, value|
 	  it "#{key} should raise an exception" do
-	    expect { Wix.make_installation(value[0], value[1]) }.to raise_error
+	    expect { Wixgem::Wix.make_installation(value[0], value[1]) }.to raise_error
 	  end
     }
   end	
     
   describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
-      Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
+      Wixgem::Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
 	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.msi.log')
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end

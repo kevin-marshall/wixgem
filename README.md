@@ -14,14 +14,15 @@ The [WiX Toolset](http://wixtoolset.org) must be installed.
 require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
-Wix.make_installation('Product.msi', ['rakefile.rb']])
+Wixgen::Wix.make_installation('Product.msi', ['rakefile.rb']])
 
-Wix.make_installation('Product.msi', {product_name: 'productname',
-                       version: '1.1.0.0'
-                       upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}',
-                       files: ['rakefile.rb'] }	
+Wixgen::Wix.make_installation('Product.msi', {product_name: 'productname',
+                              version: '1.1.0.0'
+                              upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}',
+                              files: ['rakefile.rb'] }	
 					   
-Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")})					   
+Wixgen::Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\// => ''}, 
+                              files: Dir.glob("test_files/**/*")})					   
 ```
   
 #### Merge Module
@@ -29,7 +30,7 @@ Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\// => ''
 require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
-Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
+Wixgen::Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
 
 ```
 An example rakefile.rb is included in the example directory of the gem.
@@ -52,6 +53,10 @@ small set of optional arguments allowing the developer to customize the generate
 * **has_vb6_files**: Required if installation contains any ocx's or dll's compiled with Visual Basic 6.
 * **remove_existing_products**: A boolean value. If the value is true the installation will remove all existing 
                              installations of the product before installing the product.
+* **all_users**: String value perUser or perMachine. The default is perUser.
+* **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
+             to the same directory as the output msi file. This can help trouble shooting the 
+			 installation.
                   
 
 ## License

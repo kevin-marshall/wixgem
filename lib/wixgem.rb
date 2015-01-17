@@ -1,12 +1,17 @@
 require 'fileutils'
 require 'SecureRandom'
+require 'logging'
+require 'tempfile'
 require 'tmpdir.rb'
 require 'rexml/document'
+require "#{File.dirname(__FILE__)}/command.rb"
 
 class Wix
   def self.initialize
     @install_path = ''
 	@debug = false
+	@logger = nil
+	@log_file = nil
   end
   def self.install_path=(path)
     @install_path = path
@@ -33,23 +38,29 @@ class Wix
   end
   
   private   
+  def self.start_logger
+    @logger = ::Logging.logger['Wixgem_logger'] 
+	@log_file = Tempfile.new('wixgem')
+	@logger.add_appenders(Logging.appenders.file(@log_file.path))
+	@logger.level = :debug
+  end
+
+  def self.end_logger
+    @logger = nil
+	@log_file = nil
+  end
+  
   def self.manage_upgrade(xml_doc, input)
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)
 
-    manufacturer = 'Not Set'
-    manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
-	
- 	if(input.kind_of?(Hash) && 
-	   input.has_key?(:remove_existing_products) && 
-	   input[:remove_existing_products])
-
+ 	if(input.has_key?(:remove_existing_products) && input[:remove_existing_products])
 	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
 	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
 	
 	  upgrade = product[0].add_element 'Upgrade', { 'Id' => input[:upgrade_code] }
-	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWPRODUCTFOUND' }
-	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '1.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'UPGRADEFOUND' }
+	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWERVERSIONDETECTED' }
+	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '0.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'OLDERVERSIONBEINGUPGRADED' }
 
 	  install_and_execute = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
 	  install_and_execute[0].add_element 'RemoveExistingProducts', { 'After'=>'InstallValidate' }
@@ -58,27 +69,9 @@ class Wix
 	return xml_doc
   end  
 
-  def self.manage_com_files(xml_doc)
-	component_groups = REXML::XPath.match(xml_doc, '//Wix/Fragment/ComponentGroup')
-	return xml_doc if(component_groups.nil?)
-
-	com_dlls = {}
-	component_groups.each do |component_group|
- 	  component_group.each_element do |component|
-	    classes = component.get_elements('Class')
-		if((classes.length == 1) && (classes[0].attributes["Context"] == 'InprocServer32'))
-		  files = component.get_elements('File')
-		  files[0].add_attribute('Assembly','.net')
-		end
-	  end
-	end
-	
-	return xml_doc
-  end  
-
   def self.manage_custom_actions(xml_doc, input)
     manufacturer = 'Not Set'
-    manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
+    manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
 	
 	install_path = '[ProgramFilesFolder][ProductName]'
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
@@ -122,16 +115,14 @@ class Wix
   end
   
   def self.copy_install_files(directory, input)
-    files = input
-	files = input[:files] if(input.kind_of?(Hash))
-	
+	files = input[:files]
 	raise 'No files were given to wixgem' if(files.length == 0)
 	
 	missing_files = []
 	files.each do |file| 
 	  if(File.file?(file))
    	    install_path = file
-        if(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
+        if(input.has_key?(:modify_file_paths))
           input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
         end
 
@@ -146,20 +137,21 @@ class Wix
     if(@debug)	
 	  max_path = files.max { |a, b| a.length <=> b.length }
 	  columen_size = max_path.length + 10
-	  File.open('./installation_files.txt', 'w') do |f| 
-	    f.printf("%-#{columen_size}s %s\n" % ['File path', 'Installation Path'])
-	    files.each do |file| 
-	      if(File.file?(file))
-   	        install_path = file
-            if(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
-              input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
-            end
-	        f.printf("%-#{columen_size}s %s\n" % [file, install_path])
+	    
+	  @logger.debug "------------------------------------ Installation Paths -----------------------------------"
+	  @logger.debug "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']
+	  files.each do |file| 
+	    if(File.file?(file))
+  	      install_path = file
+          if(input.has_key?(:modify_file_paths))
+            input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
           end
-		end
-	  end
+	      @logger.debug "%-#{columen_size}s %s\n" % [file, install_path]
+        end
+      end
+	  @logger.debug "-------------------------------------------------------------------------------------------"
 	end
-	
+
 	if(missing_files.length > 0)
 	  missing_files_str = ''
 	  missing_files.each { |f| 
@@ -177,28 +169,32 @@ class Wix
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
 
-	wix_cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
-	wix_cmd = wix_cmd.gsub(/-srd/, '-svb6 -srd') if(input.kind_of?(Hash) && input.has_key?(:has_vb6_files))
+	cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
+	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files))
 	
-	stdout = %x[#{wix_cmd}]
+	heat_cmd = Command.new(cmd)
+	@logger.debug "command: #{heat_cmd[:command]}" if(@debug)
 
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'w') { |f| f.puts wix_cmd } if(@debug)
-	raise "#{stdout}\nFailed to generate .wxs file" unless(File.exists?(wxs_file))
-		
+	heat_cmd.execute	
+	if(@debug)
+	  @logger.debug "--------------------------- Heat output -----------------------------------"
+	  @logger.debug heat_cmd[:output] 
+	end
+			
 	product_name = File.basename(wxs_file, '.wxs')
-    product_name = input[:product_name] if(input.kind_of?(Hash) && input.has_key?(:product_name))
+    product_name = input[:product_name] if(input.has_key?(:product_name))
 	
     manufacturer = 'Not Set'
-    manufacturer = input[:manufacturer] if(input.kind_of?(Hash) && input.has_key?(:manufacturer))
+    manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
 
 	product_version = ''
-    product_version = input[:version] if(input.kind_of?(Hash) && input.has_key?(:version))
+    product_version = input[:version] if(input.has_key?(:version))
 
 	product_code = ''
-	product_code = input[:product_code] if(input.kind_of?(Hash) && input.has_key?(:product_code))
+	product_code = input[:product_code] if(input.has_key?(:product_code))
 
 	upgrade_code = ''
-	upgrade_code = input[:upgrade_code] if(input.kind_of?(Hash) && input.has_key?(:upgrade_code))
+	upgrade_code = input[:upgrade_code] if(input.has_key?(:upgrade_code))
 	
 	wxs_text = File.read(wxs_file)
 
@@ -213,9 +209,11 @@ class Wix
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 	
 	xml_doc = REXML::Document.new(wxs_text)
+	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
+	packages.each { |package| package.add_attribute('InstallScope', 'perMachine') } if(input.has_key?(:all_users))
+
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)
-	xml_doc = manage_com_files(xml_doc)
 	xml_doc = manage_msm_files(xml_doc)
 	
 	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	
@@ -229,21 +227,32 @@ class Wix
   def self.create_output(wxs_file, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	wix_cmd = "\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\""
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'a') { |f| f.puts wix_cmd } if(@debug)
-	stdout = %x[#{wix_cmd}]
-	raise "#{stdout}\nFailed to generate .wixobj file" unless(File.exists?(wixobj_file))
+	candle_cmd = Command.new("\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
+	@logger.debug "command: #{candle_cmd[:command]}" if(@debug)
 
-	wix_cmd = "\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\""
-	File.open("#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt", 'a') { |f| f.puts wix_cmd } if(@debug)
-    stdout = %x[#{wix_cmd}]	
-	raise "#{stdout}\nFailed to generate #{output} file" unless(File.exists?(output))
+	candle_cmd.execute	
+	if(@debug)
+	  @logger.debug "--------------------------- Candle output -----------------------------------"
+	  @logger.debug candle_cmd[:output] 
+	end
+	
+	light_cmd = Command.new("\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
+	@logger.debug "command: #{light_cmd[:command]}" if(@debug)
+
+	light_cmd.execute
+	if(@debug)
+	  @logger.debug "--------------------------- Light output -----------------------------------"
+	  @logger.debug light_cmd[:output] 
+	end
   end
 
   def self.apply_wix_template(output, input, template)
     raise 'WIX path is not set!' if(install_path.nil?)
+	input = { files: input } unless(input.kind_of?(Hash))
+  	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
 
-  	@debug = input[:debug] if(!@debug && input.kind_of?(Hash) && input.has_key?(:debug))
+	start_logger if(@debug)
+	
 	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
 	
 	ext = File.extname(output)
@@ -260,18 +269,17 @@ class Wix
 	    begin
 		  create_wxs_file(wxs_file, input, ext)
 	      create_output(wxs_file, output_absolute_path)
+		rescue Exception => e
+		  raise "Wixgem exception: #{e}"
 		ensure
-	      if(@debug)
-	        FileUtils.cp(wxs_file, "#{output_absolute_path}.wxs") if(File.exists?(wxs_file))
-		    wix_cmds_file = "#{File.basename(wxs_file,'.wxs')}.wix_cmds.txt"
-		    FileUtils.cp(wix_cmds_file, "#{output_absolute_path}.wix_cmds.txt") if(File.exists?(wix_cmds_file))
-	      end
+	      FileUtils.cp(wxs_file, "#{output_absolute_path}.wxs") if(File.exists?(wxs_file) && @debug)
+	      FileUtils.cp(@log_file.path, "#{output_absolute_path}.log") if(@debug)
 		end
 	  end
-		    
-	  FileUtils.mv('installation_files.txt', "#{output_absolute_path}_paths.txt") if(File.exists?('installation_files.txt'))
 	end
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
+	
+	end_logger if(@debug)
   end
 end

@@ -2,9 +2,6 @@ require 'rspec'
 require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './admin.rb'
-require './spec/test_install.rb'
-require './spec/test_files_exist.rb'
-require 'json'
 
 if(admin?)
 describe 'Wixgem' do

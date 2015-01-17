@@ -2,7 +2,7 @@ require 'rspec'
 require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
-require './spec/execute.rb'
+require './spec/WindowsInstaller.rb'
 require './admin.rb'
 
 Wix.debug=true
@@ -37,8 +37,7 @@ describe 'Wixgem' do
 	  it "should produce the debug files" do
 	    if(key == :test5)
 	      expect(File.exists?("#{value[0]}.wxs")).to be(true)
-	      expect(File.exists?("#{value[0]}.wix_cmds.txt")).to be(true)
-	      expect(File.exists?("#{value[0]}_paths.txt")).to be(true)
+	      expect(File.exists?("#{value[0]}.log")).to be(true)
 		end
      end
     }
@@ -63,13 +62,13 @@ describe 'Wixgem' do
 	
       it "should install contents of merge module" do
 	    begin
-	      execute("msiexec.exe /i #{msi_file}")
+	      WindowsInstaller.install(msi_file)
 		
 		  install_dir = "C:/Program Files (x86)/#{File.basename(msi_file, '.msi')}"
 	      expect(File.exists?("#{install_dir}/rakefile.rb")).to be(true)
 	      expect(File.exists?("#{install_dir}/Gemfile")).to be(true)
 	    ensure
-	      execute("msiexec.exe /quiet /x #{msi_file}")
+	      WindowsInstaller.uninstall(msi_file)
 	    end
       end 
 	end

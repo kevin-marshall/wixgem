@@ -72,6 +72,9 @@ class Wix
   end  
 
   def self.manage_custom_actions(xml_doc, input)
+    # Example custom action
+	#<CustomAction Id='comReg' Directory='INSTALLLOCATION' Execute='deferred' Impersonate='no' ExeCommand='"[NETFRAMEWORK40CLIENTINSTALLROOTDIR]regasm.exe" "[INSTALLLOCATION]EAWordImporter.dll" /codebase' Return='check' />
+
     manufacturer = 'Not Set'
     manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
 	
@@ -81,13 +84,15 @@ class Wix
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)
 	
-	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Return' => 'check'}
+	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
-	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
+	#custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
+	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
 
 	admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
-	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
+	#custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
+	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
 	return xml_doc
   end
   
@@ -178,7 +183,7 @@ class Wix
 	@logger.debug "command: #{heat_cmd[:command]}" if(@debug)
 
 	heat_cmd.execute	
-	if(@debug)
+	if(@debug && !heat_cmd[:output].empty?)
 	  @logger.debug "--------------------------- Heat output -----------------------------------"
 	  @logger.debug heat_cmd[:output] 
 	end
@@ -229,20 +234,20 @@ class Wix
   def self.create_output(wxs_file, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	candle_cmd = Command.new("\"#{install_path}\\bin\\candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
+	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
 	@logger.debug "command: #{candle_cmd[:command]}" if(@debug)
 
 	candle_cmd.execute	
-	if(@debug)
+	if(@debug && !candle_cmd[:output].empty?)
 	  @logger.debug "--------------------------- Candle output -----------------------------------"
 	  @logger.debug candle_cmd[:output] 
 	end
 	
-	light_cmd = Command.new("\"#{install_path}\\bin\\light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
+	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
 	@logger.debug "command: #{light_cmd[:command]}" if(@debug)
 
 	light_cmd.execute
-	if(@debug)
+	if(@debug && !light_cmd[:output].empty?)
 	  @logger.debug "--------------------------- Light output -----------------------------------"
 	  @logger.debug light_cmd[:output] 
 	end

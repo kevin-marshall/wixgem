@@ -56,5 +56,4 @@ describe 'Wixgem' do
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end
   end	
-
 end

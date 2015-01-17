@@ -13,10 +13,23 @@ class WindowsInstaller
 
 	def self.install(msi)
 	  raise "#{msi} is already installed" if(WindowsInstaller.installed?(msi))
+	  execute("msiexec.exe /i #{msi}")
 	end
 
-	def self.uninstall(msi)
-	  execute("msiexec.exe /quiet /x #{msi}") if(File.exists?(msi))
+	def self.uninstall(msi_product_code_or_product_name)
+	  value = msi_product_code_or_product_name
+	  if(File.exists?(value))
+	    execute("msiexec.exe /quiet /x #{value}") 
+		return
+	  end
+	  
+	  installer = WIN32OLE.new('WindowsInstaller.Installer')
+	  installer.Products.each { |prod_code|
+		name = installer.ProductInfo(prod_code, "ProductName")
+		value = prod_code if (value == name)
+	  }
+	  
+	  execute("msiexec.exe /quiet /x #{value}")
     end
 	
 	def self.product_code_installed?(product_code)
@@ -25,13 +38,13 @@ class WindowsInstaller
 	  return false
 	end
 	
-	def self.version?(product_name)
+	def self.version(product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
-	  info = product_info(installer, product_code?(product_name, installer))
+	  info = product_info(installer, product_code(product_name, installer))
 	  return info['VersionString']
 	end
 
-	def self.product_code?(product_name, installer = nil)
+	def self.product_code(product_name, installer = nil)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer') if(installer.nil?)
 	  installer.Products.each { |prod_code|
 		name = installer.ProductInfo(prod_code, "ProductName")
@@ -70,7 +83,7 @@ class WindowsInstaller
 	public
 	def self.dump_info(product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
-	  properties = product_info(installer, product_code?(product_name, installer))
+	  properties = product_info(installer, product_code(product_name, installer))
 	  properties.each { |id, value| puts "#{id}: #{value}" }
 	end
 
@@ -130,11 +143,9 @@ class WindowsInstaller
 	  puts ''
 	end	
 
-    def execute(cmd)
-      command = Command.new(cmd)
+    def self.execute(cmd)
+      command = Wixgem::Command.new(cmd)
       command.execute
-  
-      raise "Failed: #{cmd} Status: #{command[:exit_code]}\nStdout: #{command[:output]}\nStderr: #{command[:error]}" unless(command[:exit_code] == 0)
     end
 end
 

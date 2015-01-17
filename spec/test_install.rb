@@ -41,24 +41,20 @@ end
 
 def test_install(name, msi_file, arg2, callback=nil)
   arg2 = { files: arg2} unless(arg2.kind_of?(Hash))
-  
   msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
-
   test_msi(msi_file, arg2)
   
   msi_info = WindowsInstaller.msi_records(msi_file)
-
   product_name = msi_info['ProductName']
 	
   if(admin?)
-	while(Wixgem::WindowsInstaller.installed?(product_name))
-	  Wixgem::WindowsInstaller.uninstall(product_name)
+	while(WindowsInstaller.installed?(product_name))
+	  WindowsInstaller.uninstall(product_name)
 	end
     raise "#{name}: Uninstall #{product_name} before running tests" if(WindowsInstaller.installed?(product_name))
     
 	begin
-	  WindowsInstaller.install(msi_file)
-			
+	  WindowsInstaller.install(msi_file)			
 	  raise "#{name}: Product name #{product_name} is not installed" unless(WindowsInstaller.installed?(product_name))
 
 	  eval callback unless(callback == nil)

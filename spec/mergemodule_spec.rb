@@ -49,7 +49,7 @@ describe 'Wixgem' do
       it "should be able to create two merge modules" do  
         Wixgem::Wix.make_mergemodule(merge1, ['rakefile.rb'])
 	    expect(File.exists?(merge1)).to be(true)
-        Wix.make_mergemodule(merge2, ['Gemfile'])
+        Wixgem::Wix.make_mergemodule(merge2, ['Gemfile'])
 	    expect(File.exists?(merge2)).to be(true)
       end 
 		

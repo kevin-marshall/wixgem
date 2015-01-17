@@ -6,7 +6,8 @@ require './spec/test_files_exist.rb'
 require 'win32ole'
 require './admin.rb'
 
-if(admin?)
+
+#if(admin? && false)
 describe 'Wixgem' do
   describe 'Installation of a COM object' do
 	it 'should not be able to instance a COM object' do
@@ -18,9 +19,9 @@ describe 'Wixgem' do
 	  WindowsInstaller.uninstall(installation_file)
 	end
 	
-	installation_hash = { debug: true, modify_file_paths: {/^.+Release\// => ''}, all_users: 'perMachine', files: ['COMObject/bin/Release/COMObject.dll']}
+	installation_hash = { debug: true, all_users: 'perMachine', files: ['COMObject/bin/Release/COMObject.dll']}
 	it "should create an installation file using: #{installation_file}" do
-      Wix.make_installation(installation_file, installation_hash)
+      Wixgem::Wix.make_installation(installation_file, installation_hash)
 	  expect(File.exists?(installation_file)).to be(true)	  
 	end
     
@@ -53,4 +54,4 @@ describe 'Wixgem' do
 	end
   end
 end
-end
+#end

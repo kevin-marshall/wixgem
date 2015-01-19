@@ -87,12 +87,17 @@ class Wix
 	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
-	#custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
 	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
 
+	install_ui_sequence = product[0].add_element 'InstallUISequence'
+	custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	
 	admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
-	#custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostFinalize' }
 	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+
+	admin_ui_sequence = product[0].add_element 'AdminUISequence'
+	custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+
 	return xml_doc
   end
   

@@ -16,6 +16,8 @@ describe 'Wixgem' do
     }
   
     test_arguments.each { |key, value| 
+	  File.delete(value[0]) if(File.exists?(value[0]))
+
 	  it "should create merge module: #{value[0]}" do
 	    Wixgem::Wix.make_mergemodule(value[0], value[1])
 	    raise "#{key}: #{value[0]} does not exist" unless(File.exists?(value[0]))

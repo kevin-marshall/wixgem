@@ -20,6 +20,8 @@ describe 'Wixgem' do
     }
 	
     test_arguments.each { |key, value| 
+	  File.delete(value[0]) if(File.exists?(value[0]))
+	
 	  it "should create an installation file using: #{value[0]}" do
         Wixgem::Wix.make_installation(value[0], value[1])
 	    expect(File.exists?(value[0])).to be(true)	  
@@ -31,8 +33,6 @@ describe 'Wixgem' do
 	    test_install(key, value[0], value[1], execute) 
 	  end
     }
-
-    test_arguments.each { |key, value| FileUtils.rm(value[0]) if(File.exists?(value[0])) }  
   end
   
   describe 'Packaging excptions' do 

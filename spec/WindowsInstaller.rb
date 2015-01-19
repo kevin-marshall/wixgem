@@ -2,16 +2,25 @@ require 'win32ole'
 require 'dev_tasks'
 
 class WindowsInstaller
-	def self.installed?(product_name)
+	def self.installed?(msi_product_code_or_product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
+	  
+	  value = msi_product_code_or_product_name
+	  if(File.exists?(value))
+        records = msi_records(value)
+		value = records['ProductCode']
+	  end
+
 	  installer.Products.each { |prod_code|
 		name = installer.ProductInfo(prod_code, "ProductName")
-		return true if (product_name == name)
+		return true if (value == name)
+		return true if (value == prod_code)
 	  }
 	  return false
 	end
 
 	def self.install(msi)
+	  msi = msi.gsub(/\//, '\\')
 	  raise "#{msi} is already installed" if(WindowsInstaller.installed?(msi))
 	  execute("msiexec.exe /i #{msi}")
 	end
@@ -19,6 +28,7 @@ class WindowsInstaller
 	def self.uninstall(msi_product_code_or_product_name)
 	  value = msi_product_code_or_product_name
 	  if(File.exists?(value))
+		value = value.gsub(/\//, '\\')
 	    execute("msiexec.exe /quiet /x #{value}") 
 		return
 	  end
@@ -105,7 +115,9 @@ class WindowsInstaller
 	    records[record.StringData(1)] = record.StringData(2) 
 		record = view.Fetch()
 	  end
+	  db.ole_free
 	  db = nil
+	  installer.ole_free
 	  installer = nil
 	  
 	  return records
@@ -138,7 +150,9 @@ class WindowsInstaller
 		puts "#{record.StringData(1)}: #{record.StringData(2)}"
 		record = view.Fetch()
 	  end
+	  db.ole_free
 	  db = nil
+	  installer.ole_free
 	  installer = nil
 	  puts ''
 	end	

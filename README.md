@@ -55,9 +55,8 @@ small set of optional arguments allowing the developer to customize the generate
                              installations of the product before installing the product.
 * **all_users**: String value perUser or perMachine. The default is perUser.
 * **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
-             to the same directory as the output msi file. This can help trouble shooting the 
-			 installation.
-                  
+             to the same directory as the output msi file. This can help trouble shoot the 
+			 installation.            
 
 ## License
 Copyright 2013-2014 Kevin Marshall

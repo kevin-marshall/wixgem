@@ -31,12 +31,12 @@ class Wix
   
   def self.make_mergemodule(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output_file, input, "#{gem_dir}/templates/mergemodule.wxs")
+    apply_wix_template(output_file, input)
   end
   
   def self.make_installation(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output_file, input, "#{gem_dir}/templates/Install.wxs")
+    apply_wix_template(output_file, input)
   end
   
   private   
@@ -253,7 +253,7 @@ class Wix
 	end
   end
 
-  def self.apply_wix_template(output, input, template)
+  def self.apply_wix_template(output, input)
     raise 'WIX path is not set!' if(install_path.nil?)
 	input = { files: input } unless(input.kind_of?(Hash))
   	@debug = input[:debug] if(!@debug && input.has_key?(:debug))

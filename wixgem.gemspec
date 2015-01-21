@@ -30,5 +30,4 @@ Gem::Specification.new do |s|
 	s.add_development_dependency 'rake', '~> 0'
 	s.add_development_dependency 'rspec', '~> 0'
 	s.add_development_dependency 'dev', '~> 0'
-	s.add_runtime_dependency 'logging', '~> 1.8', '>= 1.8.2'
 end

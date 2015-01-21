@@ -1,7 +1,5 @@
 require 'fileutils'
 require 'SecureRandom'
-require 'logging'
-require 'tempfile'
 require 'tmpdir.rb'
 require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
@@ -41,15 +39,11 @@ class Wix
   
   private   
   def self.start_logger
-    @logger = ::Logging.logger['Wixgem_logger'] 
-	@log_file = Tempfile.new('wixgem')
-	@logger.add_appenders(Logging.appenders.file(@log_file.path))
-	@logger.level = :debug
+    @logger = []
   end
 
   def self.end_logger
     @logger = nil
-	@log_file = nil
   end
   
   def self.manage_upgrade(xml_doc, input)
@@ -150,18 +144,18 @@ class Wix
 	  max_path = files.max { |a, b| a.length <=> b.length }
 	  columen_size = max_path.length + 10
 	    
-	  @logger.debug "------------------------------------ Installation Paths -----------------------------------"
-	  @logger.debug "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']
+	  @logger << "------------------------------------ Installation Paths -----------------------------------" unless(@logger.nil?)
+	  @logger << "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']  unless(@logger.nil?)
 	  files.each do |file| 
 	    if(File.file?(file))
   	      install_path = file
           if(input.has_key?(:modify_file_paths))
             input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
           end
-	      @logger.debug "%-#{columen_size}s %s\n" % [file, install_path]
+	      @logger << "%-#{columen_size}s %s\n" % [file, install_path]  unless(@logger.nil?)
         end
       end
-	  @logger.debug "-------------------------------------------------------------------------------------------"
+	  @logger << "-------------------------------------------------------------------------------------------" unless(@logger.nil?)
 	end
 
 	if(missing_files.length > 0)
@@ -185,12 +179,12 @@ class Wix
 	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files))
 	
 	heat_cmd = Command.new(cmd)
-	@logger.debug "command: #{heat_cmd[:command]}" if(@debug)
+	@logger << "command: #{heat_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	heat_cmd.execute	
 	if(@debug && !heat_cmd[:output].empty?)
-	  @logger.debug "--------------------------- Heat output -----------------------------------"
-	  @logger.debug heat_cmd[:output] 
+	  @logger << "--------------------------- Heat output -----------------------------------"  unless(@logger.nil?)
+	  @logger << heat_cmd[:output] unless(@logger.nil?)
 	end
 			
 	product_name = File.basename(wxs_file, '.wxs')
@@ -240,21 +234,21 @@ class Wix
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
 	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
-	@logger.debug "command: #{candle_cmd[:command]}" if(@debug)
+	@logger << "command: #{candle_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	candle_cmd.execute	
 	if(@debug && !candle_cmd[:output].empty?)
-	  @logger.debug "--------------------------- Candle output -----------------------------------"
-	  @logger.debug candle_cmd[:output] 
+	  @logger << "--------------------------- Candle output -----------------------------------"  unless(@logger.nil?)
+	  @logger << candle_cmd[:output] unless(@logger.nil?)
 	end
 	
 	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
-	@logger.debug "command: #{light_cmd[:command]}" if(@debug)
+	@logger << "command: #{light_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	light_cmd.execute
 	if(@debug && !light_cmd[:output].empty?)
-	  @logger.debug "--------------------------- Light output -----------------------------------"
-	  @logger.debug light_cmd[:output] 
+	  @logger << "--------------------------- Light output -----------------------------------"  unless(@logger.nil?)
+	  @logger << light_cmd[:output]  unless(@logger.nil?)
 	end
   end
 
@@ -285,7 +279,7 @@ class Wix
 		  raise "Wixgem exception: #{e}"
 		ensure
 	      FileUtils.cp(wxs_file, "#{output_absolute_path}.wxs") if(File.exists?(wxs_file) && @debug)
-	      FileUtils.cp(@log_file.path, "#{output_absolute_path}.log") if(@debug)
+	      File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
 		end
 	  end
 	end

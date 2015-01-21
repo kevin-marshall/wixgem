@@ -1,0 +1,12 @@
+------------------------------------ Installation Paths -----------------------------------
+File path             Installation Path
+rakefile.rb           rakefile.rb
+-------------------------------------------------------------------------------------------
+command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/heat.exe" dir . -template product -cg InstallionFiles -gg -nologo -svb6 -srd -o  "wixgem_install_vb6_files.wxs"
+command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/candle.exe" -out "wixgem_install_vb6_files.wixobj" "wixgem_install_vb6_files.wxs"
+--------------------------- Candle output -----------------------------------
+Windows Installer XML Toolset Compiler version 3.9.1006.0
+Copyright (c) Outercurve Foundation. All rights reserved.
+
+wixgem_install_vb6_files.wxs
+command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/light.exe" -nologo -out "E:/Development/wrk/github/wixgem/test/wixgem_install_vb6_files.msi" "wixgem_install_vb6_files.wixobj"

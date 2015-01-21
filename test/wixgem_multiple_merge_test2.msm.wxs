@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='wixgem_multiple_merge_test2' Language='1033' Version='1.0.0.0'>
+        <Package Id='{8F5EA969-862A-43F3-AE5C-2835E008C2D5}' InstallerVersion='200' Manufacturer='Not Set'/>
+        <ComponentGroupRef Id='InstallionFiles'/>
+        <ComponentRef Id='cmpB941A6F34A9C1ACDB7DFD45905FF000B'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+    </Module>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='TARGETDIR' Guid='{C565521E-9374-4C53-BC91-47AAB23B0DE7}' Id='cmpB941A6F34A9C1ACDB7DFD45905FF000B'>
+                <File Id='filA25C7980B2D45A22736480C78000FC5F' KeyPath='yes' Source='.\Gemfile'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

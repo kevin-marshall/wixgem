@@ -1,0 +1,23 @@
+DEBUG  Wixgem_logger : ------------------------------------ Installation Paths -----------------------------------
+DEBUG  Wixgem_logger : File path                                      Installation Path
+
+DEBUG  Wixgem_logger : test_files/32145.txt                           32145.txt
+
+DEBUG  Wixgem_logger : test_files/8.0/File With Space.txt             8.0/File With Space.txt
+
+DEBUG  Wixgem_logger : test_files/9.0/File With Space.txt             9.0/File With Space.txt
+
+DEBUG  Wixgem_logger : test_files/9.0/test_files/a_file.txt           9.0/test_files/a_file.txt
+
+DEBUG  Wixgem_logger : test_files/File-With-Hyphen.txt                File-With-Hyphen.txt
+
+DEBUG  Wixgem_logger : -------------------------------------------------------------------------------------------
+DEBUG  Wixgem_logger : command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/heat.exe" dir . -template product -cg InstallionFiles -gg -nologo -srd -o  "wixgem_install_test8.wxs"
+DEBUG  Wixgem_logger : command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/candle.exe" -out "wixgem_install_test8.wixobj" "wixgem_install_test8.wxs"
+DEBUG  Wixgem_logger : --------------------------- Candle output -----------------------------------
+DEBUG  Wixgem_logger : Windows Installer XML Toolset Compiler version 3.9.1006.0
+Copyright (c) Outercurve Foundation. All rights reserved.
+
+wixgem_install_test8.wxs
+
+DEBUG  Wixgem_logger : command: "E:/Development/dep/OpenSource/WixToolset/3.9/bin/light.exe" -nologo -out "E:/Development/wrk/github/wixgem/test/wixgem_install_test8.msi" "wixgem_install_test8.wixobj"

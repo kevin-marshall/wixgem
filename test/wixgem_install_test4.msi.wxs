@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{7E39FE98-9446-47C7-BEC7-C1BC14207BE8}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_test4' UpgradeCode='{F581789E-55BD-4E31-B4F6-BB051AE9FF37}' Version='1.1.2.3'>
+        <Package Compressed='yes' InstallerVersion='200'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        </Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='TARGETDIR' Guid='{DDC34B66-EC8C-45C4-A67F-51A9C6EAD2FE}' Id='cmpB941A6F34A9C1ACDB7DFD45905FF000B'>
+                <File Id='filA25C7980B2D45A22736480C78000FC5F' KeyPath='yes' Source='.\Gemfile'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

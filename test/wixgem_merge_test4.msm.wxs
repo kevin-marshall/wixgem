@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='wixgem_merge_test4' Language='1033' Version='1.0.0.0'>
+        <Package Id='{48CEB706-CBF8-400A-8A7C-D57AF2DA317A}' InstallerVersion='200' Manufacturer='Not Set'/>
+        <ComponentGroupRef Id='InstallionFiles'/>
+        <ComponentRef Id='cmp76459E1097DAAE80980B9D598A3AD93E'/>
+        <ComponentRef Id='cmp9AF680269CF58A96BA9CD01AA7425837'/>
+        <ComponentRef Id='cmpEE254C2A3AD48F7CBDCF253D1C9C2811'/>
+        <ComponentRef Id='cmpD29CF95DB568093EBCD5B1FACCDCA5DE'/>
+        <ComponentRef Id='cmp485530296D7A901E0E60133116B22433'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+    </Module>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Guid='{ACEFE1A1-0ABF-435D-BB3C-EFB4647D043B}' Id='cmp76459E1097DAAE80980B9D598A3AD93E'>
+                <File Id='filC0B8D6FA3507CE639640629756DBF80D' KeyPath='yes' Source='.\test_files\32145.txt'/>
+            </Component>
+            <Component Directory='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Guid='{D5C7ADD1-7ACC-4F86-A8CB-1DA69F4593F0}' Id='cmp9AF680269CF58A96BA9CD01AA7425837'>
+                <File Id='filF0E23CEFC72502556B61C9EF5F4104BB' KeyPath='yes' Source='.\test_files\File-With-Hyphen.txt'/>
+            </Component>
+            <Component Directory='dirC7B08FFF6A56656DA24F8131545B59EB' Guid='{F933FB9B-D6A3-4F54-8B77-5F905308F1C4}' Id='cmpEE254C2A3AD48F7CBDCF253D1C9C2811'>
+                <File Id='filBF0EA41FE4044682DA05F9A72C9B98C0' KeyPath='yes' Source='.\test_files\8.0\File With Space.txt'/>
+            </Component>
+            <Component Directory='dir576C6867A1EC9A5300E67C6C65A8662F' Guid='{6E78234A-AE95-41BA-82DB-1C87E3254CEE}' Id='cmpD29CF95DB568093EBCD5B1FACCDCA5DE'>
+                <File Id='fil3A2D7C116E16D517D6F1164D9F9EDE39' KeyPath='yes' Source='.\test_files\9.0\File With Space.txt'/>
+            </Component>
+            <Component Directory='dir1786554ADD7F381262F0E76708E4F622' Guid='{2766C405-1CD1-41DA-B8EC-063EDE40B8A0}' Id='cmp485530296D7A901E0E60133116B22433'>
+                <File Id='fil9937BAB5B4153FDB7F5BC7B37536CCE3' KeyPath='yes' Source='.\test_files\9.0\test_files\a_file.txt'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='dir576C6867A1EC9A5300E67C6C65A8662F'>
+            <Directory Id='dir1786554ADD7F381262F0E76708E4F622' Name='test_files'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD'>
+            <Directory Id='dir576C6867A1EC9A5300E67C6C65A8662F' Name='9.0'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD'>
+            <Directory Id='dirC7B08FFF6A56656DA24F8131545B59EB' Name='8.0'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Name='test_files'/>
+        </DirectoryRef>
+    </Fragment>
+</Wix>

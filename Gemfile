@@ -4,4 +4,3 @@ source "http://rubygems.org"
 gem 'rake'
 gem 'dev'
 gem 'bundler'
-gem 'logging'

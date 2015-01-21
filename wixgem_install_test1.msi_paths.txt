@@ -1,2 +1,0 @@
-File path             Installation Path
-rakefile.rb           rakefile.rb

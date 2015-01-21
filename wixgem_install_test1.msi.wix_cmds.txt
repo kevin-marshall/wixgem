@@ -1,3 +1,0 @@
-"E:/Development/dep/OpenSource/WixToolset/3.9/bin/heat.exe" dir . -template product -cg InstallionFiles -gg -nologo -srd -o  "wixgem_install_test1.wxs"
-"E:/Development/dep/OpenSource/WixToolset/3.9\bin\candle.exe" -out "wixgem_install_test1.wixobj" "wixgem_install_test1.wxs"
-"E:/Development/dep/OpenSource/WixToolset/3.9\bin\light.exe" -nologo -out "E:/Development/wrk/github/wixgem/wixgem_install_test1.msi" "wixgem_install_test1.wixobj"

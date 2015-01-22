@@ -11,8 +11,7 @@ describe 'Wixgem' do
       test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
 	  test2: ['test/wixgem_merge_test2.msm', {files: ['Gemfile']}],
 	  test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
-	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/**/*")],
-	  test5: ['test/wixgem_merge_test5.msm', {debug: true, files: Dir.glob("test_files/**/*")}]
+	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/9.0/*")]
     }
   
     test_arguments.each { |key, value| 

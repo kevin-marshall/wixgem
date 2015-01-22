@@ -16,7 +16,8 @@ describe 'Wixgem' do
 	  test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
 	  test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	  test8: ['test/wixgem_install_test8.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob("test_files/**/*")}]
+	  test9: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test8: ['test/wixgem_install_test8.msi', {modify_file_paths: {/\Atest_files\// => ''}, suppress_registry_harvesting: true, files: Dir.glob("test_files/**/*")}]
     }
 	
     test_arguments.each { |key, value| 
@@ -51,9 +52,9 @@ describe 'Wixgem' do
     
   describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
-      Wixgem::Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb'], debug: true})
+      Wixgem::Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb']})
 	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.msi.log')
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end
-  end	
+  end	  
 end

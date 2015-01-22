@@ -58,7 +58,9 @@ small set of optional arguments allowing the developer to customize the generate
 * **all_users**: String value perUser or perMachine. The default is perUser.
 * **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
              to the same directory as the output msi file. This can help trouble shoot the 
-			 installation.            
+			 installation.      
+* **suppress_registry_harvesting** Suppress registry harvesting. Can fix the Runtime Error E6034.		 
+* **suppress_COM_elements** Suppress COM elements.
 
 ## License
 Copyright 2013-2014 Kevin Marshall

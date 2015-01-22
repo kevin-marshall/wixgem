@@ -176,7 +176,9 @@ class Wix
 	template_option = "-template module" unless(ext == ".msi")
 
 	cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
-	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files))
+	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files) && input[:has_vb6_files])
+	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
+	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
 	
 	heat_cmd = Command.new(cmd)
 	@logger << "command: #{heat_cmd[:command]}" if(@debug && !@logger.nil?)

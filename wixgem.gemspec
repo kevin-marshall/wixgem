@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= "0.42.0"
+	s.version		= "0.43.0"
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.'
 	s.authors		= ["Kevin Marshall"]
@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 	#s.rubyforge_project = 'wixgem'
 	s.homepage		= 'http://rubygems.org/gems/wixgem'
     s.required_ruby_version = '>= 1.9.1'
-	s.files         = Dir["LICENSE","README.md","lib/**/*","example/**/*","test_files/**/*","spec/**/*"]
+	s.files         = Dir["LICENSE","README.md","lib/**/*","example/**/*"]
 	s.license       = 'Apache 2.0'
 	s.require_path  = 'lib'
     s.add_development_dependency 'bundler', '~> 0'

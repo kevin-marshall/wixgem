@@ -14,6 +14,7 @@ The [WiX Toolset](http://wixtoolset.org) must be installed.
 require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
+Wixgem::Wix.install_path = WIX_TOOLSET_ROOT
 Wixgen::Wix.make_installation('Product.msi', ['rakefile.rb']])
 
 Wixgen::Wix.make_installation('Product.msi', {product_name: 'productname',
@@ -30,6 +31,7 @@ Wixgen::Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\
 require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
+Wixgem::Wix.install_path = WIX_TOOLSET_ROOT
 Wixgen::Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
 
 ```

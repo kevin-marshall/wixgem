@@ -31,9 +31,9 @@ describe 'Wixgem' do
 	    execute = "test_files_exist('#{value[0]}', #{value[1]})"
 	    execute = value[2] if(value.length == 3)
 	    test_install(key, value[0], value[1], execute) 
-	  end
-    }
-  end
+	  end	  
+	}
+    end
   
   describe 'Packaging excptions' do 
     exception_test_arguments = {

@@ -1,8 +1,8 @@
 require 'rspec'
 require './lib/wixgem.rb'
+require './lib/WindowsInstaller.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
-require './spec/WindowsInstaller.rb'
 require './admin.rb'
 
 describe 'Wixgem' do
@@ -61,15 +61,12 @@ describe 'Wixgem' do
       end 
 	
       it "should install contents of merge module" do
-	    begin
-	      WindowsInstaller.install(msi_file)
-		
-		  install_dir = "C:/Program Files (x86)/#{File.basename(msi_file, '.msi')}"
-	      expect(File.exists?("#{install_dir}/rakefile.rb")).to be(true)
-	      expect(File.exists?("#{install_dir}/Gemfile")).to be(true)
-	    ensure
-	      WindowsInstaller.uninstall(msi_file)
-	    end
+	    Wixgem::WindowsInstaller.install(msi_file)
+	    
+		install_dir = "C:/Program Files (x86)/#{File.basename(msi_file, '.msi')}"
+	    expect(File.exists?("#{install_dir}/rakefile.rb")).to be(true)
+	    expect(File.exists?("#{install_dir}/Gemfile")).to be(true)
+	    Wixgem::WindowsInstaller.uninstall(msi_file) if(Wixgem::WindowsInstaller::msi_installed?(msi_file))
       end 
 	end
   end

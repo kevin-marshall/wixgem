@@ -218,7 +218,11 @@ class Wix
 	
 	xml_doc = REXML::Document.new(wxs_text)
 	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
-	packages.each { |package| package.add_attribute('InstallScope', 'perMachine') } if(input.has_key?(:all_users))
+	packages.each do |package| 
+		package.add_attribute('InstallScope', 'perMachine') if(input.has_key?(:all_users))
+		package.attributes['InstallerVersion'] = 450
+		package.attributes['InstallerVersion'] = (input[:installer_version]*100).to_i if(input.has_key?(:installer_version))
+	end 
 
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)

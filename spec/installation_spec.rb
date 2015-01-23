@@ -5,7 +5,6 @@ require './spec/test_install.rb'
 require './spec/test_files_exist.rb'
 
 describe 'Wixgem' do
-  #Wixgem::Wix.debug = true
   describe 'Installation' do
     test_arguments = {
       test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
@@ -36,7 +35,7 @@ describe 'Wixgem' do
 	}
     end
   
-  describe 'Packaging excptions' do 
+  describe 'Packaging exceptions' do 
     exception_test_arguments = {
       test1: ['test/wixgem_install_test1.msi', nil],
       test2: ['test/wixgem_install_test1.msi', []],
@@ -52,9 +51,32 @@ describe 'Wixgem' do
     
   describe 'including vb6 files' do 
 	it "the wix's heat command should contain the -svb6 flag" do
-      Wixgem::Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, manufacturer: 'musco', has_vb6_files: true, files: ['rakefile.rb']})
+      Wixgem::Wix.make_installation('test/wixgem_install_vb6_files.msi', {debug: true, has_vb6_files: true, files: ['rakefile.rb']})
 	  wix_cmd_text = File.read('test/wixgem_install_vb6_files.msi.log')
 	  expect(wix_cmd_text.include?('-svb6')).to eq(true)
 	end
+  end	 
+  
+  describe 'installer version' do 
+	it "the default installer version should be set to 450" do
+      Wixgem::Wix.make_installation('test/wixgem_installer_version1.msi', {debug: true, files: ['rakefile.rb']})
+	  wxs_text = File.read('test/wixgem_installer_version1.msi.wxs')
+	  xml_doc = REXML::Document.new(wxs_text)
+	  packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
+	  packages.each { |package| 
+		expect(package.attributes['InstallerVersion'].to_i).to eq(450)
+	  }
+	end
+	
+	it "the installer version should be set to 200" do
+      Wixgem::Wix.make_installation('test/wixgem_installer_version2.msi', {debug: true, installer_version: 2.0, files: ['rakefile.rb']})
+	  wxs_text = File.read('test/wixgem_installer_version2.msi.wxs')
+	  xml_doc = REXML::Document.new(wxs_text)
+	  packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
+	  packages.each { |package| 
+		expect(package.attributes['InstallerVersion'].to_i).to eq(200)
+	  }
+	end
   end	  
+
 end

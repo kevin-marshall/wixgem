@@ -56,11 +56,14 @@ small set of optional arguments allowing the developer to customize the generate
 * **remove_existing_products**: A boolean value. If the value is true the installation will remove all existing 
                              installations of the product before installing the product.
 * **all_users**: String value perUser or perMachine. The default is perUser.
-* **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
-             to the same directory as the output msi file. This can help trouble shoot the 
-			 installation.      
 * **suppress_registry_harvesting** Suppress registry harvesting. Can fix the Runtime Error E6034.		 
 * **suppress_COM_elements** Suppress COM elements.
+* **installer_version** Represents the minimum version of the Windows installer required to install
+                        this package. The default version is 4.0. Other valid versions are 2.0,
+						3.0, 3.5, 4.0, 4.5. 
+* **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
+             to the same directory as the output msi file. If you are familiar with WiX this can helpful
+			 if there is a problem.      
 
 ## License
 Copyright 2013-2014 Kevin Marshall

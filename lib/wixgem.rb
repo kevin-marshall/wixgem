@@ -105,8 +105,15 @@ class Wix
 		}
 	  }
 	}
+	return xml_doc if(merge_modules.length == 0)
 	
 	directory_root = REXML::XPath.match(xml_doc, '//Wix/Product/Directory')
+	if(directory_root.length == 0)
+		module_root = REXML::XPath.match(xml_doc, '//Wix/Module')
+		raise 'Merge modules can not be added to a merge module' unless(module_root.nil?)
+		raise 'Wix element //Wix/Product/Directory does not exist'
+	end
+	
 	default_feature = REXML::XPath.match(xml_doc, '//Wix/Product/Feature')
 
 	merge_modules.each { |component,file|	

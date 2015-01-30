@@ -138,8 +138,9 @@ class Wix
         if(input.has_key?(:modify_file_paths))
           input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
         end
+		raise "Invalid relative installation path: #{install_path}" if(install_path.include?(':'))
 
-   	    install_path = "#{directory}/#{install_path}"
+   	    install_path = "#{directory}/#{install_path}"		
 		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
 		FileUtils.cp(file, install_path)
 	  elsif(!File.exists?(file))
@@ -187,7 +188,7 @@ class Wix
 	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
 	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
 	
-	heat_cmd = Command.new(cmd)
+	heat_cmd = Command.new(cmd, { quiet: true })
 	@logger << "command: #{heat_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	heat_cmd.execute	
@@ -246,7 +247,7 @@ class Wix
   def self.create_output(wxs_file, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
+	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	@logger << "command: #{candle_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	candle_cmd.execute	
@@ -255,7 +256,7 @@ class Wix
 	  @logger << candle_cmd[:output] unless(@logger.nil?)
 	end
 	
-	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
+	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"", { quiet: true })
 	@logger << "command: #{light_cmd[:command]}" if(@debug && !@logger.nil?)
 
 	light_cmd.execute

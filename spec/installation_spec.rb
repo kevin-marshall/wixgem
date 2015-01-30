@@ -36,15 +36,20 @@ describe 'Wixgem' do
     end
   
   describe 'Packaging exceptions' do 
-    exception_test_arguments = {
-      test1: ['test/wixgem_install_test1.msi', nil],
-      test2: ['test/wixgem_install_test1.msi', []],
-      test3: ['test/wixgem_install_test1.msi', ['does_not_exist.txt']]
-    }
+    exception_test_arguments = [
+      {id: 'test1', msi_file: 'test/wixgem_install_test1.msi', input: nil },
+      {id: 'test2', msi_file: 'test/wixgem_install_test2.msi', input: [] },
+      {id: 'test3', msi_file: 'test/wixgem_install_test3.msi', input: ['does_not_exist.txt'] },
+	  {id: 'test4', msi_file: 'test/wixgem_install_test3.msi', input: ["#{__FILE__}"], error_msg: "Invalid relative installation path: #{__FILE__}" }	  
+    ]
   
-    exception_test_arguments.each { |key, value|
-	  it "#{key} should raise an exception" do
-	    expect { Wixgem::Wix.make_installation(value[0], value[1]) }.to raise_error
+    exception_test_arguments.each { |test|
+	  it "#{test[:id]} should raise an exception" do
+	    if(test.has_key?(:error_msg))
+			expect { Wixgem::Wix.make_installation(test[:msi_file], test[:input]) }.to raise_error(/#{test[:error_msg]}/)
+		else
+			expect { Wixgem::Wix.make_installation(test[:msi_file], test[:input]) }.to raise_error
+		end
 	  end
     }
   end	

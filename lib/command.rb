@@ -1,5 +1,4 @@
 require 'open3'
-require 'hash'
 
 module Wixgem
 
@@ -32,7 +31,10 @@ class Command < Hash
 	if((self[:exit_code] != 0) && !self[:ignore_exit_code])
 	  exception_text = self[:error]
 	  exception_text = self[:output] if(self[:error].empty?)
-	  raise "Command exception: #{exception_text}" 
+	  
+	  usr_msg = "Command exit code: #{self[:exit_code]}"
+	  usr_msg = "#{usr_msg}\nCommand exception: #{exception_text}" unless(exception_text.empty?)
+	  raise usr_msg
 	end
   end
 end

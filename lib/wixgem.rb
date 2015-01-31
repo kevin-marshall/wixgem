@@ -1,8 +1,8 @@
 require 'fileutils'
-require 'SecureRandom'
 require 'tmpdir.rb'
 require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
+require 'SecureRandom'
 
 module Wixgem
 
@@ -29,12 +29,12 @@ class Wix
   
   def self.make_mergemodule(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output_file, input)
+    create_package(output_file, input)
   end
   
   def self.make_installation(output_file, input)
     gem_dir = File.dirname(__FILE__)
-    apply_wix_template(output_file, input)
+    create_package(output_file, input)
   end
   
   private   
@@ -120,23 +120,43 @@ class Wix
 	return xml_doc
   end
   
+  def self.modify_file_path(input, file)
+    return file unless(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
+  
+    modify_paths = input[:modify_file_paths]
+    modify_paths.each { |regex, replacement_string| file = file.gsub(regex, replacement_string) }
+  
+    return file
+  end
+
+  def self.files(input)
+    files = input
+    files = input[:files] if(input.kind_of?(Hash))
+
+    files.each { |file| files.delete(file) if(File.directory?(file)) }
+  
+    return files
+  end
+
+  def self.ignore_files(input)
+    files = []
+    files = input[:ignore_files] if(input.kind_of?(Hash) && input.has_key?(:ignore_files))
+    
+    return files
+  end
+  
   def self.copy_install_files(directory, input)
-	files = input[:files]
+	files = files(input)
 	raise 'No files were given to wixgem' if(files.length == 0)
 	
 	missing_files = []
 	files.each do |file| 
-	  if(File.file?(file))
-   	    install_path = file
-        if(input.has_key?(:modify_file_paths))
-          input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
-        end
-
-   	    install_path = "#{directory}/#{install_path}"
-		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
-		FileUtils.cp(file, install_path)
-	  elsif(!File.exists?(file))
-	    missing_files.insert(missing_files.length, file)
+	  if(File.exists?(file))
+	    install_path = "#{directory}/#{modify_file_path(input, file)}"
+	    FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
+	    FileUtils.cp(file, install_path)
+	  else
+	    missing_files << file
 	  end
 	end
 
@@ -171,24 +191,119 @@ class Wix
 	end
   end
 
+  def self.log_wix_output(cmd)
+	return unless(@debug && !@logger.nil?)
+	
+	@logger << "----------------------------------------------------------------------------"
+	@logger << cmd
+	
+	if(!cmd[:output].empty?)
+	  @logger << "--------------------------- std output -----------------------------------"
+	  @logger << cmd[:output]
+	end
+	
+	if(!cmd[:error].empty?)
+	  @logger << "--------------------------- std error ------------------------------------"
+	  @logger << cmd[:error]
+	end
+  end
+  
+  def self.modify_heat_commandline(input, cmd)
+  	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files) && input[:has_vb6_files])
+	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
+	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
+	return cmd
+  end
+
+  def self.execute_heat(input, cmd_line_options)		  
+	heat_cmd = Command.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}")
+	heat_cmd.execute	
+	log_wix_output(heat_cmd)
+  end
+  
+  def self.execute_heat_file(wxs_file, input, template_option)
+	install_files = files(input)
+	modified_paths = []
+    install_files.each { |file| modified_paths << modify_file_path(input, file) }
+	install_files = modified_paths
+	
+	install_ignore_files = ignore_files(input) 
+	modified_paths = []
+    install_ignore_files.each { |file| modified_paths << modify_file_path(input, file) }
+	install_ignore_files = modified_paths
+	
+	install_files.reject! { |f| install_ignore_files.include?(f) }
+
+	directory_fragments = {}
+	wxs_files = {}
+	install_files.each do |file|
+	  windows_path = file.gsub(/\//, '\\')
+	  
+	  filename = wxs_file
+	  if(install_files.index(file) == 0)
+        execute_heat(input, "file \"#{windows_path}\" #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{filename}\"")
+	  else
+		filename = File.basename(wxs_file).gsub('.wxs', "-#{wxs_files.length}.wxs") 
+		execute_heat(input, "file \"#{windows_path}\" -template fragment -gg -nologo -srd -o  \"#{filename}\"")
+		wxs_files[file] = filename
+ 	  end
+
+	  directory_fragments[File.dirname(file)] = "dir#{SecureRandom.uuid.gsub(/-/,'')}"
+	  xml_doc = REXML::Document.new(File.read(filename))
+	  file_elements = REXML::XPath.match(xml_doc, '//Wix/Fragment/DirectoryRef/Component/File')
+	  file_elements[0].attributes['Source'] = "SourceDir\\#{file.gsub(/\//,'\\')}" if(file_elements.length == 1)
+	  file_elements[0].attributes['Id'] = "fil#{SecureRandom.uuid.gsub(/-/,'')}" if(file_elements.length == 1) # Assigning new Id, because the id is somehow generated from the filename. So it is possible for heat to generate duplicate id's
+	  File.open(filename, 'w') { |f| f.puts(xml_doc.to_s) }	
+	end
+	directory_fragments['.'] = 'TARGETDIR'
+	
+	xml_doc = REXML::Document.new(File.read(wxs_file))
+
+	wix_elements = REXML::XPath.match(xml_doc, '//Wix')
+	raise "Invalid wxs file: #{wxs_file}" unless(wix_elements.length == 1)
+	
+	directory_fragments.each do |key, id|
+	  if(key != '.')
+		  fragment_element = wix_elements[0].add_element 'Fragment'
+		  directory_ref_element = fragment_element.add_element 'DirectoryRef', { 'Id' => directory_fragments[File.dirname(key)] }
+		  directory_ref_element.add_element 'Directory', { 'Id' => id, 'Name' => File.basename(key) }
+	  end
+ 	end
+	
+	component_group_element = REXML::XPath.match(xml_doc, '//Wix/Fragment/ComponentGroup')
+	raise "Failed to create installation package for file: #{wxs_file}" unless(component_group_element.length == 1)
+
+	wxs_files.each do |file, filename|
+	  xml_fragment_doc = REXML::Document.new(File.read(filename))
+	  component_elements = REXML::XPath.match(xml_fragment_doc, '//Wix/Fragment/DirectoryRef/Component')
+	  
+	  component_elements.each do |component_element| 
+	    component_element.attributes['Id'] = "cmp#{SecureRandom.uuid.gsub(/-/,'')}" # Assigning new Id, because the id is somehow generated from the filename. So it is possible for heat to generate duplicate id's
+	    component_element = component_group_element[0].add_element component_element, { 'Directory' =>  directory_fragments[File.dirname(file)] } 
+      end		
+	end
+
+	formatter = REXML::Formatters::Pretty.new(2)
+	formatter.compact = true # This is the magic line that does what you need!
+	xml_text=''
+	formatter.write(xml_doc, xml_text)
+	File.open(wxs_file, 'w') { |f| f.puts xml_text }
+  end
+  
+  def self.execute_heat_dir(wxs_file, input, template_option)
+	execute_heat(input,"dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\"")
+  end
+  
   def self.create_wxs_file(wxs_file, input, ext)
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
-
-	cmd = "\"#{install_path}/bin/heat.exe\" dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\""
-	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files) && input[:has_vb6_files])
-	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
-	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
 	
-	heat_cmd = Command.new(cmd)
-	@logger << "command: #{heat_cmd[:command]}" if(@debug && !@logger.nil?)
-
-	heat_cmd.execute	
-	if(@debug && !heat_cmd[:output].empty?)
-	  @logger << "--------------------------- Heat output -----------------------------------"  unless(@logger.nil?)
-	  @logger << heat_cmd[:output] unless(@logger.nil?)
+	if(input.has_key?(:ignore_files))
+		execute_heat_file(wxs_file, input, template_option)
+	else
+		execute_heat_dir(wxs_file, input, template_option)
 	end
-			
+	
 	product_name = File.basename(wxs_file, '.wxs')
     product_name = input[:product_name] if(input.has_key?(:product_name))
 	
@@ -240,25 +355,15 @@ class Wix
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
 	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
-	@logger << "command: #{candle_cmd[:command]}" if(@debug && !@logger.nil?)
-
 	candle_cmd.execute	
-	if(@debug && !candle_cmd[:output].empty?)
-	  @logger << "--------------------------- Candle output -----------------------------------"  unless(@logger.nil?)
-	  @logger << candle_cmd[:output] unless(@logger.nil?)
-	end
+	log_wix_output(candle_cmd)
 	
 	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
-	@logger << "command: #{light_cmd[:command]}" if(@debug && !@logger.nil?)
-
 	light_cmd.execute
-	if(@debug && !light_cmd[:output].empty?)
-	  @logger << "--------------------------- Light output -----------------------------------"  unless(@logger.nil?)
-	  @logger << light_cmd[:output]  unless(@logger.nil?)
-	end
+	log_wix_output(light_cmd)
   end
 
-  def self.apply_wix_template(output, input)
+  def self.create_package(output, input)
     raise 'WIX path is not set!' if(install_path.nil?)
 	input = { files: input } unless(input.kind_of?(Hash))
   	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
@@ -273,6 +378,9 @@ class Wix
  
 	output_absolute_path = File.absolute_path(output)
 
+	#dir = './tmp_dir'
+	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))
+	#FileUtils.mkdir(dir)
 	Dir.mktmpdir do |dir|
 	  copy_install_files(dir, input)
 	  

@@ -22,8 +22,8 @@ class Command < Hash
       self[:output],self[:error], self[:exit_code] = Open3.capture3(self[:command])
       self[:exit_code]=self[:exit_code].to_i
 	  
-	  puts self[:output] unless(self[:quiet])
 	  if(self[:debug])
+	    puts "output: #{self[:output]}"
 	    puts "error: #{self[:error]}"
 	    puts "exit_code: #{self[:exit_code]}"
 	  end

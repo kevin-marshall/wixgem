@@ -43,7 +43,10 @@ def test_files_exist(msi_file, data)
   raise "#{name}: relative_install_dir should be set to the product name" if(relative_install_dir.length == 0)
   relative_install_dir = "#{manufacturer}/#{relative_install_dir}" if(manufacturer.length > 0)
  
-  files(data).each { |file| 
+  file_array = files(data)
+  ignored_files(data).each { |file| file_array.delete(file) }
+  
+  file_array.each { |file| 
     full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
 	raise "#{full_path} not installed." unless(File.exists?(full_path))
   }

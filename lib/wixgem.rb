@@ -229,7 +229,7 @@ class Wix
   end
 
   def self.execute_heat(input, cmd_line_options)		  
-	heat_cmd = Command.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}")
+	heat_cmd = Command.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
 	heat_cmd.execute	
 	log_wix_output(heat_cmd)
   end

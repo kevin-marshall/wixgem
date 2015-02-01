@@ -69,7 +69,6 @@ class WindowsInstaller
 	  raise "Failed to find product code for product: #{product_name}"
 	end
 
-    private
 	def self.product_info(installer, code)
 	  raise 'Windows installer cannot be nil' if(installer.nil?)
 	  hash = Hash.new
@@ -96,13 +95,13 @@ class WindowsInstaller
 	  return hash
 	end
 	
-	public
 	def self.dump_info(product_name)
 	  installer = WIN32OLE.new('WindowsInstaller.Installer')
 	  properties = product_info(installer, product_code_from_product_name(product_name, installer))
 	  properties.each { |id, value| puts "#{id}: #{value}" }
 	end
 
+	private
 	def self.msi_records(msi_file)
 	  records = {}
 	  
@@ -164,7 +163,7 @@ class WindowsInstaller
 	end	
 
     def self.execute(cmd)
-      command = Wixgem::Command.new(cmd)
+      command = Wixgem::Command.new(cmd, { quiet: true } )
 	  #command[:debug] = true
       command.execute
     end

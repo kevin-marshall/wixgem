@@ -10,6 +10,10 @@ describe 'Wixgem' do
     product1='wixgem_multiple 1.0'
     product2='wixgem_multiple 1.1'
       
+	product_name="wixgem_multiple 1.1"
+	while(Wixgem::WindowsInstaller.product_name_installed?(product_name))
+	  Wixgem::WindowsInstaller.uninstall_product_name(product_name)
+	end
     it "product #{product1} should not be installed" do
       expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to be(false)
 	end
@@ -58,11 +62,11 @@ describe 'Wixgem' do
     product2='wixgem_install 1.1'
 	
     it "product #{product1} should not be installed" do
-      expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to be(false)
+      expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to eq(false)
 	end
 
     it "product #{product2} should not be installed" do
-      expect(Wixgem::WindowsInstaller.product_name_installed?(product2)).to be(false)
+      expect(Wixgem::WindowsInstaller.product_name_installed?(product2)).to eq(false)
 	end
 	
     it "should be able to create installation packages #{product1} and #{product2}" do
@@ -72,16 +76,16 @@ describe 'Wixgem' do
 	
     it "should install version 1.0.0" do
 	  Wixgem::WindowsInstaller.install('test\\wixgem_install.1.0.0.msi')
-	  expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to be(true)
+	  expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to eq(true)
 	end
 
     it "should install version 1.1.0" do
 	  Wixgem::WindowsInstaller.install('test\\wixgem_install.1.1.0.msi')
-	  expect(Wixgem::WindowsInstaller.product_name_installed?(product2)).to be(true)
+	  expect(Wixgem::WindowsInstaller.product_name_installed?(product2)).to eq(true)
 	end
 	  
 	it "#{product1} should have been uninstalled when #{product2} was installed" do
-      expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to be(false)
+      expect(Wixgem::WindowsInstaller.product_name_installed?(product1)).to eq(false)
 	end
 	
 	it "should be able to uninstall #{product2}" do

@@ -42,6 +42,22 @@ describe 'Wixgem' do
     }
   end  
   
+  describe 'Packaging mergemodule exceptions' do 
+    exception_test_arguments = [
+      {
+		file: 'test/wixgem_merge_test100.msm', 
+		input: ['test/wixgem_merge_test1.msm', 'test/wixgem_merge_test1.msm'],
+		msg: 'Wixgem exception: Merge modules can not be added to a merge module' 
+	  }
+    ]
+  
+    exception_test_arguments.each { |test|
+	  it "#{test[:file]} should raise an exception" do
+	    expect { Wixgem::Wix.make_installation(test[:file], test[:input]) }.to raise_error(test[:msg])
+	  end
+    }
+  end	
+  
   if(admin?)
     describe 'Multiple merge Module' do 
       msi_file='test\\wixgem_multiple_merge_test1.msi'

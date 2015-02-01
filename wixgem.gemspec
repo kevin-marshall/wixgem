@@ -1,4 +1,4 @@
-# Copyright 2013-2014 Kevin Marshall
+# Copyright 2013-2015 Kevin Marshall
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= "0.44.0"
+	s.version		= "0.47.0"
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.'
 	s.authors		= ["Kevin Marshall"]

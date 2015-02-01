@@ -105,8 +105,15 @@ class Wix
 		}
 	  }
 	}
+	return xml_doc if(merge_modules.length == 0)
 	
 	directory_root = REXML::XPath.match(xml_doc, '//Wix/Product/Directory')
+	if(directory_root.length == 0)
+		module_root = REXML::XPath.match(xml_doc, '//Wix/Module')
+		raise 'Merge modules can not be added to a merge module' unless(module_root.nil?)
+		raise 'Wix element //Wix/Product/Directory does not exist'
+	end
+	
 	default_feature = REXML::XPath.match(xml_doc, '//Wix/Product/Feature')
 
 	merge_modules.each { |component,file|	
@@ -151,12 +158,18 @@ class Wix
 	
 	missing_files = []
 	files.each do |file| 
-	  if(File.exists?(file))
-	    install_path = "#{directory}/#{modify_file_path(input, file)}"
-	    FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
-	    FileUtils.cp(file, install_path)
-	  else
-	    missing_files << file
+	  if(File.file?(file))
+   	    install_path = file
+        if(input.has_key?(:modify_file_paths))
+          input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
+        end
+		raise "Invalid relative installation path: #{install_path}" if(install_path.include?(':'))
+
+   	    install_path = "#{directory}/#{install_path}"		
+		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
+		FileUtils.cp(file, install_path)
+	  elsif(!File.exists?(file))
+	    missing_files.insert(missing_files.length, file)
 	  end
 	end
 
@@ -354,11 +367,11 @@ class Wix
   def self.create_output(wxs_file, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"")
+	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	
 	log_wix_output(candle_cmd)
 	
-	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"")
+	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)
   end

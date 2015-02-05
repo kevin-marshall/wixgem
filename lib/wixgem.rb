@@ -154,8 +154,7 @@ class Wix
   
   def self.copy_install_files(directory, input)
 	files = files(input)
-	raise 'No files were given to wixgem' if(files.length == 0)
-	
+
 	missing_files = []
 	files.each do |file| 
 	  if(File.file?(file))
@@ -174,8 +173,10 @@ class Wix
 	end
 
     if(@debug)	
-	  max_path = files.max { |a, b| a.length <=> b.length }
-	  columen_size = max_path.length + 10
+	  if(files.length > 0)
+		max_path = files.max { |a, b| a.length <=> b.length }
+		columen_size = max_path.length + 10
+	  end
 	    
 	  @logger << "------------------------------------ Installation Paths -----------------------------------" unless(@logger.nil?)
 	  @logger << "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']  unless(@logger.nil?)
@@ -188,8 +189,16 @@ class Wix
 	      @logger << "%-#{columen_size}s %s\n" % [file, install_path]  unless(@logger.nil?)
         end
       end
+      
+	  if(input.has_key?(:ignore_files))
+	    @logger << "------------------------------------ ignoring files -----------------------------------" unless(@logger.nil?)
+		input[:ignore_files].each { |file| @logger << file }
+	  end
+	  
 	  @logger << "-------------------------------------------------------------------------------------------" unless(@logger.nil?)
 	end
+
+	raise 'No files were given to wixgem' if(files.length == 0)
 
 	if(missing_files.length > 0)
 	  missing_files_str = ''
@@ -247,6 +256,10 @@ class Wix
 	
 	install_files.reject! { |f| install_ignore_files.include?(f) }
 
+	package_type = 'installation'
+	package_type = 'merge module' if(template_option.include?('module'))
+	raise "At least one file is required to build a #{package_type}" if(install_files.length == 0)
+	
 	directory_fragments = {}
 	wxs_files = {}
 	install_files.each do |file|
@@ -310,7 +323,7 @@ class Wix
   def self.create_wxs_file(wxs_file, input, ext)
     template_option = "-template product"
 	template_option = "-template module" unless(ext == ".msi")
-	
+
 	if(input.has_key?(:ignore_files))
 		execute_heat_file(wxs_file, input, template_option)
 	else
@@ -376,8 +389,17 @@ class Wix
 	log_wix_output(light_cmd)
   end
 
+  def self.verify_input_keys(input)
+    if(input.kind_of?(Hash))
+	  [:files,:ignore_files].each { |key| raise "Hash key #{key} cannot be nil" if(input.has_key?(key) && input[key].nil?)}
+	end
+  end
+  
   def self.create_package(output, input)
     raise 'WIX path is not set!' if(install_path.nil?)
+
+	verify_input_keys(input)
+	
 	input = { files: input } unless(input.kind_of?(Hash))
   	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
 
@@ -395,21 +417,22 @@ class Wix
 	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))
 	#FileUtils.mkdir(dir)
 	Dir.mktmpdir do |dir|
-	  copy_install_files(dir, input)
-	  
 	  wxs_file = "#{basename}.wxs"	    
-	  Dir.chdir(dir) do |current_dir|
-	    begin
+	  begin
+		copy_install_files(dir, input)
+	  
+		Dir.chdir(dir) do |current_dir|
 		  create_wxs_file(wxs_file, input, ext)
 	      create_output(wxs_file, output_absolute_path)
-		rescue Exception => e
-		  raise "Wixgem exception: #{e}"
-		ensure
-	      FileUtils.cp(wxs_file, "#{output_absolute_path}.wxs") if(File.exists?(wxs_file) && @debug)
-	      File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
 		end
-	  end
+	  rescue Exception => e
+		raise "Wixgem exception: #{e}"
+	  ensure
+	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
+	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
+	  end	  
 	end
+	
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
 	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
 	

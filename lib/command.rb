@@ -22,6 +22,7 @@ class Command < Hash
       self[:exit_code]=self[:exit_code].to_i
 	  
 	  if(self[:debug])
+		puts "command: #{self[:command]}" if(self[:quiet])
 	    puts "output: #{self[:output]}"
 	    puts "error: #{self[:error]}"
 	    puts "exit_code: #{self[:exit_code]}"

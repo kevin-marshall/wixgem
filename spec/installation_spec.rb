@@ -7,16 +7,16 @@ require './spec/test_files_exist.rb'
 describe 'Wixgem' do
   describe 'Installation' do
     test_arguments = {
-      # test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
-      # test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
-	  # test2: ['test/wixgem_install_test2.msi', {manufacturer: 'musco', files: ['Gemfile']}], 
-	  # test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
-	  # test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
-	  # test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
-	  # test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
-	  # test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	  # test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
-	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*')}],
+      test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
+      test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
+	  test2: ['test/wixgem_install_test2.msi', {manufacturer: 'musco', files: ['Gemfile']}], 
+	  test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
+	  test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
+	  test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
+	  test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
+	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
+	  test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
 	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
     }
 	
@@ -41,7 +41,9 @@ describe 'Wixgem' do
       {id: 'test1', msi_file: 'test/wixgem_install_test1.msi', input: nil },
       {id: 'test2', msi_file: 'test/wixgem_install_test2.msi', input: [] },
       {id: 'test3', msi_file: 'test/wixgem_install_test3.msi', input: ['does_not_exist.txt'] },
-	  {id: 'test4', msi_file: 'test/wixgem_install_test3.msi', input: ["#{__FILE__}"], error_msg: "Invalid relative installation path: #{__FILE__}" }	  
+	  {id: 'test4', msi_file: 'test/wixgem_install_test4.msi', input: ["#{__FILE__}"], error_msg: "Invalid relative installation path: #{__FILE__}" },	  
+	  {id: 'test5', msi_file: 'test/wixgem_install_test5.msi', input: { debug: true, files: ["#{__FILE__}"], ignore_files: ["#{__FILE__}"]}},	  
+	  {id: 'test6', msi_file: 'test/wixgem_install_test6.msi', input: { files: Dir.glob('test_files/**/*'), ignore_files: Dir.glob('test_files/**/*')}, error_msg: "At least one file is required" }	  
     ]
   
     exception_test_arguments.each { |test|

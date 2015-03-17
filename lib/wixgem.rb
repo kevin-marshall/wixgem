@@ -69,11 +69,11 @@ class Wix
     # Example custom action
 	#<CustomAction Id='comReg' Directory='INSTALLLOCATION' Execute='deferred' Impersonate='no' ExeCommand='"[NETFRAMEWORK40CLIENTINSTALLROOTDIR]regasm.exe" "[INSTALLLOCATION]EAWordImporter.dll" /codebase' Return='check' />
 
-    manufacturer = 'Not Set'
+    manufacturer = 'Default Manufacturer'
     manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
 	
 	install_path = '[ProgramFilesFolder][ProductName]'
-	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
+	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
 
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)

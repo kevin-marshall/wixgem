@@ -3,6 +3,7 @@ require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
 require './spec/test_files_exist.rb'
+require './spec/test_file_attributes.rb'
 
 describe 'Wixgem' do
   describe 'Installation' do
@@ -17,7 +18,7 @@ describe 'Wixgem' do
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
 	  test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
 	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
-	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
+	  test11: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
     }
 	
     test_arguments.each { |key, value| 
@@ -29,13 +30,30 @@ describe 'Wixgem' do
 	  end
     
 	  it "should install and uninstall: #{value[0]}" do
-	    execute = "test_files_exist('#{value[0]}', #{value[1]})"
-	    execute = value[2] if(value.length == 3)
-	    test_install(key, value[0], value[1], execute) 
+	    test_install(key, value[0], value[1], "test_files_exist('#{value[0]}', #{value[1]})") 
 	  end	  
 	}
   end
-  
+
+#  describe 'test file attributes' do
+#    test_arguments = {
+#	  test100: ['test/wixgem_install_test100.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/*')}],
+#    }
+#	
+#    test_arguments.each { |key, value| 
+#	  File.delete(value[0]) if(File.exists?(value[0]))
+#	
+#	  it "should create an installation file using: #{value[0]}" do
+#        Wixgem::Wix.make_installation(value[0], value[1])
+#	    expect(File.exists?(value[0])).to be(true)	  
+#	  end
+#   
+#	  it "should install and uninstall: #{value[0]}" do
+#	    test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
+#	  end	  
+#	}
+#  end
+
   describe 'Packaging exceptions' do 
     exception_test_arguments = [
       {id: 'test1', msi_file: 'test/wixgem_install_test1.msi', input: nil },

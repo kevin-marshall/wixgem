@@ -7,7 +7,7 @@ class WindowsInstaller
 	  raise "#{msi_file} does not exist!" unless(File.exists?(msi_file))
 	  msi_file = msi_file.gsub(/\//, '\\')
 	  raise "#{msi_file} is already installed" if(WindowsInstaller.msi_installed?(msi_file))
-	  execute("msiexec.exe /i #{msi_file}")
+	  execute("msiexec.exe /quiet /i #{msi_file}")
 	end
 
 	def self.uninstall(msi_file)

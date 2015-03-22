@@ -3,7 +3,6 @@ require 'tmpdir.rb'
 require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
 require 'SecureRandom'
-require 'fiddle'
 require_relative('file.rb')
 
 module Wixgem

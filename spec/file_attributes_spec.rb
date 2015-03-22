@@ -1,8 +1,8 @@
 require 'rspec'
+require './admin.rb'
 require './lib/wixgem.rb'
 require './spec/wixpath.rb'
 require './spec/test_install.rb'
-require './spec/test_files_exist.rb'
 require './spec/test_file_attributes.rb'
 
 describe 'Wixgem' do
@@ -19,9 +19,11 @@ describe 'Wixgem' do
 	    expect(File.exists?(value[0])).to be(true)	  
 	  end
    
-	  it "should install and uninstall: #{value[0]}" do
-	    test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
-	  end	  
+      if(admin?)
+	    it "should install and uninstall: #{value[0]}" do
+	      test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
+	    end
+      end		
 	}
   end  
 end

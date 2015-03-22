@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= "0.52.0"
+	s.version		= "0.53.0"
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.'
 	s.authors		= ["Kevin Marshall"]
@@ -30,4 +30,5 @@ Gem::Specification.new do |s|
 	s.add_development_dependency 'rake', '~> 0'
 	s.add_development_dependency 'rspec', '~> 0'
 	s.add_development_dependency 'dev', '~> 0'
+	s.add_development_dependency 'ffi', '~> 0'
 end

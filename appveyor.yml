@@ -1,8 +1,9 @@
 version: "{build}"
 
 install:
-  - choco install svn
+  - choco install -y svn
   - ps: $env:PATH = "C:\Program Files (x86)\Subversion\bin;" + $env:PATH
+  - gem install bundler --quiet --no-ri --no-rdoc
   - gem install rake --quiet --no-ri --no-rdoc
   - gem install rspec --quiet --no-ri --no-rdoc
   - gem install dev --quiet --no-ri --no-rdoc

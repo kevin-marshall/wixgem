@@ -4,6 +4,7 @@ require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
 require 'SecureRandom'
 require_relative('file.rb')
+require_relative('shortcut.rb')
 
 module Wixgem
 
@@ -140,6 +141,17 @@ class Wix
 		file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
 		file_elements[0].attributes['ReadOnly'] = 'yes' if(file_elements.length == 1)
 	  end
+	end
+	
+	return xml_doc
+  end
+  
+  def self.manage_shortcuts(xml_doc,input)
+	return xml_doc unless(input.has_key?(:shortcuts))
+	
+	input[:shortcuts].each do |file, shortcut_hash|
+	  shortcut = Shortcut.new(file, shortcut_hash)
+	  xml_doc = shortcut.create(xml_doc)
 	end
 	
 	return xml_doc
@@ -384,6 +396,7 @@ class Wix
 	xml_doc = manage_upgrade(xml_doc,input)
 	xml_doc = manage_msm_files(xml_doc)
 	xml_doc = manage_read_only_files(xml_doc,input)
+	xml_doc = manage_shortcuts(xml_doc, input)
 	
 	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	
     #formatter = REXML::Formatters::Pretty.new(2)

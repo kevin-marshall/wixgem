@@ -14,6 +14,10 @@ Text.replace_in_glob './spec/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'
 
 task :commit => [:add]
 
+task :setup do
+	FileUtils.chmod('a-w', 'test_files/ReadOnly.txt')
+end
+
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 puts 'Running as non administrator. Will not be able to test installing the msi files!'

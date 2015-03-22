@@ -3,6 +3,8 @@ require 'tmpdir.rb'
 require 'rexml/document'
 require "#{File.dirname(__FILE__)}/command.rb"
 require 'SecureRandom'
+require 'fiddle'
+require_relative('file.rb')
 
 module Wixgem
 
@@ -126,6 +128,23 @@ class Wix
 	
 	return xml_doc
   end
+
+  def self.manage_read_only_files(xml_doc,input)
+	install_files = files(input)
+	
+	install_files.each do |file| 
+	  absolute_path = file
+	  absolute_path = "#{input[:files_root_dir]}/#{file}" unless(File.exists?(file))
+	  
+	  if(File.read_only?(absolute_path))
+	    install_path = ".\\#{self.modify_file_path(input, file)}"
+		file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
+		file_elements[0].attributes['ReadOnly'] = 'yes' if(file_elements.length == 1)
+	  end
+	end
+	
+	return xml_doc
+  end
   
   def self.modify_file_path(input, file)
     return file unless(input.kind_of?(Hash) && input.has_key?(:modify_file_paths))
@@ -139,9 +158,6 @@ class Wix
   def self.files(input)
     files = input
     files = input[:files] if(input.kind_of?(Hash))
-
-    files.each { |file| files.delete(file) if(File.directory?(file)) }
-  
     return files
   end
 
@@ -166,7 +182,7 @@ class Wix
 
    	    install_path = "#{directory}/#{install_path}"		
 		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
-		FileUtils.cp(file, install_path)
+		FileUtils.cp(file, install_path, { preserve: true })
 	  elsif(!File.exists?(file))
 	    missing_files.insert(missing_files.length, file)
 	  end
@@ -368,6 +384,7 @@ class Wix
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)
 	xml_doc = manage_msm_files(xml_doc)
+	xml_doc = manage_read_only_files(xml_doc,input)
 	
 	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	
     #formatter = REXML::Formatters::Pretty.new(2)
@@ -390,18 +407,17 @@ class Wix
   end
 
   def self.verify_input_keys(input)
-    if(input.kind_of?(Hash))
-	  [:files,:ignore_files].each { |key| raise "Hash key #{key} cannot be nil" if(input.has_key?(key) && input[key].nil?)}
-	end
+	input[:files].reject! { |f| File.directory?(f) }
+
+    [:files,:ignore_files].each { |key| raise "Hash key #{key} cannot be nil" if(input.has_key?(key) && input[key].nil?)}	
   end
   
   def self.create_package(output, input)
     raise 'WIX path is not set!' if(install_path.nil?)
-
-	verify_input_keys(input)
-	
 	input = { files: input } unless(input.kind_of?(Hash))
-  	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
+	verify_input_keys(input)
+	  	
+	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
 
 	start_logger if(@debug)
 	
@@ -412,6 +428,7 @@ class Wix
 	FileUtils.rm(output) if(File.exists?(output))
  
 	output_absolute_path = File.absolute_path(output)
+	input[:files_root_dir] = Dir.pwd
 
 	#dir = './tmp_dir'
 	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))

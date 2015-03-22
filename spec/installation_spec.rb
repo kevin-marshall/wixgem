@@ -18,7 +18,7 @@ describe 'Wixgem' do
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
 	  test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
 	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
-	  test11: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
+	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
     }
 	
     test_arguments.each { |key, value| 
@@ -35,33 +35,14 @@ describe 'Wixgem' do
 	}
   end
 
-#  describe 'test file attributes' do
-#    test_arguments = {
-#	  test100: ['test/wixgem_install_test100.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/*')}],
-#    }
-#	
-#    test_arguments.each { |key, value| 
-#	  File.delete(value[0]) if(File.exists?(value[0]))
-#	
-#	  it "should create an installation file using: #{value[0]}" do
-#        Wixgem::Wix.make_installation(value[0], value[1])
-#	    expect(File.exists?(value[0])).to be(true)	  
-#	  end
-#   
-#	  it "should install and uninstall: #{value[0]}" do
-#	    test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
-#	  end	  
-#	}
-#  end
-
   describe 'Packaging exceptions' do 
     exception_test_arguments = [
-      {id: 'test1', msi_file: 'test/wixgem_install_test1.msi', input: nil },
-      {id: 'test2', msi_file: 'test/wixgem_install_test2.msi', input: [] },
-      {id: 'test3', msi_file: 'test/wixgem_install_test3.msi', input: ['does_not_exist.txt'] },
-	  {id: 'test4', msi_file: 'test/wixgem_install_test4.msi', input: ["#{__FILE__}"], error_msg: "Invalid relative installation path: #{__FILE__}" },	  
-	  {id: 'test5', msi_file: 'test/wixgem_install_test5.msi', input: { debug: true, files: ["#{__FILE__}"], ignore_files: ["#{__FILE__}"]}},	  
-	  {id: 'test6', msi_file: 'test/wixgem_install_test6.msi', input: { files: Dir.glob('test_files/**/*'), ignore_files: Dir.glob('test_files/**/*')}, error_msg: "At least one file is required" }	  
+     {id: 'test1', msi_file: 'test/wixgem_install_exception_test1.msi', input: nil },
+     {id: 'test2', msi_file: 'test/wixgem_install_exception_test2.msi', input: [] },
+     {id: 'test3', msi_file: 'test/wixgem_install_exception_test3.msi', input: ['does_not_exist.txt'] },
+	 {id: 'test4', msi_file: 'test/wixgem_install_exception_test4.msi', input: ["#{__FILE__}"], error_msg: "Invalid relative installation path: #{__FILE__}" },	  
+	 {id: 'test5', msi_file: 'test/wixgem_install_exception_test5.msi', input: { debug: true, files: ["#{__FILE__}"], ignore_files: ["#{__FILE__}"]}},	  
+	 {id: 'test6', msi_file: 'test/wixgem_install_exception_test6.msi', input: { files: Dir.glob('test_files/**/*'), ignore_files: Dir.glob('test_files/**/*')}, error_msg: "At least one file is required" }	  
     ]
   
     exception_test_arguments.each { |test|

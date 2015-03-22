@@ -134,7 +134,7 @@ class Wix
 	
 	install_files.each do |file| 
 	  absolute_path = file
-	  absolute_path = "#{input[:files_root_dir]}/#{file}" unless(File.exists?(file))
+	  absolute_path = "#{input[:original_pwd]}/#{file}" unless(File.exists?(file))
 	  
 	  if(File.read_only?(absolute_path))
 	    install_path = ".\\#{self.modify_file_path(input, file)}"
@@ -428,7 +428,7 @@ class Wix
 	FileUtils.rm(output) if(File.exists?(output))
  
 	output_absolute_path = File.absolute_path(output)
-	input[:files_root_dir] = Dir.pwd
+	input[:original_pwd] = Dir.pwd
 
 	#dir = './tmp_dir'
 	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))

@@ -135,9 +135,10 @@ class Wix
 	install_files.each do |file| 
 	  absolute_path = file
 	  absolute_path = "#{input[:original_pwd]}/#{file}" unless(File.exists?(file))
-	  
+
 	  if(File.read_only?(absolute_path))
-	    install_path = ".\\#{self.modify_file_path(input, file)}"
+	    install_path = ".\\#{self.modify_file_path(input, file).gsub(/\//,'\\')}"
+		install_path = install_path.gsub(/\.\\\\/,'.\\')
 		file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
 		file_elements[0].attributes['ReadOnly'] = 'yes' if(file_elements.length == 1)
 	  end

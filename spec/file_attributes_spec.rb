@@ -29,17 +29,4 @@ describe 'Wixgem' do
       end		
 	}
   end  
-
-  describe 'test file attributes' do
-  files = Rake::FileList.new
-  files.include('/Development/wrk/Musco.Cpp/lightworks.commandline/trunk/vc12/bin/Release/*.{dll,exe}',
-                '/Development/wrk/Musco.Cpp/lightworks.commandline/trunk/library/**/*')
-  Wixgem::Wix.install_path = "#{Environment.dev_root}/dep/OpenSource/WixToolset/3.9"
-  Wixgem::Wix.make_installation("test/lightworks.commandline 1.0.msi",  
-		  {debug: true, manufacturer: 'Musco', product_name: 'Lightworks commandline 1.0', 
-		    version: "1.0.0.0", 
-            upgrade_code: '{ec55f38b-d8b4-459d-ab81-bb970e44c631}', 
-		    files: files,
-			modify_file_paths: {/vc12\/bin\/Release/ => 'bin'}})  
-  end  
 end

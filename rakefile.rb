@@ -1,9 +1,9 @@
-require 'dev'
 require './admin.rb'
+require 'dev'
 
 WIX_VERSION='3.9'
 
-CLEAN.include('test')
+CLEAN.include('test','wix-*.gem')
 
 #COMMANDS[:source].include('test_files/**/*')
 SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}

@@ -43,10 +43,18 @@ class Shortcut
 	
 	shortcut_element.attributes['Advertise']="yes"
 	shortcut_element.attributes['Advertise'] = "no" if(@hash.has_key?(:advertise) && !@hash[:advertise])
+	create_icon_element(shortcut_element) if(@hash.has_key?(:icon))
 	
 	return shortcut_element
   end
-  
+
+  def create_icon_element(shortcut_element)
+    icon_element = shortcut_element.add_element 'Icon'	
+	icon_element.attributes['Id'] = File.basename(@hash[:icon])
+    icon_element.attributes['SourceFile'] = ".\\#{@hash[:icon].gsub(/\//, '\\')}"
+	return icon_element
+  end
+
   def create_directory(xml_doc, directory)
 	raise 'Currently only supporting desktop shortcuts' unless(directory == :desktop)
 	if(directory == :desktop)

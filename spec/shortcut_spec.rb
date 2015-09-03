@@ -10,9 +10,8 @@ describe 'Wixgem' do
 	  {id: 'test1', msi: 'test/wixgem_create_shortcut_test1.msi', wix_hash: {files: ['test_files/32145.txt'], shortcuts: {'test_files/32145.txt' => { :directory => :desktop }}}},
 	  {id: 'test2', msi: 'test/wixgem_create_shortcut_test2.msi', wix_hash: {files: ['test_files/32145.txt'], shortcuts: {'test_files/32145.txt' => { name: 'name', :directory => :desktop}}}},
 	  {id: 'test3', msi: 'test/wixgem_create_shortcut_test3.msi', wix_hash: {files: ['test_files/32145.txt'], shortcuts: {'test_files/32145.txt' => { name: 'name', arguments: '/test', :directory => :desktop}}}},
-	  {id: 'test4', msi: 'test/wixgem_create_shortcut_test4.msi', wix_hash: {files: ['test_files/32145.txt','test_files/Camera.ico'], shortcuts: {'test_files/32145.txt' => { name: 'name', icon: 'test_files/Camera.ico', :directory => :desktop}}}},
-	  {id: 'test5', msi: 'test/wixgem_create_shortcut_test5.msi', wix_hash: {files: ['test_files/32145.txt'], shortcuts: {'test_files/32145.txt' => { name: 'Menu Test', directory: :startup_menu}}}}
-	  
+	  {id: 'test4', msi: 'test/wixgem_create_shortcut_test4.msi', wix_hash: {files: ['test_files/32145.txt','test_files/Camera.ico'], shortcuts: {'test_files/32145.txt' => { name: 'name', icon: 'test_files/Camera.ico', :directory => :desktop}}}}
+	  #{id: 'test5', msi: 'test/wixgem_create_shortcut_test5.msi', wix_hash: {files: ['test_files/32145.txt'], shortcuts: {'test_files/32145.txt' => { name: 'Menu Test', directory: :startup_menu}}}}	  
     ]
 	
     test_arguments.each { |test| 

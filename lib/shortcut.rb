@@ -28,18 +28,15 @@ class Shortcut
 	shortcut_element.attributes['Arguments'] = @hash[:arguments] if(@hash.has_key?(:arguments))
 	
 	shortcut_name = File.basename(@file)
-	shortcut_name = @hash[:name] if(@hash.has_key?(:name))
+	if(@hash.has_key?(:name))
+	  shortcut_name = @hash[:name] 
+	else
+	  @hash[:name] = shortcut_name
+	end
 	shortcut_element.attributes['Name'] = shortcut_name
 
 	shortcut_element.attributes['Description'] = @hash[:description] if(@hash.has_key?(:description))
-	if(@hash.has_key?(:directory)) 
-	  case @hash[:directory]
-	  when :desktop
-		shortcut_element.attributes['Directory'] = 'DesktopFolder'
-	  else
-	    shortcut_element.attributes['Directory'] = @hash[:directory] 
-	  end
-	end
+	shortcut_element.attributes['Directory'] = 'DesktopFolder'
 	
 	shortcut_element.attributes['Advertise']="yes"
 	shortcut_element.attributes['Advertise'] = "no" if(@hash.has_key?(:advertise) && !@hash[:advertise])

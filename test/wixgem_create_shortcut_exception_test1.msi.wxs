@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="{D29C58D7-273A-4C90-8F17-94984BC8C36C}" Language="1033" Manufacturer="PUT-COMPANY-NAME-HERE" Name="PUT-PRODUCT-NAME-HERE" UpgradeCode="{85D48652-8510-417A-AF0C-8793E305B953}" Version="1.0.0.0">
+    <Product Id="{4C8E6462-8B6C-460D-B0ED-FCE4A5CDF3CA}" Language="1033" Manufacturer="PUT-COMPANY-NAME-HERE" Name="PUT-PRODUCT-NAME-HERE" UpgradeCode="{C9220E39-97E3-4541-86DA-D8305038644F}" Version="1.0.0.0">
         <Package Compressed="yes" InstallerVersion="200" />
         <Directory Id="TARGETDIR" Name="SourceDir" />
         <Feature Id="ProductFeature" Level="1" Title="PUT-FEATURE-TITLE-HERE">
@@ -10,7 +10,7 @@
     </Product>
     <Fragment>
         <ComponentGroup Id="InstallionFiles">
-            <Component Id="cmp6CBF876003676ED76F2434744DC1DEBA" Directory="TARGETDIR" Guid="{DA6308BD-09C2-4F48-A08E-5F23A22DF876}">
+            <Component Id="cmp6CBF876003676ED76F2434744DC1DEBA" Directory="TARGETDIR" Guid="{F5227F0F-B243-4BC9-8575-72D5C57A99EC}">
                 <File Id="fil1A494ACB18A36B075959928C734B3431" KeyPath="yes" Source="SourceDir\32145.txt" />
             </Component>
         </ComponentGroup>

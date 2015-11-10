@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-    <Product Id='{43F2B9D8-2B81-441A-A9B3-DECC8C2DDF4B}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_heat_problem_dll' UpgradeCode='{5697D665-4ABA-47FB-9CB1-4B53862E658D}' Version='1.0.0.0'>
+    <Product Id='{7120F709-6622-4FDF-AC58-D51BC3696F97}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_heat_problem_dll' UpgradeCode='{51354DDA-25AA-4539-87EB-934AF0F6F0BD}' Version='1.0.0.0'>
         <Package Compressed='yes' InstallerVersion='450'/>
         <Directory Id='TARGETDIR' Name='SourceDir'/>
         <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
@@ -10,7 +10,7 @@
     <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
     <Fragment>
         <ComponentGroup Id='InstallionFiles'>
-            <Component Directory='dir19E1457555326D3FE821E5F9F4207582' Guid='{6459B796-A061-45E9-837A-805276CFF15A}' Id='cmp23033C56D2083C765F8E662A7B03ADBA'>
+            <Component Directory='dir19E1457555326D3FE821E5F9F4207582' Guid='{92990BAB-D0C6-4A2A-8175-F03E6DF10E9C}' Id='cmp23033C56D2083C765F8E662A7B03ADBA'>
                 <File Id='fil9E8150A85E3C196C4D9E8AEE736DEE4E' KeyPath='yes' Source='.\test_files\heat_com_reg_problem\zlib.dll'/>
             </Component>
         </ComponentGroup>

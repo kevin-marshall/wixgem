@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-    <Product Id='{B32C800A-1666-4EE0-8893-21AA701DBFC6}' Language='1033' Manufacturer='Not Set' Name='wixgem_merge_test2' UpgradeCode='{E4D7A941-310E-42AE-97CD-18796D40B09E}' Version='1.0.0.0'>
+    <Product Id='{AA2A9EDF-E787-4348-942D-F99B75C02A73}' Language='1033' Manufacturer='Not Set' Name='wixgem_merge_test2' UpgradeCode='{ED525C81-5A8B-459B-ABC7-3145E01C7D72}' Version='1.0.0.0'>
         <Package Compressed='yes' InstallerVersion='450'/>
         <Directory Id='TARGETDIR' Name='SourceDir'><Merge DiskId='1' Id='merge9C57E177F4238415B0D0C84ED46C6B85' Language='1033' SourceFile='.\test\wixgem_merge_test2.msm'/></Directory>
         <Feature Id='ProductFeature' Level='1' Title='Files to Install'>

@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
     <Module Id='wixgem_merge_test1' Language='1033' Version='1.0.0.0'>
-        <Package Id='{754A91F3-F92E-47EA-8C2D-BE5C52D8496A}' InstallerVersion='200' Manufacturer='Not Set'/>
+        <Package Id='{D1E75F0E-21EF-4C17-84B9-DA7F75B22A27}' InstallerVersion='200' Manufacturer='Not Set'/>
         <ComponentGroupRef Id='InstallionFiles'/>
         <ComponentRef Id='cmp813D50662C85E719A6DA543981D0DF7E'/>
         <Directory Id='TARGETDIR' Name='SourceDir'/>
     </Module>
     <Fragment>
         <ComponentGroup Id='InstallionFiles'>
-            <Component Directory='TARGETDIR' Guid='{1CB94D7F-9AB2-4228-B500-316D755AE7AC}' Id='cmp813D50662C85E719A6DA543981D0DF7E'>
+            <Component Directory='TARGETDIR' Guid='{11497422-4FA1-4CD7-89AD-0D98DC173522}' Id='cmp813D50662C85E719A6DA543981D0DF7E'>
                 <File Id='fil01C7C0523699D7297537A588D7D820BB' KeyPath='yes' Source='.\rakefile.rb'/>
             </Component>
         </ComponentGroup>

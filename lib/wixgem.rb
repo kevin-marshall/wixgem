@@ -80,24 +80,20 @@ class Wix
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)
 	
+	product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => '[INSTALLDIR]', 'After' => 'CostFinalize', 'Sequence' => 'both' }	
 	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
-	product[0].add_element 'CustomAction', { 'Id' => 'SetARPINSTALLLOCATION', 'Property' => 'ARPINSTALLLOCATION', 'Value' => '[ApplicationFolder]' }
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
 	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetARPINSTALLLOCATION', 'After' => 'CostFinalize' }
 
 	install_ui_sequence = product[0].add_element 'InstallUISequence'
 	custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-	custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetARPINSTALLLOCATION', 'After' => 'CostFinalize' }
 	
 	admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
 	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetARPINSTALLLOCATION', 'After' => 'CostFinalize' }
 
 	admin_ui_sequence = product[0].add_element 'AdminUISequence'
 	custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-	custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetARPINSTALLLOCATION', 'After' => 'CostFinalize' }
 
 	return xml_doc
   end

@@ -20,7 +20,7 @@ desc "Generate an installation msi file"
 task :installation => [:mergemodule] do	  
   installation_files = Dir.glob('./example.msm')
   Wixgem::Wix.make_installation("./example.msi",  
-    { upgrade_code: '{a62c35a7-6a6d-4392-822b-f6aca7eef88b}', 
+    { upgrade_code: '{a62c35a7-6a6d-4392-822b-f6aca7eef88b}', debug: true,
 	  files: installation_files } 
   )
 end

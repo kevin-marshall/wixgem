@@ -3,7 +3,7 @@ require 'dev'
 
 WIX_VERSION='3.9'
 
-CLEAN.include('test/**','wixgem-*.gem','wixgem_install*.msi')
+CLEAN.include('test/**','wixgem_install*.msi')
 
 SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}
 

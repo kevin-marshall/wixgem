@@ -80,7 +80,7 @@ class Wix
 	product = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(product.length == 0)
 	
-	product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => '#{install_path}', 'After' => 'CostFinalize', 'Sequence' => 'both' }	
+	product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{install_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
 	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
 
 	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'

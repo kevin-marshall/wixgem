@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='wixgem_merge_test3' Language='1033' Version='1.0.0.0'>
+        <Package Id='{15CD1E72-D0DD-4167-8FF1-942DBD5CDBE3}' InstallerVersion='200' Manufacturer='Not Set'/>
+        <ComponentGroupRef Id='InstallionFiles'/>
+        <ComponentRef Id='cmpB941A6F34A9C1ACDB7DFD45905FF000B'/>
+        <ComponentRef Id='cmp813D50662C85E719A6DA543981D0DF7E'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+    </Module>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='TARGETDIR' Guid='{EBCC5D36-7EFA-413F-9920-BC68A04A93FC}' Id='cmpB941A6F34A9C1ACDB7DFD45905FF000B'>
+                <File Id='filA25C7980B2D45A22736480C78000FC5F' KeyPath='yes' Source='.\Gemfile'/>
+            </Component>
+            <Component Directory='TARGETDIR' Guid='{A51D3AD5-F926-4634-8CDF-0D8964745028}' Id='cmp813D50662C85E719A6DA543981D0DF7E'>
+                <File Id='fil01C7C0523699D7297537A588D7D820BB' KeyPath='yes' Source='.\rakefile.rb'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

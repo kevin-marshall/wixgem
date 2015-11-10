@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{59BBF2DF-7B32-449A-82D5-0FC4419D639A}' Language='1033' Manufacturer='Not Set' Name='wixgem_merge_test4' UpgradeCode='{76ADE97B-2576-4FB7-B1A4-06AEA72206A3}' Version='1.0.0.0'>
+        <Package Compressed='yes' InstallerVersion='450'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'><Merge DiskId='1' Id='mergeE1DC84E8F1823C9FC41D0E4BADFF5E5F' Language='1033' SourceFile='.\test\wixgem_merge_test4.msm'/></Directory>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        <MergeRef Id='mergeE1DC84E8F1823C9FC41D0E4BADFF5E5F'/></Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dirE623DCEBC9F9CFEE13B66F38FD7634CA' Name='test'/>
+        </DirectoryRef>
+    </Fragment>
+</Wix>

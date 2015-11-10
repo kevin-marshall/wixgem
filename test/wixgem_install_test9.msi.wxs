@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{AB2110D9-18B0-45BF-802A-A790FD821770}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_test9' UpgradeCode='{61E6BF17-2144-44B0-9239-5299E78B1093}' Version='1.0.0.0'>
+        <Package Compressed='yes' InstallerVersion='450'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        </Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='TARGETDIR' Guid='{EA3C8E86-5080-4BD6-B382-E062890EBFE8}' Id='cmp6CBF876003676ED76F2434744DC1DEBA'>
+                <File Id='fil1A494ACB18A36B075959928C734B3431' KeyPath='yes' Source='.\32145.txt'/>
+            </Component>
+            <Component Directory='TARGETDIR' Guid='{2FF65D0C-F151-43A4-83B4-3C898A37053E}' Id='cmpBAE968A34CB61BEFFA8D9716353C0E18'>
+                <File Id='fil0122F21B4BBAA61C69DC5787CD1DC35F' KeyPath='yes' Source='.\Camera.ico'/>
+            </Component>
+            <Component Directory='TARGETDIR' Guid='{F2ECF16B-F761-48CB-8799-BF59C80ED627}' Id='cmpF4D8341031D9F75F8CD96BE8B4ADBF5D'>
+                <File Id='fil551BC8ED66F072F3355F8853447D232C' KeyPath='yes' Source='.\File-With-Hyphen.txt'/>
+            </Component>
+            <Component Directory='TARGETDIR' Guid='{9D040212-3D79-49F5-B6B3-A0F60D978627}' Id='cmp6CED91002DBEF5C74AB8F5EFA8DE5FDB'>
+                <File Id='filB63ED470E1E15F2E089A89B4F55DFD73' KeyPath='yes' ReadOnly='yes' Source='.\ReadOnly.txt'/>
+            </Component>
+            <Component Directory='TARGETDIR' Guid='{F4E9C4C1-3AEE-4E22-BE85-6ECB66C94486}' Id='cmpC4602F5A354E424AC7CCB9031AF52686'>
+                <File Id='fil29C3E8A4713CB9A7BD1435FDFE7E29BE' KeyPath='yes' Source='.\test.exe'/>
+            </Component>
+            <Component Directory='dir715770DB9E04B7524F1E2F9BE82FC40D' Guid='{D02353A9-2EA7-4748-B0B0-51D3C674625D}' Id='cmpE33E22E4D5DC03F40F4C0020A2A746CF'>
+                <File Id='fil566EA8B1923BB36AF8C48EC7C47BADD0' KeyPath='yes' Source='.\8.0\File With Space.txt'/>
+            </Component>
+            <Component Directory='dir3EE2B822E31E0231520E359488DA4936' Guid='{00C9DAC9-8AF2-41A8-AFAC-F8489734134B}' Id='cmp0D56DC13B251960C1F29D3C134260CB4'>
+                <File Id='fil309CE3D06A6FD016E1DAACC7DBE530AD' KeyPath='yes' Source='.\9.0\File With Space.txt'/>
+            </Component>
+            <Component Directory='dir26297785B55A5B894C2B14F83000FF73' Guid='{7C19F5CA-4CF2-443A-82C3-6762685F0197}' Id='cmp7B7BE2C44CAA6A86CB7393B5708F6BBA'>
+                <File Id='fil8E51BC711D18FE874F9EF1EC341279F1' KeyPath='yes' Source='.\9.0\test_files\a_file.txt'/>
+            </Component>
+            <Component Directory='dirD65B7FF60DEDEAD03CBB1DBAF21DC155' Guid='{4CD9AA42-DB58-4FA7-9A78-372FCE4FEE76}' Id='cmp78AE98DBB29ADAE96ECFE9610B05E663'>
+                <File Id='fil1CB698AC4D7454E9B313FB5C6EEC0BEC' KeyPath='yes' Source='.\heat_com_reg_problem\zlib.dll'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='dir3EE2B822E31E0231520E359488DA4936'>
+            <Directory Id='dir26297785B55A5B894C2B14F83000FF73' Name='test_files'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dir3EE2B822E31E0231520E359488DA4936' Name='9.0'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dir715770DB9E04B7524F1E2F9BE82FC40D' Name='8.0'/>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dirD65B7FF60DEDEAD03CBB1DBAF21DC155' Name='heat_com_reg_problem'/>
+        </DirectoryRef>
+    </Fragment>
+</Wix>

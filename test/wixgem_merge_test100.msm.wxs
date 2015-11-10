@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Module Id="PUT-MODULE-NAME-HERE" Language="1033" Version="1.0.0.0">
+        <Package Id="{B4F54B22-F87F-48B8-9833-FB1216C6700C}" InstallerVersion="200" Manufacturer="PUT-COMPANY-NAME-HERE" />
+        <ComponentGroupRef Id="InstallionFiles" />
+        <ComponentRef Id="cmp626585919A3E43F660332BCFE1D396F0" />
+        <Directory Id="TARGETDIR" Name="SourceDir" />
+    </Module>
+    <Fragment>
+        <ComponentGroup Id="InstallionFiles">
+            <Component Id="cmp626585919A3E43F660332BCFE1D396F0" Directory="dirE623DCEBC9F9CFEE13B66F38FD7634CA" Guid="{B0E0DE97-87FC-4EAE-BA40-0F2CA1B643E1}">
+                <File Id="fil3F0A52BED8122776B8BFF97BAD049FE9" KeyPath="yes" Source="SourceDir\test\wixgem_merge_test1.msm" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="TARGETDIR">
+            <Directory Id="dirE623DCEBC9F9CFEE13B66F38FD7634CA" Name="test" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

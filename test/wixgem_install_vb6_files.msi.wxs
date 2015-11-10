@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{C8B86881-04BD-49E2-A752-20DC9FB1447D}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_vb6_files' UpgradeCode='{9FB9B61D-F6DB-40C1-8BEB-18620A56DACF}' Version='1.0.0.0'>
+        <Package Compressed='yes' InstallerVersion='450'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        </Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='TARGETDIR' Guid='{DFBF4D24-4D78-42E7-8C39-E4487B4BC249}' Id='cmp813D50662C85E719A6DA543981D0DF7E'>
+                <File Id='fil01C7C0523699D7297537A588D7D820BB' KeyPath='yes' Source='.\rakefile.rb'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{7F6917F8-A4EF-46D6-8667-E3C75B4E77C8}' Language='1033' Manufacturer='Not Set' Name='wixgem_create_shortcut_test2' UpgradeCode='{E6C718D5-7EC7-4933-A558-40C938E9E477}' Version='1.0.0.0'>
+        <Package Compressed='yes' InstallerVersion='450'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        </Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Guid='{439B4E68-E360-47CD-AB59-AA8DAC9E217D}' Id='cmp76459E1097DAAE80980B9D598A3AD93E'>
+                <File Id='filC0B8D6FA3507CE639640629756DBF80D' KeyPath='yes' Source='.\test_files\32145.txt'><Shortcut Advertise='yes' Directory='DesktopFolder' Id='Shortcut_b1e0a26bb1894dd8bf2db6d3bec51ba8' Name='name'/></File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Name='test_files'/>
+        </DirectoryRef>
+    </Fragment>
+<Fragment><DirectoryRef Id='TARGETDIR'><Directory Id='DesktopFolder' Name='Desktop'/></DirectoryRef></Fragment></Wix>

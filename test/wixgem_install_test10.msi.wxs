@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Id='{4EBDE663-B541-4664-8585-64723150A3AD}' Language='1033' Manufacturer='Not Set' Name='wixgem_install_test10' UpgradeCode='{0ACB79D6-C03D-4773-9E0E-8EA4E071AA9D}' Version='1.0.0.0'>
+    <Package Compressed='yes' InstallerVersion='450'/>
+    <Directory Id='TARGETDIR' Name='SourceDir'/>
+    <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+      <ComponentGroupRef Id='InstallionFiles'/>
+    </Feature>
+    <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+  <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+  <Fragment>
+    <ComponentGroup Id='InstallionFiles'>
+      <Component Directory='TARGETDIR' Guid='{5252A26A-CFA9-468E-B7DE-21B9814CA9DC}' Id='cmp4A983AF40FB7CEEB167926FEA9A2BA10'>
+        <File Id='fil64DB3D5852600DA5FDE7CEC100CB1E13' KeyPath='yes' Source='.\32145.txt'/>
+      </Component>
+      <Component Directory='dir00812b17f1e54fb196f39623d9874a8c' Guid='{F6821CF2-3575-40EC-98F1-9076A26F5D2C}' Id='cmp5676e814fa524a948453dae1785712f0'>
+        <File Id='fild209c5bada7e432d8591925cc909c730' KeyPath='yes' Source='.\8.0\File With Space.txt'/>
+      </Component>
+      <Component Directory='dir1d6905ea139c4bc6acbb0bcdfeb9fe69' Guid='{26947B6F-9800-47B5-B740-0EC1013BD9B9}' Id='cmp2e5aaf2bd93e4105a5e983cfe96de783'>
+        <File Id='fil61748bc1e325430aa653e62f62f60e21' KeyPath='yes' Source='.\9.0\File With Space.txt'/>
+      </Component>
+      <Component Directory='diraa3fab6a692348219f02f31b1cb3564e' Guid='{B30087E6-08E1-4503-99DA-81C773F2B60D}' Id='cmpd224d989c3c14579acd07b473f5bd302'>
+        <File Id='fil2f80ee7a86ab424db5ffdcb8c19a121e' KeyPath='yes' Source='.\9.0\test_files\a_file.txt'/>
+      </Component>
+      <Component Directory='TARGETDIR' Guid='{86DDF5C6-0055-4B67-8C92-363EF2108BA2}' Id='cmp2a273caf323540a7b33b5952ee3aaf58'>
+        <File Id='filb27f77c6929e4038b134a1040d8895b1' KeyPath='yes' Source='.\Camera.ico'/>
+      </Component>
+      <Component Directory='TARGETDIR' Guid='{D72B9886-744E-466D-880D-44780B5EECA4}' Id='cmpaa308feda38c4235b32acfbc00a839ef'>
+        <File Id='filb7e7a8d7fabc495e98e57cf1c5bae6fb' KeyPath='yes' Source='.\File-With-Hyphen.txt'/>
+      </Component>
+      <Component Directory='TARGETDIR' Guid='{BA213C2A-6E17-4D8F-BDA5-F1311948DAB5}' Id='cmp1349c38090d44d6cb98dc2e0fcb164f4'>
+        <File Id='fil6f89ad02d37345a4ababba11c48a564c' KeyPath='yes' ReadOnly='yes' Source='.\ReadOnly.txt'/>
+      </Component>
+      <Component Directory='TARGETDIR' Guid='{41AB2995-A877-4342-9836-895B724FB57A}' Id='cmpfd2a987854b34c5982ab1aad0ec05442'>
+        <File Id='filb0b6d5d7dd764ee8b63ced59b76bad88' KeyPath='yes' Source='.\test.exe'/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <DirectoryRef Id='TARGETDIR'>
+      <Directory Id='dir00812b17f1e54fb196f39623d9874a8c' Name='8.0'/>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
+    <DirectoryRef Id='TARGETDIR'>
+      <Directory Id='dir1d6905ea139c4bc6acbb0bcdfeb9fe69' Name='9.0'/>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
+    <DirectoryRef Id='dir1d6905ea139c4bc6acbb0bcdfeb9fe69'>
+      <Directory Id='diraa3fab6a692348219f02f31b1cb3564e' Name='test_files'/>
+    </DirectoryRef>
+  </Fragment>
+</Wix>

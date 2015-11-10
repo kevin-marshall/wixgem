@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id='{6D8B2332-1F67-47F7-9C75-9D47D2CA47D5}' Language='1033' Manufacturer='Not Set' Name='wixgem_create_shortcut_test4' UpgradeCode='{F140AB74-383A-47FF-8DCB-D65F0B770723}' Version='1.0.0.0'>
+        <Package Compressed='yes' InstallerVersion='450'/>
+        <Directory Id='TARGETDIR' Name='SourceDir'/>
+        <Feature Id='ProductFeature' Level='1' Title='Files to Install'>
+            <ComponentGroupRef Id='InstallionFiles'/>
+        </Feature>
+        <Media Cabinet='product.cab' EmbedCab='yes' Id='1'/>
+    <CustomAction Execute='firstSequence' Id='SetTARGETDIR' Property='TARGETDIR' Return='check' Value='[ProgramFilesFolder][ProductName]'/><InstallExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallExecuteSequence><InstallUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></InstallUISequence><AdminExecuteSequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminExecuteSequence><AdminUISequence><Custom Action='SetTARGETDIR' Before='CostInitialize'/></AdminUISequence></Product>
+    <Fragment>
+        <ComponentGroup Id='InstallionFiles'>
+            <Component Directory='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Guid='{077921F8-DC12-453C-AFF4-FA2C94946CB6}' Id='cmp76459E1097DAAE80980B9D598A3AD93E'>
+                <File Id='filC0B8D6FA3507CE639640629756DBF80D' KeyPath='yes' Source='.\test_files\32145.txt'><Shortcut Advertise='yes' Directory='DesktopFolder' Id='Shortcut_e3d122d38a774fffab6263a5cea5ca1d' Name='name'><Icon Id='Camera.ico' SourceFile='.\test_files\Camera.ico'/></Shortcut></File>
+            </Component>
+            <Component Directory='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Guid='{6AD12323-5197-4A50-A671-94E28AF32BF6}' Id='cmp79BB711655458E63B928FA747104E05E'>
+                <File Id='filF5B8F2C7AF58F61E6FAE2DB734B8DA87' KeyPath='yes' Source='.\test_files\Camera.ico'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id='TARGETDIR'>
+            <Directory Id='dirE881972EA8E0B8FCAF6CEF6ABF73EFDD' Name='test_files'/>
+        </DirectoryRef>
+    </Fragment>
+<Fragment><DirectoryRef Id='TARGETDIR'><Directory Id='DesktopFolder' Name='Desktop'/></DirectoryRef></Fragment></Wix>

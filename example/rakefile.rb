@@ -1,7 +1,7 @@
 require 'wixgem'
 	
-#Wixgem::Wix.install_path = 'E:\Development\dep\OpenSource\WixToolset\3.9'
-Wixgem::Wix.install_path = '<Path to the root directory of the wix toolset>'
+Wixgem::Wix.install_path = 'C:\Development\dep\OpenSource\WixToolset\3.9'
+#Wixgem::Wix.install_path = '<Path to the root directory of the wix toolset>'
 
 task :create_installation_files do
   FileUtils.mkpath('./install_files/directory')

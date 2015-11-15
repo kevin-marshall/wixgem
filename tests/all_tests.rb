@@ -1,3 +1,4 @@
+require 'fileutils'
 require_relative 'installation_test.rb'
 require_relative 'mergemodule_test.rb'
 #require_relative 'file_attributes_test.rb'

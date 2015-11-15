@@ -9,11 +9,11 @@ require_relative 'test_install.rb'
 #require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 
-class WindowsInstaller_test < MiniTest::Unit::TestCase
+class MergeModule_test < MiniTest::Unit::TestCase
   def setup
 	@installer = Wixgem::WindowsInstaller.new
-	FileUtils.cp('../rakefile.rb', '.') unless(File.exists?('rakefile.rb'))
-	FileUtils.cp('../Gemfile', '.') unless(File.exists?('Gemfile'))
+	FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
+	FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
   end
   def teardown
     File.delete('rakefile.rb')

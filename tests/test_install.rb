@@ -1,6 +1,6 @@
 require_relative '../lib/WindowsInstaller.rb'
 
-require_relative 'admin.rb'
+require_relative '../lib/admin.rb'
 require_relative '../lib/command.rb'
 
 def get_product_name(msi_file, wix_hash)

@@ -1,10 +1,11 @@
-require_relative 'tests/admin.rb'
 require 'dev'
 require 'rbconfig'
+require_relative 'lib/admin.rb'
+require 'cmd'
 
 WIX_VERSION='3.9'
 
-CLEAN.include('example/*.wxs','tests/test/**','wixgem_install*.msi')
+CLEAN.include('example/*.wxs','tests/test/**','tests/wixgem_install*.*', 'tests/rakefile.rb', 'tests/Gemfile')
 
 SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}
 
@@ -36,7 +37,7 @@ task :test => [:setup] do
   Dir.chdir('tests') do
 	MSBuild.get_build_commands 'COMObject/COMObject.sln'
   
-    cmd = Wixgem::Command.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb")
+    cmd = CMD.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb", {echo_output: false})
 	cmd.execute	
   end
 end

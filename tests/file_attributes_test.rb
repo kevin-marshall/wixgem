@@ -5,7 +5,7 @@ require_relative '../lib/wixgem.rb'
 require_relative 'wixpath.rb'
 require_relative 'test_file_attributes.rb'
 require_relative 'test_install.rb'
-require_relative 'admin.rb'
+require_relative '../lib/admin.rb'
 
 class FileAttributes_test < MiniTest::Unit::TestCase
   def test_file_attributes

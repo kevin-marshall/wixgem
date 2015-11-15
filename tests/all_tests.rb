@@ -1,2 +1,7 @@
-require_relative 'instiallation_test.rb'
-
+require_relative 'installation_test.rb'
+require_relative 'mergemodule_test.rb'
+#require_relative 'file_attributes_test.rb'
+require_relative 'file_test.rb'
+require_relative 'multiple_product_installation_test.rb'
+#require_relative 'COM_test.rb'
+require_relative 'shortcut_test.rb'

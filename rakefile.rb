@@ -1,29 +1,45 @@
-require './admin.rb'
+require_relative 'tests/admin.rb'
 require 'dev'
+require 'rbconfig'
 
 WIX_VERSION='3.9'
 
-CLEAN.include('test/**','wixgem_install*.msi')
+CLEAN.include('example/*.wxs','tests/test/**','wixgem_install*.msi')
 
 SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}
 
 WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/#{WIX_VERSION}"
 
-Text.replace_in_glob './spec/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
+Text.replace_in_glob './tests/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
 
 task :commit => [:add]
 
 task :setup do
-	FileUtils.chmod('a-w', 'test_files/ReadOnly.txt')
+	FileUtils.chmod('a-w', 'tests/test_files/ReadOnly.txt')
 end
 
 task :add => [:clean]
 
 task :pre_build do
-  Dir.glob('**/*.wxs') { |f| File.delete(f) } # Default build task tries to build these
+  Dir.glob('**/*.wxs').each { |f| File.delete(f) } # Default build task tries to build these
 end
-task :build => [:pre_build]
 
+task :build => [:pre_build] do
+  Dir.chdir('example') do
+    cmd = Wixgem::Command.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
+    cmd.execute	
+  end
+end
+
+
+task :test => [:setup] do
+  Dir.chdir('tests') do
+	MSBuild.get_build_commands 'COMObject/COMObject.sln'
+  
+    cmd = Wixgem::Command.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb")
+	cmd.execute	
+  end
+end
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 puts 'Running as non administrator. Will not be able to test installing the msi files!'

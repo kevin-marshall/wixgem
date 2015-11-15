@@ -9,18 +9,19 @@ require_relative('shortcut.rb')
 module Wixgem
 
 class Wix
+  @@install_path = ''
+  @@install_path = ENV['WIX'] unless(ENV['WIX'].nil?)
+
   def self.initialize
-    @install_path = ''
-	@install_path = ENV['WIX'] unless(ENV['WIX'].nil?)
 	@debug = false
 	@logger = nil
 	@log_file = nil
   end
   def self.install_path=(path)
-    @install_path = path
+    @@install_path = path
   end
   def self.install_path
-    return @install_path
+    return @@install_path
   end
   
   def self.debug=(bool)
@@ -428,7 +429,7 @@ class Wix
   end
   
   def self.create_package(output, input)
-    raise 'WIX path is not set!' if(install_path.nil?)
+    raise 'WIX path is not set! Assign with Wixgem::Wix.install_path = WIX_PATH' if(self.install_path.nil?)
 	input = { files: input } unless(input.kind_of?(Hash))
 	verify_input_keys(input)
 	  	

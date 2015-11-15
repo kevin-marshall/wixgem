@@ -20,8 +20,7 @@ class FileAttributes_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(value[0]), "should create an installation file using: #{value[0]}")	  
    
       if(admin?)
-	    #test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
-	    test_install(key, value[0], value[1]) 
+	    test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
       end		
 	}
   end  

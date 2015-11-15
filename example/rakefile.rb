@@ -1,8 +1,6 @@
-require 'wixgem'
+require_relative '../lib/wixgem.rb'
+#require 'wixgem'	Use this require statement when including in a project outside of wixgem
 	
-#Wixgem::Wix.install_path = 'C:\Development\dep\OpenSource\WixToolset\3.9'
-Wixgem::Wix.install_path = '<Path to the root directory of the wix toolset>'
-
 task :create_installation_files do
   FileUtils.mkpath('./install_files/directory')
   sleep(1)
@@ -20,8 +18,7 @@ desc "Generate an installation msi file"
 task :installation => [:mergemodule] do	  
   installation_files = Dir.glob('./example.msm')
   Wixgem::Wix.make_installation("./example.msi",  
-    { upgrade_code: '{a62c35a7-6a6d-4392-822b-f6aca7eef88b}',
-	  files: installation_files } 
+    { upgrade_code: '{a62c35a7-6a6d-4392-822b-f6aca7eef88b}', files: installation_files } 
   )
 end
 

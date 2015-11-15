@@ -429,7 +429,7 @@ class Wix
   end
   
   def self.create_package(output, input)
-    raise 'WIX path is not set! Assign with Wixgem::Wix.install_path = WIX_PATH' if(self.install_path.nil?)
+    raise 'WIX path is not set! Install Wixtoolset or assign with Wixgem::Wix.install_path = <path to wix toolset' if(self.install_path.nil?)
 	input = { files: input } unless(input.kind_of?(Hash))
 	verify_input_keys(input)
 	  	

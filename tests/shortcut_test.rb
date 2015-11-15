@@ -3,7 +3,6 @@ require_relative '../lib/wixgem.rb'
 require_relative '../lib/file.rb'
 require_relative 'test_install.rb'
 require_relative 'test_shortcut.rb'
-require_relative 'wixpath.rb'
 
 class Shortcut_test < MiniTest::Unit::TestCase
   def test_creating_shortcuts

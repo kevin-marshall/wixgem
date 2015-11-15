@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require_relative '../lib/wixgem.rb'
-require_relative 'wixpath.rb'
 require 'WindowsInstaller.rb'
 require_relative '../lib/file.rb'
 require_relative '../lib/admin.rb'

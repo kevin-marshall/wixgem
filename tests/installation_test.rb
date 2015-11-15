@@ -3,7 +3,6 @@ require 'WindowsInstaller'
 require 'win32ole'
 
 require_relative '../lib/wixgem.rb'
-require_relative 'wixpath.rb'
 require_relative 'test_install.rb'
 require_relative 'test_files_exist.rb'
 require_relative 'test_file_attributes.rb'

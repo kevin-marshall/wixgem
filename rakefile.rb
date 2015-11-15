@@ -9,10 +9,6 @@ CLEAN.include('example/*.wxs','tests/test/**','tests/wixgem_install*.*', 'tests/
 
 SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}
 
-WIX_PATH = "#{Environment.dev_root}/dep/OpenSource/WixToolset/#{WIX_VERSION}"
-
-Text.replace_in_glob './tests/wixpath.rb',/WIX_PATH='.+'/,"WIX_PATH='#{WIX_PATH}'"
-
 task :commit => [:add]
 
 task :setup do

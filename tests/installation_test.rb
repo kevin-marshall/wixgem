@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require_relative('../lib/WindowsInstaller.rb')
+require 'WindowsInstaller'
 require 'win32ole'
 
 require_relative '../lib/wixgem.rb'
@@ -11,7 +11,7 @@ require_relative 'assert_exception.rb'
 
 class Installation_test < MiniTest::Unit::TestCase
   def setup
-	@installer = Wixgem::WindowsInstaller.new
+	@installer = WindowsInstaller.new
 	FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
 	FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
   end

@@ -1,7 +1,7 @@
-require_relative 'command.rb'
+require 'cmd.rb'
 
 def admin?
-  cmd = Wixgem::Command.new('net session')
+  cmd = CMD.new('net session')
   cmd[:ignore_exit_code] = true
   cmd[:quiet] = true
   cmd.execute

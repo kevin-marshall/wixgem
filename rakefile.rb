@@ -27,7 +27,7 @@ end
 
 task :build => [:pre_build] do
   Dir.chdir('example') do
-    cmd = Wixgem::Command.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
+    cmd = CMD.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
     cmd.execute	
   end
 end

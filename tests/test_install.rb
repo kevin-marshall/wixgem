@@ -1,7 +1,6 @@
-require_relative '../lib/WindowsInstaller.rb'
+require 'WindowsInstaller'
 
 require_relative '../lib/admin.rb'
-require_relative '../lib/command.rb'
 
 def get_product_name(msi_file, wix_hash)
   product_name = File.basename(msi_file, File.extname(msi_file))
@@ -13,7 +12,8 @@ end
 def test_msi(msi_file, wix_hash)
   product_name = get_product_name(msi_file, wix_hash)
 	
-  msi_info = Wixgem::WindowsInstaller.msi_records(msi_file)
+  installer = WindowsInstaller.new
+  msi_info = installer.msi_properties(msi_file)
   #puts msi_info.to_s
   
   if(wix_hash.has_key?(:product_name))
@@ -44,21 +44,23 @@ def test_install(name, msi_file, wix_hash, callback=nil)
   msi_file = msi_file.gsub(/\//) { |s| s = '\\' }
   test_msi(msi_file, wix_hash)
   
-  msi_info = Wixgem::WindowsInstaller.msi_records(msi_file)
+  installer = WindowsInstaller.new
+
+  msi_info = installer.msi_properties(msi_file)
   product_name = msi_info['ProductName']
 	
   if(admin?)
-	while(Wixgem::WindowsInstaller.product_name_installed?(product_name))
-	  Wixgem::WindowsInstaller.uninstall_product_name(product_name)
+	while(installer.product_installed?(product_name))
+	  installer.uninstall_product(product_name)
 	end
-    raise "#{name}: Uninstall #{product_name} before running tests" if(Wixgem::WindowsInstaller.product_name_installed?(product_name))
+    raise "#{name}: Uninstall #{product_name} before running tests" if(installer.product_installed?(product_name))
     
-	Wixgem::WindowsInstaller.install(msi_file)			
-	raise "#{name}: Product name #{product_name} is not installed" unless(Wixgem::WindowsInstaller.product_name_installed?(product_name))
+	installer.install_msi(msi_file)			
+	raise "#{name}: Product name #{product_name} is not installed" unless(installer.product_installed?(product_name))
 
 	eval callback unless(callback == nil)
 	 
-	Wixgem::WindowsInstaller.uninstall(msi_file) if(Wixgem::WindowsInstaller.product_name_installed?(product_name))
-	raise "Failed to uninstall product #{product_name}" if(Wixgem::WindowsInstaller.product_name_installed?(product_name))
+	installer.uninstall_msi(msi_file) if(installer.product_installed?(product_name))
+	raise "Failed to uninstall product #{product_name}" if(installer.product_installed?(product_name))
   end
 end

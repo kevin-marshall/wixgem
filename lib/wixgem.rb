@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tmpdir.rb'
 require 'rexml/document'
-require "#{File.dirname(__FILE__)}/command.rb"
+require 'CMD'
 require 'SecureRandom'
 require_relative('file.rb')
 require_relative('shortcut.rb')
@@ -269,7 +269,7 @@ class Wix
   end
 
   def self.execute_heat(input, cmd_line_options)		  
-	heat_cmd = Command.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
+	heat_cmd = CMD.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
 	heat_cmd.execute	
 	log_wix_output(heat_cmd)
   end
@@ -413,11 +413,11 @@ class Wix
   def self.create_output(wxs_file, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	candle_cmd = Command.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
+	candle_cmd = CMD.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	
 	log_wix_output(candle_cmd)
 	
-	light_cmd = Command.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"", { quiet: true })
+	light_cmd = CMD.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)
   end

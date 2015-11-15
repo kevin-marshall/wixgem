@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require_relative('../lib/WindowsInstaller.rb')
+require 'WindowsInstaller.rb'
 #require 'win32ole'
 
 require_relative '../lib/wixgem.rb'
@@ -11,7 +11,7 @@ require_relative 'assert_exception.rb'
 
 class MergeModule_test < MiniTest::Unit::TestCase
   def setup
-	@installer = Wixgem::WindowsInstaller.new
+    @installer = WindowsInstaller.new
 	FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
 	FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
   end
@@ -77,12 +77,12 @@ class MergeModule_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(msi_file),"should be able to create an installation file using: #{msi_file}")
 	
 
-	  Wixgem::WindowsInstaller.install(msi_file)
+	  @installer.install_msi(msi_file)
 	    
 	  install_dir = "C:/Program Files (x86)/#{File.basename(msi_file, '.msi')}"
 	  assert(File.exists?("#{install_dir}/rakefile.rb"),"should install contents of merge module")
 	  assert(File.exists?("#{install_dir}/Gemfile"),"should install contents of merge module")
-	  Wixgem::WindowsInstaller.uninstall(msi_file) if(Wixgem::WindowsInstaller::msi_installed?(msi_file))
+	  @installer.uninstall_msi(msi_file) if(@installer.msi_installed?(msi_file))
     end 
   end
 end

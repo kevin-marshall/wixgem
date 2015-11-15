@@ -1,5 +1,3 @@
-require 'rspec'
-
 def os_x64?
 	return false unless(ENV.has_key?('ProgramFiles(x86)'))
 	return true

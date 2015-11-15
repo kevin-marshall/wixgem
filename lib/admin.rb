@@ -1,4 +1,4 @@
-require './lib/command.rb'
+require_relative 'command.rb'
 
 def admin?
   cmd = Wixgem::Command.new('net session')

@@ -19,6 +19,11 @@ end
 
 task :add => [:clean]
 
+task :pre_build do
+  Dir.glob('**/*.wxs') { |f| File.delete(f) } # Default build task tries to build these
+end
+task :build => [:pre_build]
+
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 puts 'Running as non administrator. Will not be able to test installing the msi files!'

@@ -11,6 +11,7 @@ module Wixgem
 class Wix
   def self.initialize
     @install_path = ''
+	@install_path = ENV['WIX'] unless(ENV['WIX'].nil?)
 	@debug = false
 	@logger = nil
 	@log_file = nil

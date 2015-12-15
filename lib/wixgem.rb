@@ -9,6 +9,7 @@ require_relative('shortcut.rb')
 module Wixgem
 
 class Wix
+
   @@install_path = ''
   @@install_path = ENV['WIX'] unless(ENV['WIX'].nil?)
 
@@ -310,6 +311,7 @@ class Wix
 	  file_elements = REXML::XPath.match(xml_doc, '//Wix/Fragment/DirectoryRef/Component/File')
 	  file_elements[0].attributes['Source'] = "SourceDir\\#{file.gsub(/\//,'\\')}" if(file_elements.length == 1)
 	  file_elements[0].attributes['Id'] = "fil#{SecureRandom.uuid.gsub(/-/,'')}" if(file_elements.length == 1) # Assigning new Id, because the id is somehow generated from the filename. So it is possible for heat to generate duplicate id's
+
 	  File.open(filename, 'w') { |f| f.puts(xml_doc.to_s) }	
 	end
 	directory_fragments['.'] = 'TARGETDIR'

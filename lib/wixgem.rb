@@ -59,12 +59,7 @@ class Wix
 	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
 	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
 	
-	  upgrade = product[0].add_element 'Upgrade', { 'Id' => input[:upgrade_code] }
-	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWERVERSIONDETECTED' }
-	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '0.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'PREVIOUSVERSIONSINSTALLED' }
-
-	  install_and_execute = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
-	  install_and_execute[0].add_element 'RemoveExistingProducts', { 'Before'=>'InstallInitialize' }
+	  upgrade = product[0].add_element 'MajorUpgrade', { 'AllowDowngrades' => 'yes' }
 	end
 	
 	return xml_doc

@@ -61,7 +61,7 @@ class Wix
 	
 	  upgrade = product[0].add_element 'Upgrade', { 'Id' => input[:upgrade_code] }
 	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => input[:version], 'OnlyDetect'=>'yes', 'Property'=>'NEWERVERSIONDETECTED' }
-	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '0.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'OLDERVERSIONBEINGUPGRADED' }
+	  upgrade.add_element 'UpgradeVersion', { 'Minimum' => '0.0.0', 'IncludeMinimum'=>'yes','Maximum'=>input[:version],'IncludeMaximum'=>'no','Property'=>'PREVIOUSVERSIONSINSTALLED' }
 
 	  install_and_execute = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
 	  install_and_execute[0].add_element 'RemoveExistingProducts', { 'Before'=>'InstallInitialize' }

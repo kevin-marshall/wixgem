@@ -82,4 +82,32 @@ class Installation_test < MiniTest::Unit::TestCase
     packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
 	packages.each { |package| assert(package.attributes['InstallerVersion'].to_i == 200) }
   end
+  def test_remove_previous_version
+    install_1_0 = 'test/wixgem_remove_previous_1.0.msi'
+	install_1_1 = 'test/wixgem_remove_previous_1.1.msi'
+	files=['rakefile.rb']
+	
+	Wixgem::Wix.make_installation(install_1_0, 
+	                              {files: files,
+								   debug: true,
+								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
+								   version: '1.0.0.0'})
+  
+	Wixgem::Wix.make_installation(install_1_1, 
+	                              {files: files,
+								   debug: true,
+								   remove_existing_products: true,
+								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
+								   version: '1.1.0.0'})
+								   
+	installer = WindowsInstaller.new
+	assert(!installer.msi_installed?(install_1_0))
+	installer.install_msi(install_1_0)
+	assert(installer.msi_installed?(install_1_0))
+	installer.install_msi(install_1_1)
+	assert(installer.msi_installed?(install_1_1))
+	assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
+	installer.uninstall_msi(install_1_1)
+	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
+  end
 end

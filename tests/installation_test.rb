@@ -8,7 +8,7 @@ require_relative 'test_files_exist.rb'
 require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 require_relative 'install_msi'
-
+	
 class Installation_test < MiniTest::Unit::TestCase
   def setup
 	@installer = WindowsInstaller.new
@@ -169,20 +169,20 @@ class Installation_test < MiniTest::Unit::TestCase
 	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
   end
   
-  #def test_custom_action
-  #  install_file='test/wixgem_install_custom_action.msi'
-	#files = ['CustomActionExe/hello_world.exe']
-	#Wixgem::Wix.make_installation(install_file, 
-	#                              {files: files,
-	#							   #install_priviledges: 'elevated',
-	#							   debug: true,
-	#							   modify_file_paths: {/CustomActionExe\// => ''},
-	#							   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE' } ]} )
-	#
-	#
-	#install_msi(install_file) do |path|
-	#  file="#{path}/hello_world.txt"
-	#  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
-	#end								   
- # end
+  def test_custom_action
+    install_file='test/wixgem_install_custom_action.msi'
+	files = ['CustomActionExe/hello_world.exe']
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
+								   #install_priviledges: 'elevated',
+								   debug: true,
+								   modify_file_paths: {/CustomActionExe\// => ''},
+								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE' } ]} )
+	
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/hello_world.txt"
+	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	end								   
+  end
 end

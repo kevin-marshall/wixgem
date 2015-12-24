@@ -53,14 +53,14 @@ class Wix
   end
   
   def self.manage_upgrade(xml_doc, input)
-	product = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return xml_doc if(product.length == 0)
+	products = REXML::XPath.match(xml_doc, '//Wix/Product')
+	return xml_doc if(products.length == 0)
 
- 	if(input.has_key?(:remove_existing_products) && input[:remove_existing_products])
+ 	if(input[:remove_existing_products])
 	  raise 'Hash must have a version key if the hash has a :remove_existing_products key' unless(input.has_key?(:version))
 	  raise 'Hash must have an upgrade_code key if the hash has a :remove_existing_products key' unless(input.has_key?(:upgrade_code))
 	
-	  upgrade = product[0].add_element 'MajorUpgrade', { 'AllowDowngrades' => 'yes' }
+	  upgrade = products[0].add_element 'MajorUpgrade', { 'AllowDowngrades' => 'yes' }
 	end
 	
 	return xml_doc
@@ -76,44 +76,7 @@ class Wix
 	
 	custom_actions.set_target_directory
 	
-	#input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
-	#end
-
-    #manufacturer = 'Default Manufacturer'
-    #manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
-	
-	#install_path = '[ProgramFilesFolder][ProductName]'
-	#install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
-
-	#product = REXML::XPath.match(xml_doc, '//Wix/Product')
-	#return xml_doc if(product.length == 0)
-	
-	#product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{install_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	#product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
-
-	#install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
-	#custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-
-	#install_ui_sequence = product[0].add_element 'InstallUISequence'
-	#custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-	
-	#admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
-	#custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-
-	#admin_ui_sequence = product[0].add_element 'AdminUISequence'
-	#custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-
-	#if(input.key?(:custom_actions))
-	#  input[:custom_actions].each do |custom_action|
-	#	install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
-	#  	file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
-	#	raise "Unable to locate installation file '#{custom_action[:file]}'" if(file_elements.nil?)
-	#    action = product[0].add_element 'CustomAction', { 'Id' => custom_action[:id], 'FileKey' => file_elements[0].attributes['Id'], 'ExeCommand' => '', 'Impersonate' =>'no', 'Return' => 'check', 'HideTarget' => 'no', 'Execute' => 'deferred' }
-	 
-	#    action = install_execute_sequence.add_element 'Custom', { 'Action' => custom_action[:id], 'Before'=>'InstallFinalize' }
-	#	action.text = 'NOT Installed AND NOT REMOVE'
- 	#  end
-	#end
+	input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
 
 	return xml_doc
   end
@@ -238,24 +201,26 @@ class Wix
 		max_path = files.max { |a, b| a.length <=> b.length }
 		columen_size = max_path.length + 10
 	  end
-	    
+	  
+	  ingore_files = self.ignore_files(input)
+	  if(input.has_key?(:ignore_files))
+	    @logger << "------------------------------------ ignoring files -----------------------------------" unless(@logger.nil?)
+		input[:ignore_files].each { |file| @logger << file }
+	  end
+
 	  @logger << "------------------------------------ Installation Paths -----------------------------------" unless(@logger.nil?)
 	  @logger << "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']  unless(@logger.nil?)
+	  files.reject! { |f| ingore_files.include?(f) }
+
 	  files.each do |file| 
-	    if(File.file?(file))
+	    if(File.file?(file) && !ingore_files)
   	      install_path = file
           if(input.has_key?(:modify_file_paths))
             input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
           end
 	      @logger << "%-#{columen_size}s %s\n" % [file, install_path]  unless(@logger.nil?)
         end
-      end
-      
-	  if(input.has_key?(:ignore_files))
-	    @logger << "------------------------------------ ignoring files -----------------------------------" unless(@logger.nil?)
-		input[:ignore_files].each { |file| @logger << file }
-	  end
-	  
+      end	  
 	  @logger << "-------------------------------------------------------------------------------------------" unless(@logger.nil?)
 	end
 

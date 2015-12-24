@@ -32,4 +32,5 @@ Gem::Specification.new do |s|
 	s.add_development_dependency 'dev', '~> 0'
 	s.add_development_dependency 'execute', '~> 0'
 	s.add_development_dependency 'WindowsInstaller', '~> 0'
+	s.add_development_dependency 'ocra', '~> 0'
 end

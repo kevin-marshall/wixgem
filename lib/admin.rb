@@ -8,4 +8,4 @@ def admin?
   return true if(cmd[:exit_code] == 0)
   return false
 end
-ENV['HOME'] ||= "#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}" if(admin?)
+ENV['HOME'] = ENV['USERPROFILE'] if(admin?)

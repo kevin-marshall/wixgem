@@ -26,6 +26,11 @@ task :build => [:pre_build] do
     cmd = CMD.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
     cmd.execute	
   end
+  
+  Dir.chdir('tests/CustomActionExe') do
+    cmd = CMD.new('ocra hello_world.rb', {echo_output: false})
+    cmd.execute	
+  end
 end
 
 

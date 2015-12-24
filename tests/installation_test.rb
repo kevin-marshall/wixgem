@@ -7,6 +7,7 @@ require_relative 'test_install.rb'
 require_relative 'test_files_exist.rb'
 require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
+require_relative 'install_msi'
 
 class Installation_test < MiniTest::Unit::TestCase
   def setup
@@ -31,7 +32,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
 	  test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
 	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
-	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}]
+	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}],
     }
 	
     test_arguments.each { |key, value| 
@@ -167,4 +168,21 @@ class Installation_test < MiniTest::Unit::TestCase
 	installer.uninstall_msi(install_1_1)
 	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
   end
+  
+  #def test_custom_action
+  #  install_file='test/wixgem_install_custom_action.msi'
+	#files = ['CustomActionExe/hello_world.exe']
+	#Wixgem::Wix.make_installation(install_file, 
+	#                              {files: files,
+	#							   #install_priviledges: 'elevated',
+	#							   debug: true,
+	#							   modify_file_paths: {/CustomActionExe\// => ''},
+	#							   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE' } ]} )
+	#
+	#
+	#install_msi(install_file) do |path|
+	#  file="#{path}/hello_world.txt"
+	#  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	#end								   
+ # end
 end

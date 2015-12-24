@@ -22,7 +22,7 @@ class MergeModule_test < MiniTest::Unit::TestCase
   def test_merge_module    
     test_arguments = {
       test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
-	  test2: ['test/wixgem_merge_test2.msm', {files: ['Gemfile']}],
+	  test2: ['test/wixgem_merge_test2.msm', ['Gemfile']],
 	  test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
 	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/9.0/*")]
     }
@@ -34,7 +34,7 @@ class MergeModule_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(value[0]), "should create merge module: #{value[0]}")
 	
 	  install_file = value[0].gsub(/msm/) { |s| s = 'msi' }
-      Wixgem::Wix.make_installation(install_file, ["#{value[0]}"])
+      Wixgem::Wix.make_installation(install_file, {files: ["#{value[0]}"], debug: true})
 	  
 	  assert(File.exists?(install_file), "should be able to create an installation file using: #{value[0]}")
     

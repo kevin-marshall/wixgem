@@ -3,8 +3,9 @@ require 'tmpdir.rb'
 require 'rexml/document'
 require 'CMD'
 require 'SecureRandom'
-require_relative('file.rb')
-require_relative('shortcut.rb')
+require_relative 'file'
+require_relative 'shortcut'
+require_relative 'custom_action'
 
 module Wixgem
 
@@ -66,32 +67,53 @@ class Wix
   end  
 
   def self.manage_custom_actions(xml_doc, input)
-    # Example custom action
-	#<CustomAction Id='comReg' Directory='INSTALLLOCATION' Execute='deferred' Impersonate='no' ExeCommand='"[NETFRAMEWORK40CLIENTINSTALLROOTDIR]regasm.exe" "[INSTALLLOCATION]EAWordImporter.dll" /codebase' Return='check' />
-
-    manufacturer = 'Default Manufacturer'
-    manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
+    custom_actions = CustomAction.new(xml_doc, input)
 	
-	install_path = '[ProgramFilesFolder][ProductName]'
-	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
-
-	product = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return xml_doc if(product.length == 0)
+ 	elements = REXML::XPath.match(xml_doc, '//Wix/Product')
+	return xml_doc if(elements.nil? || (elements.length != 1))
+	@product = elements[0]
+	return xml_doc if(@product.nil?)
 	
-	product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{install_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
-
-	install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
-	custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
-
-	install_ui_sequence = product[0].add_element 'InstallUISequence'
-	custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	custom_actions.set_target_directory
 	
-	admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
-	custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	#input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
+	#end
 
-	admin_ui_sequence = product[0].add_element 'AdminUISequence'
-	custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+    #manufacturer = 'Default Manufacturer'
+    #manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
+	
+	#install_path = '[ProgramFilesFolder][ProductName]'
+	#install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
+
+	#product = REXML::XPath.match(xml_doc, '//Wix/Product')
+	#return xml_doc if(product.length == 0)
+	
+	#product[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{install_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
+	#product[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{install_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
+
+	#install_execute_sequence = product[0].add_element 'InstallExecuteSequence'
+	#custom_action = install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+
+	#install_ui_sequence = product[0].add_element 'InstallUISequence'
+	#custom_action = install_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	
+	#admin_execute_sequence = product[0].add_element 'AdminExecuteSequence'
+	#custom_action = admin_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+
+	#admin_ui_sequence = product[0].add_element 'AdminUISequence'
+	#custom_action = admin_ui_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+
+	#if(input.key?(:custom_actions))
+	#  input[:custom_actions].each do |custom_action|
+	#	install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
+	#  	file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
+	#	raise "Unable to locate installation file '#{custom_action[:file]}'" if(file_elements.nil?)
+	#    action = product[0].add_element 'CustomAction', { 'Id' => custom_action[:id], 'FileKey' => file_elements[0].attributes['Id'], 'ExeCommand' => '', 'Impersonate' =>'no', 'Return' => 'check', 'HideTarget' => 'no', 'Execute' => 'deferred' }
+	 
+	#    action = install_execute_sequence.add_element 'Custom', { 'Action' => custom_action[:id], 'Before'=>'InstallFinalize' }
+	#	action.text = 'NOT Installed AND NOT REMOVE'
+ 	#  end
+	#end
 
 	return xml_doc
   end
@@ -403,6 +425,7 @@ class Wix
 		package.add_attribute('InstallScope', 'perMachine') if(input.has_key?(:all_users))
 		package.attributes['InstallerVersion'] = 450
 		package.attributes['InstallerVersion'] = (input[:installer_version]*100).to_i if(input.has_key?(:installer_version))
+	    package.attributes['InstallPrivileges']= input[:install_priviledges] if(input.has_key?(:install_priviledges))
 	end 
 
 	xml_doc = manage_custom_actions(xml_doc, input)
@@ -444,7 +467,7 @@ class Wix
 	verify_input_keys(input)
 	  	
 	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
-
+    
 	start_logger if(@debug)
 	
 	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
@@ -468,8 +491,8 @@ class Wix
 		  create_wxs_file(wxs_file, input, ext)
 	      create_output(wxs_file, output_absolute_path)
 		end
-	  rescue Exception => e
-		raise "Wixgem exception: #{e}"
+	  rescue StandardError => e
+		raise e
 	  ensure
 	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
 	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)

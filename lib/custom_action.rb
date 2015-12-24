@@ -4,14 +4,13 @@ require 'SecureRandom'
 module Wixgem
 
 class CustomAction
-  
-  def initialize(xml_doc)
-    @xml_doc = file
-	@actions = actions
-	return if(has_product?)
+  def initialize(xml_doc, input)
+    @xml_doc = xml_doc
+    @input = input
 
  	elements = REXML::XPath.match(xml_doc, '//Wix/Product')
-	@product = elements[0] if(elements.length == 1)
+	return if(elements.nil? || (elements.length != 1))
+	@product = elements[0] 
 	return if(@product.nil?)
 
  	elements = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
@@ -25,7 +24,7 @@ class CustomAction
 	raise 'Unable to set target directory custom action if the product is not defined' if(@product.nil?)
 	
 	manufacturer = 'Default Manufacturer'
-    manufacturer = input[:manufacturer] if(input.has_key?(:manufacturer))
+    manufacturer = @input[:manufacturer] if(@input.has_key?(:manufacturer))
 	
 	install_path = '[ProgramFilesFolder][ProductName]'
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
@@ -51,8 +50,8 @@ class CustomAction
 	cmd_line = custom_action[:exe_command] if(custom_action.key?(:exe_command))
 	impersonate = 'yes'
 	impersonate = custom_action[:impersonate] if(custom_action.key?(:impersonate))
-	flags='1'
-	flags = custom_action[:flags] if(custom_action.key?(:flags))
+	condition='1'
+	condition = custom_action[:condition] if(custom_action.key?(:condition))
 	execute='deferred'
 	execute = custom_action[:execute] if(custom_action.key?(:execute))
 	ret='check'
@@ -61,6 +60,9 @@ class CustomAction
 	action = @product.add_element 'CustomAction', { 'Id' => id, 'FileKey' => file_key, 'ExeCommand' =>  cmd_line,   
 	                                                'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
 	 
-	action = @install_execute_sequence.add_element 'Custom', { 'Action' => custom_action[:id], 'Before'=>'InstallFinalize' }
-    action.text = flags
+	action = @install_execute_sequence.add_element 'Custom', { 'Action' => id, 'Before'=>'InstallFinalize' }
+    action.text = condition
   end
+end
+
+end

@@ -434,13 +434,10 @@ class Wix
 	xml_doc = manage_read_only_files(xml_doc,input)
 	xml_doc = manage_shortcuts(xml_doc, input)
 	xml_doc = manage_self_register(xml_doc, input)
-	
-	File.open(wxs_file, 'w') { |f| f.puts(xml_doc.to_s) }	
-    #formatter = REXML::Formatters::Pretty.new(2)
-    #formatter.compact = true # This is the magic line that does what you need!
-	#wxs_text = ''
-	#formatter.write(xml, wxs_text)
-	#File.open(wxs_file, 'w') { |f| f.puts(wxs_text) }	
+		
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true 
+  	File.open(wxs_file, 'w') { |f| formatter.write(xml_doc, f) }	
   end
 
   def self.create_output(wxs_file, output)

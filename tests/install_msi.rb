@@ -5,9 +5,13 @@ def install_msi(msi)
   installer.install_msi(msi)
   
   msi_properties = installer.msi_properties(msi)
-  installed_properties = installer.installation_properties(msi['ProductCode'])
+  installed_properties = installer.installation_properties(msi_properties['ProductCode'])
   
-  yield installed_properties['InstallLocation']
-  
-  installer.uninstall_msi(msi)
+  begin
+    yield installed_properties['InstallLocation'].gsub(/\\/,'/')
+  rescue Exception => e
+    raise e
+  ensure
+    installer.uninstall_msi(msi)
+  end
 end

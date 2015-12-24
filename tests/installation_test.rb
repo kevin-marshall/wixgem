@@ -83,34 +83,6 @@ class Installation_test < MiniTest::Unit::TestCase
     packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
 	packages.each { |package| assert(package.attributes['InstallerVersion'].to_i == 200) }
   end
-  def test_remove_previous_version
-    install_1_0 = 'test/wixgem_remove_previous_1.0.msi'
-	install_1_1 = 'test/wixgem_remove_previous_1.1.msi'
-	files=['rakefile.rb']
-	
-	Wixgem::Wix.make_installation(install_1_0, 
-	                              {files: files,
-								   debug: true,
-								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
-								   version: '1.0.0.0'})
-  
-	Wixgem::Wix.make_installation(install_1_1, 
-	                              {files: files,
-								   debug: true,
-								   remove_existing_products: true,
-								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
-								   version: '1.1.0.0'})
-								   
-	installer = WindowsInstaller.new
-	assert(!installer.msi_installed?(install_1_0))
-	installer.install_msi(install_1_0)
-	assert(installer.msi_installed?(install_1_0))
-	installer.install_msi(install_1_1)
-	assert(installer.msi_installed?(install_1_1))
-	assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
-	installer.uninstall_msi(install_1_1)
-	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
-  end
 
   def test_remove_previous_version
     install_1_0 = 'test/wixgem_remove_previous_1.0.msi'
@@ -134,11 +106,11 @@ class Installation_test < MiniTest::Unit::TestCase
 	assert(!installer.msi_installed?(install_1_0))
 	installer.install_msi(install_1_0)
 	assert(installer.msi_installed?(install_1_0))
-	installer.install_msi(install_1_1)
-	assert(installer.msi_installed?(install_1_1))
-	assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
-	installer.uninstall_msi(install_1_1)
-	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
+
+	install_msi(install_1_1) do |path|
+	  assert(installer.msi_installed?(install_1_1))
+	  assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
+    end
   end
   def test_remove_previous_version1
     install_1_0 = 'test/wixgem_remove_previous_1.0.0.0.msi'
@@ -162,11 +134,11 @@ class Installation_test < MiniTest::Unit::TestCase
 	assert(!installer.msi_installed?(install_1_0))
 	installer.install_msi(install_1_0)
 	assert(installer.msi_installed?(install_1_0))
-	installer.install_msi(install_1_1)
-	assert(installer.msi_installed?(install_1_1))
-	assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
-	installer.uninstall_msi(install_1_1)
-	assert(!installer.msi_installed?(install_1_1),"#{install_1_1} should have been uninstalled")
+	
+	install_msi(install_1_1) do |path|
+	  assert(installer.msi_installed?(install_1_1))
+	  assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
+    end
   end
   
   def test_custom_action
@@ -181,10 +153,27 @@ class Installation_test < MiniTest::Unit::TestCase
 	
 	install_msi(install_file) do |path|
 	  file="#{path}/hello_world.txt"
-	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	  #assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
 	end								   
 
     install_file='test/wixgem_install_custom_action1.msi'
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
+								   install_priviledges: 'elevated',
+								   binary_table: [{ id: 'hello_world', file: 'hello_world.exe' }],
+								   debug: true,
+								   modify_file_paths: {/CustomActionExe\// => ''},
+								   custom_actions: [ {binary_key: 'hello_world', impersonate: 'no'} ]} )
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/hello_world.txt"
+	  #assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	  #contents = File.read(file)
+	  #puts "File: #{contents}"
+	  #assert(contents.include?('admin: true'), "Should be run with administrative privledges")
+	end								   
+	
+    install_file='test/wixgem_install_custom_action2.msi'
 	files = ['CustomActionExe/hello_world.exe']
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
@@ -199,7 +188,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
 	end								   
     
-	install_file='test/wixgem_install_custom_action2.msi'
+	install_file='test/wixgem_install_custom_action3.msi'
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
 								   #install_priviledges: 'elevated',
@@ -215,7 +204,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(contents.include?('/argument'), "Command line argument /argument did not get passed to command line")
 	end								   
 
-	install_file='test/wixgem_install_custom_action3.msi'
+	install_file='test/wixgem_install_custom_action4.msi'
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
 								   install_scope: 'perMachine',

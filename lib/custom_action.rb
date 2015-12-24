@@ -29,16 +29,15 @@ class CustomAction
 	return install_path
   end
   def set_target_directory
-	raise 'Unable to set target directory custom action if the product is not defined' if(@product.nil?)
+	wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
+	fragment = wix_element.add_element 'Fragment'
 	
-	@product.add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	@product.add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
+	fragment.add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
+	fragment.add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
 
 	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
   end
   def add(custom_action)
-	raise 'Unable to add a custom action if the product is not defined' if(@product.nil?)
-   
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))
       raise 'Currently, only supported custom actions work with installed executable or binary key' 
 	end
@@ -71,7 +70,10 @@ class CustomAction
 	ret='check'
 	ret = custom_action[:return] if(custom_action.key?(:return))
 	
-	action = @product.add_element 'CustomAction', { 'Id' => id, 'ExeCommand' =>  cmd_line, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
+	wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
+	fragment = wix_element.add_element 'Fragment'
+	
+	action = fragment.add_element 'CustomAction', { 'Id' => id, 'ExeCommand' =>  cmd_line, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
 	if(custom_action.key?(:binary_key))
 	  action.attributes['BinaryKey'] = custom_action[:binary_key]
 	else

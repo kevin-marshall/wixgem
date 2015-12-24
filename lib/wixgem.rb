@@ -167,6 +167,7 @@ class Wix
 	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
 	  raise "Unable to find file '#{entry[:file]}' to add to binary table" unless (file_elements.length == 1)
 	  
+	  puts "File: #{file_elements[0].attributes['Source']}"
 	  binary = fragment.add_element 'Binary', { 'Id' => entry[:id], 'SourceFile' => file_elements[0].attributes['Source'] }
 	end
 

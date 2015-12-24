@@ -174,6 +174,20 @@ class Installation_test < MiniTest::Unit::TestCase
 	files = ['CustomActionExe/hello_world.exe']
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
+								   binary_table: [{ id: 'hello_world', file: 'hello_world.exe' }],
+								   debug: true,
+								   modify_file_paths: {/CustomActionExe\// => ''},
+								   custom_actions: [ {binary_key: 'hello_world'} ]} )
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/hello_world.txt"
+	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	end								   
+
+    install_file='test/wixgem_install_custom_action1.msi'
+	files = ['CustomActionExe/hello_world.exe']
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
 								   #install_priviledges: 'elevated',
 								   debug: true,
 								   modify_file_paths: {/CustomActionExe\// => ''},
@@ -185,7 +199,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
 	end								   
     
-	install_file='test/wixgem_install_custom_action1.msi'
+	install_file='test/wixgem_install_custom_action2.msi'
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
 								   #install_priviledges: 'elevated',
@@ -201,7 +215,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(contents.include?('/argument'), "Command line argument /argument did not get passed to command line")
 	end								   
 
-	install_file='test/wixgem_install_custom_action2.msi'
+	install_file='test/wixgem_install_custom_action3.msi'
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
 								   install_scope: 'perMachine',

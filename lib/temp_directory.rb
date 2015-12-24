@@ -1,6 +1,6 @@
 require 'securerandom'
 
-module Wixgem
+#module Wixgem
 
 def temp_directory
 	tmp_file = "#{ENV['TEMP'].gsub(/\\/,'/')}/#{SecureRandom.hex}"
@@ -10,9 +10,9 @@ def temp_directory
 	rescue Exception => e
 	  raise e
 	ensure
-	  sleep(0.5)
+	  sleep(0.1)
 	  FileUtils.rm_rf(tmp_file)
 	end
 end
 
-end
+#end

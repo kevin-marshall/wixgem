@@ -39,14 +39,20 @@ class CustomAction
   def add(custom_action)
 	raise 'Unable to add a custom action if the product is not defined' if(@product.nil?)
    
-    raise 'Currently, only supported custom action is an executable' unless(custom_action.key?(:file))
+    unless(custom_action.key?(:file) || custom_action.key?(:binary_key))
+      raise 'Currently, only supported custom actions work with installed executable or binary key' 
+	end
 	
-    install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
-	file_elements = REXML::XPath.match(@xml_doc, "//File[@Source='#{install_path}']")
-	raise "Unable to locate installation file '#{custom_action[:file]} for custom action'" if(file_elements.nil?)
+	file_key=nil
+	if(custom_action.key?(:file))
+      install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
+	  file_elements = REXML::XPath.match(@xml_doc, "//File[@Source='#{install_path}']")
+	  raise "Unable to locate installation file '#{custom_action[:file]} for custom action'" if(file_elements.nil?)
 	
-	file_key = file_elements[0].attributes['Id']
-	id = "act#{SecureRandom.uuid.gsub(/-/,'')}"
+	  file_key = file_elements[0].attributes['Id']
+	end
+	
+	id = "ca_#{SecureRandom.uuid.gsub(/-/,'')}"
 	id = custom_action[:id] if(custom_action.key?(:id))
 	
 	cmd_line = ''
@@ -55,8 +61,8 @@ class CustomAction
 	impersonate = 'yes'
 	impersonate = custom_action[:impersonate] if(custom_action.key?(:impersonate))
 	
-	#condition='1' Until binary entries are supported, the default should be install only
 	condition='NOT Installed AND NOT REMOVE'
+	condition='1' if(custom_action.key?(:binary_key))
 	condition = custom_action[:condition] if(custom_action.key?(:condition))
 	
 	execute='deferred'
@@ -65,9 +71,13 @@ class CustomAction
 	ret='check'
 	ret = custom_action[:return] if(custom_action.key?(:return))
 	
-	action = @product.add_element 'CustomAction', { 'Id' => id, 'FileKey' => file_key, 'ExeCommand' =>  cmd_line,   
-	                                                'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
-	 
+	action = @product.add_element 'CustomAction', { 'Id' => id, 'ExeCommand' =>  cmd_line, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
+	if(custom_action.key?(:binary_key))
+	  action.attributes['BinaryKey'] = custom_action[:binary_key]
+	else
+	  action.attributes['FileKey'] = file_key
+	end
+	
 	action = @install_execute_sequence.add_element 'Custom', { 'Action' => id, 'Before'=>'InstallFinalize' }
     action.text = condition
   end

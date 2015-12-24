@@ -149,7 +149,25 @@ class Wix
 	  install_path = ".\\#{self.modify_file_path(input, file).gsub(/\//,'\\')}"
 	  install_path = install_path.gsub(/\.\\\\/,'.\\')
 	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
-	  file_elements[0].attributes['SelfRegCost'] = '0' if(file_elements.length == 1)
+	  raise "Unable to find file '#{file}' for self registering" unless (file_elements.length == 1)
+	  file_elements[0].attributes['SelfRegCost'] = '0'
+	end
+
+	return xml_doc
+  end
+  
+  def self.manage_binary_table(xml_doc, input)
+	return xml_doc unless(input.has_key?(:binary_table))
+	wix_element = REXML::XPath.match(xml_doc, "/Wix")[0]
+
+	fragment = wix_element.add_element 'Fragment'
+	input[:binary_table].each do |entry|
+	  install_path = ".\\#{self.modify_file_path(input, entry[:file]).gsub(/\//,'\\')}"
+	  install_path = install_path.gsub(/\.\\\\/,'.\\')
+	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
+	  raise "Unable to find file '#{entry[:file]}' to add to binary table" unless (file_elements.length == 1)
+	  
+	  binary = fragment.add_element 'Binary', { 'Id' => entry[:id], 'SourceFile' => file_elements[0].attributes['Source'] }
 	end
 
 	return xml_doc
@@ -401,6 +419,7 @@ class Wix
 	xml_doc = manage_read_only_files(xml_doc,input)
 	xml_doc = manage_shortcuts(xml_doc, input)
 	xml_doc = manage_self_register(xml_doc, input)
+	xml_doc = manage_binary_table(xml_doc, input)
 		
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true 

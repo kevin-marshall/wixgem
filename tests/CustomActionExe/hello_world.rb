@@ -11,5 +11,8 @@ def admin?
   return false
 end
 
+text = ''
+text << "admin: #{admin?}\n"
+text << "argumens: #{ARGV.join}"
 file="#{File.dirname(executable)}/hello_world.txt"    
-File.open(file, 'w') { |f| f.write("admin: #{admin?}") } unless defined?(Ocra)
+File.open(file, 'w') { |f| f.write(text) } unless defined?(Ocra)

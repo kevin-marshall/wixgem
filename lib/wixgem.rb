@@ -1,11 +1,12 @@
 require 'fileutils'
-require 'tmpdir.rb'
 require 'rexml/document'
 require 'CMD'
 require 'SecureRandom'
+
 require_relative 'file'
 require_relative 'shortcut'
 require_relative 'custom_action'
+require_relative 'temp_directory'
 
 module Wixgem
 
@@ -388,6 +389,7 @@ class Wix
 	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
 	packages.each do |package| 
 		package.add_attribute('InstallScope', 'perMachine') if(input.has_key?(:all_users))
+		package.add_attribute('InstallScope', input[:install_scope]) if(input.has_key?(:install_scope))
 		package.attributes['InstallerVersion'] = 450
 		package.attributes['InstallerVersion'] = (input[:installer_version]*100).to_i if(input.has_key?(:installer_version))
 	    package.attributes['InstallPrivileges']= input[:install_priviledges] if(input.has_key?(:install_priviledges))
@@ -441,10 +443,7 @@ class Wix
 	output_absolute_path = File.absolute_path(output)
 	input[:original_pwd] = Dir.pwd
 
-	#dir = './tmp_dir'
-	#FileUtils.rm_rf(dir) if(Dir.exists?(dir))
-	#FileUtils.mkdir(dir)
-	Dir.mktmpdir do |dir|
+	temp_directory do |dir|
 	  wxs_file = "#{basename}.wxs"	    
 	  begin
 		copy_install_files(dir, input)
@@ -453,7 +452,7 @@ class Wix
 		  create_wxs_file(wxs_file, input, ext)
 	      create_output(wxs_file, output_absolute_path)
 		end
-	  rescue StandardError => e
+	  rescue Exception => e
 		raise e
 	  ensure
 	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)

@@ -184,5 +184,40 @@ class Installation_test < MiniTest::Unit::TestCase
 	  file="#{path}/hello_world.txt"
 	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
 	end								   
+    
+	install_file='test/wixgem_install_custom_action1.msi'
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
+								   #install_priviledges: 'elevated',
+								   debug: true,
+								   modify_file_paths: {/CustomActionExe\// => ''},
+								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE', exe_command: '/argument' } ]} )
+	
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/hello_world.txt"
+	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	  contents = File.read(file)
+	  assert(contents.include?('/argument'), "Command line argument /argument did not get passed to command line")
+	end								   
+
+	install_file='test/wixgem_install_custom_action2.msi'
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
+								   install_scope: 'perMachine',
+								   install_priviledges: 'elevated',
+								   debug: true,
+								   modify_file_paths: {/CustomActionExe\// => ''},
+								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE', impersonate: 'no' } ]} )
+	
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/hello_world.txt"
+	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	  contents = File.read(file)
+	  #puts "File: #{contents}"
+	  #assert(contents.include?('admin: true'), "Should be run with administrative privledges")
+	end								   
+	
   end
 end

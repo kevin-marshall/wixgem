@@ -46,7 +46,7 @@ class CustomAction
 	if(custom_action.key?(:file))
       install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
 	  file_elements = REXML::XPath.match(@xml_doc, "//File[@Source='#{install_path}']")
-	  raise "Unable to locate installation file '#{custom_action[:file]} for custom action'" if(file_elements.nil?)
+	  raise "Unable to locate installation file '#{custom_action[:file]} for custom action'" if(file_elements.nil? || (file_elements.size == 0))
 	
 	  file_key = file_elements[0].attributes['Id']
 	end

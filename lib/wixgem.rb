@@ -161,15 +161,10 @@ class Wix
 	wix_element = REXML::XPath.match(xml_doc, "/Wix")[0]
 
 	fragment = wix_element.add_element 'Fragment'
-	input[:binary_table].each do |entry|
-	  install_path = ".\\#{self.modify_file_path(input, entry[:file]).gsub(/\//,'\\')}"
-	  install_path = install_path.gsub(/\.\\\\/,'.\\')
-	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
-	  raise "Unable to find file '#{entry[:file]}' to add to binary table" unless (file_elements.length == 1)
-	  
-	  puts "File: #{file_elements[0].attributes['Source']}"
-	  binary = fragment.add_element 'Binary', { 'Id' => entry[:id], 'SourceFile' => file_elements[0].attributes['Source'] }
-	end
+	input[:binary_table].each { |entry| 
+	  #puts "File: #{entry[:file]}"
+	  binary = fragment.add_element 'Binary', { 'Id' => entry[:id], 'SourceFile' => entry[:file] }
+	}
 
 	return xml_doc
   end
@@ -259,6 +254,11 @@ class Wix
 	end
   end
 
+  def self.modify_binary_files(input)
+    return unless(input.key?(:binary_table))
+	input[:binary_table].each { |entry| entry[:file] = File.absolute_path(entry[:file]) }
+  end
+  
   def self.log_wix_output(cmd)
 	return unless(@debug && !@logger.nil?)
 	
@@ -462,6 +462,8 @@ class Wix
  
 	output_absolute_path = File.absolute_path(output)
 	input[:original_pwd] = Dir.pwd
+		
+	modify_binary_files(input)
 
 	temp_directory do |dir|
 	  wxs_file = "#{basename}.wxs"	    

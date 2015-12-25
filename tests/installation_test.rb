@@ -143,84 +143,41 @@ class Installation_test < MiniTest::Unit::TestCase
   
   def test_custom_action
     install_file='test/wixgem_install_custom_action.msi'
+	files = ['all_tests.rb']
+	
+	hello_world_path="#{File.dirname(__FILE__)}/test/hello_world.txt"
+	hello_world_path=File.absolute_path(hello_world_path)
+	
+	File.delete(hello_world_path) if(File.exists?(hello_world_path))
+	Wixgem::Wix.make_installation(install_file, 
+	                              {files: files,
+								   binary_table: [{ id: 'hello_world', file: 'CustomActionExe/hello_world.exe' }],
+								   debug: true,
+								   custom_actions: [ {binary_key: 'hello_world', exe_command: hello_world_path} ]} )
+	
+	install_msi(install_file) do |path|
+	  file="#{path}/all_tests.rb"
+	  assert(File.exists?(file), "#{file} should have been installed" )
+	  assert(File.exists?(hello_world_path), "Custom action should have created #{hello_world_path}" )
+	  contents = File.read(hello_world_path)
+	  puts contents
+	end								   
+	    
+	File.delete(hello_world_path) if(File.exists?(hello_world_path))
+
+	install_file='test/wixgem_install_custom_action1.msi'
 	files = ['CustomActionExe/hello_world.exe']
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
-								   binary_table: [{ id: 'hello_world', file: 'hello_world.exe' }],
 								   debug: true,
 								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {binary_key: 'hello_world'} ]} )
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.txt"
-	  #assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
-	end								   
-
-    install_file='test/wixgem_install_custom_action1.msi'
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   install_priviledges: 'elevated',
-								   binary_table: [{ id: 'hello_world', file: 'hello_world.exe' }],
-								   debug: true,
-								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {binary_key: 'hello_world', impersonate: 'no'} ]} )
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.txt"
-	  #assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
-	  #contents = File.read(file)
-	  #puts "File: #{contents}"
-	  #assert(contents.include?('admin: true'), "Should be run with administrative privledges")
-	end								   
-	
-    install_file='test/wixgem_install_custom_action2.msi'
-	files = ['CustomActionExe/hello_world.exe']
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   #install_priviledges: 'elevated',
-								   debug: true,
-								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE' } ]} )
+								   custom_actions: [ {file: 'hello_world.exe', exe_command: hello_world_path } ]} )
 	
 	
 	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.txt"
-	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
+	  file="#{path}/hello_world.exe"
+	  assert(File.exists?(file), "#{file} should have been installed" )
+	  assert(File.exists?(hello_world_path), "If the custom action executed then #{hello_world_path} should exist" )
 	end								   
-    
-	install_file='test/wixgem_install_custom_action3.msi'
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   #install_priviledges: 'elevated',
-								   debug: true,
-								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE', exe_command: '/argument' } ]} )
-	
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.txt"
-	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
-	  contents = File.read(file)
-	  assert(contents.include?('/argument'), "Command line argument /argument did not get passed to command line")
-	end								   
-
-	install_file='test/wixgem_install_custom_action4.msi'
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   install_scope: 'perMachine',
-								   install_priviledges: 'elevated',
-								   debug: true,
-								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {file: 'hello_world.exe', condition: 'NOT Installed AND NOT REMOVE', impersonate: 'no' } ]} )
-	
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.txt"
-	  assert(File.exists?(file), "If the custom action executed then #{file} should exist" )
-	  contents = File.read(file)
-	  #puts "File: #{contents}"
-	  #assert(contents.include?('admin: true'), "Should be run with administrative privledges")
-	end								   
-	
   end
 end

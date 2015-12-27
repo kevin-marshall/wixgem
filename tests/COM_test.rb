@@ -35,8 +35,8 @@ class COMInstaller_test < MiniTest::Unit::TestCase
 
 	  installation_file = 'test\\wixgem_self_register.msi'	
  	  installation_hash = { debug: true, all_users: 'perMachine', 
-	                       files: ['COMObject/bin/Release/COMObject.dll'], 
-						   com_self_register: ['COMObject/bin/Release/COMObject.dll'],  
+	                       files: ['COMObject.dll'], 
+						   com_self_register: ['COMObject.dll'],  
 						   modify_file_paths: {/.+Release\// => ''},
 						   suppress_registry_harvesting: true}
 

@@ -146,7 +146,7 @@ class Wix
   def self.manage_self_register(xml_doc, input)
 	return xml_doc unless(input.has_key?(:com_self_register))
 	input[:com_self_register].each do |file|
-	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='.\\#{@file.gsub(/\//,'\\')}']")
+	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='.\\#{file.gsub(/\//,'\\')}']")
 	  raise "Unable to find file '#{file}' for self registering" unless (file_elements.length == 1)
 	  file_elements[0].attributes['SelfRegCost'] = '0'
 	end

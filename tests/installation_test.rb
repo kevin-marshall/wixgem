@@ -160,7 +160,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(file), "#{file} should have been installed" )
 	  assert(File.exists?(hello_world_path), "Custom action should have created #{hello_world_path}" )
 	  contents = File.read(hello_world_path)
-	  puts contents
+	  #puts contents
 	end								   
 	    
 	File.delete(hello_world_path) if(File.exists?(hello_world_path))

@@ -29,13 +29,13 @@ class CustomAction
 	return install_path
   end
   def set_target_directory
-	wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
-	fragment = wix_element.add_element 'Fragment'
+	product_elements = REXML::XPath.match(@xml_doc, "/Wix/Product")
+	return if(product_elements.nil? || (product_elements.size != 1))
 	
-	fragment.add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	fragment.add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
+	product_elements[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
+	product_elements[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Return' => 'check'}
 
-	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
   end
   def add(custom_action)
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))

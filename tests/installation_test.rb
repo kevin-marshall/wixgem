@@ -3,7 +3,6 @@ require 'WindowsInstaller'
 require 'win32ole'
 
 require_relative '../lib/wixgem.rb'
-require_relative 'test_install.rb'
 require_relative 'test_files_exist.rb'
 require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
@@ -24,25 +23,26 @@ class Installation_test < MiniTest::Unit::TestCase
     test_arguments = {
       test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
       test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
-	  test2: ['test/wixgem_install_test2.msi', {manufacturer: 'musco', files: ['Gemfile']}], 
+	  test2: ['test/wixgem_install_test2.msi', {manufacturer: 'Musco', files: ['Gemfile']}], 
 	  test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
 	  test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
 	  test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
 	  test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
 	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	  test8: ['test/wixgem_install_heat_problem_dll.msi', {debug: true, suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
-	  test9: ['test/wixgem_install_test9.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
+	  test8: ['test/wixgem_install_heat_problem_dll.msi', {suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test9: ['test/wixgem_install_test9.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
 	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}],
     }
 	
-    test_arguments.each { |key, value| 
+    test_arguments.each do |key, value| 
 	  File.delete(value[0]) if(File.exists?(value[0]))
 	
       Wixgem::Wix.make_installation(value[0], value[1])
 	  assert(File.exists?(value[0]), "Should have created an installation file: #{value[0]}") 
     
-	  test_install(key, value[0], value[1], "test_files_exist('#{value[0]}', #{value[1]})") 
-	}
+	  hash = (value[1].is_a?(Hash)) ? value[1] : nil
+	  install_msi(value[0], hash) { |install_path| test_files_exist(value[0], value[1]) }
+	end
   end
   def test_packaging_exceptions
     absolute_path = File.absolute_path(__FILE__)
@@ -51,7 +51,7 @@ class Installation_test < MiniTest::Unit::TestCase
      {id: 'test2', msi_file: 'test/wixgem_install_exception_test2.msi', input: [] },
      {id: 'test3', msi_file: 'test/wixgem_install_exception_test3.msi', input: ['does_not_exist.txt'] },
 	 {id: 'test4', msi_file: 'test/wixgem_install_exception_test4.msi', input: [absolute_path], error_msg: "Invalid absolute installation path: #{absolute_path}" },	  
-	 {id: 'test5', msi_file: 'test/wixgem_install_exception_test5.msi', input: { debug: true, files: [absolute_path], ignore_files: [absolute_path]}},	  
+	 {id: 'test5', msi_file: 'test/wixgem_install_exception_test5.msi', input: { files: [absolute_path], ignore_files: [absolute_path]}},	  
 	 {id: 'test6', msi_file: 'test/wixgem_install_exception_test6.msi', input: { files: Dir.glob('test_files/**/*'), ignore_files: Dir.glob('test_files/**/*')}, error_msg: "At least one file is required" }	  
     ]
   
@@ -84,6 +84,15 @@ class Installation_test < MiniTest::Unit::TestCase
 	packages.each { |package| assert(package.attributes['InstallerVersion'].to_i == 200) }
   end
 
+  def test_net_framework
+	Wixgem::Wix.make_installation('test/wixgem_installer_requires_netframework.msi', {debug: true, files: ['rakefile.rb'], requires_netframework: 'NETFRAMEWORK45'})
+    wxs_text = File.read('test/wixgem_installer_requires_netframework.msi.wxs')
+	xml_doc = REXML::Document.new(wxs_text)
+
+	framework = REXML::XPath.match(xml_doc, "/Wix//PropertyRef[@Id='NETFRAMEWORK45']")[0]
+	assert(!framework.nil?, "Expected /Wix/Product/PropertyRef@Id='NETFRAMEWORK45")
+  end
+  
   def test_remove_previous_version
     install_1_0 = 'test/wixgem_remove_previous_1.0.msi'
 	install_1_1 = 'test/wixgem_remove_previous_1.1.msi'
@@ -91,13 +100,11 @@ class Installation_test < MiniTest::Unit::TestCase
 	
 	Wixgem::Wix.make_installation(install_1_0, 
 	                              {files: files,
-								   debug: true,
 								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
 								   version: '1.0.0.0'})
   
 	Wixgem::Wix.make_installation(install_1_1, 
 	                              {files: files,
-								   debug: true,
 								   remove_existing_products: true,
 								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
 								   version: '1.1.0.0'})
@@ -119,13 +126,11 @@ class Installation_test < MiniTest::Unit::TestCase
 	
 	Wixgem::Wix.make_installation(install_1_0, 
 	                              {files: files,
-								   debug: true,
 								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
 								   version: '1.0.0.0'})
   
 	Wixgem::Wix.make_installation(install_1_1, 
 	                              {files: files,
-								   debug: true,
 								   remove_existing_products: true,
 								   upgrade_code: '{1dc40b00-51f8-4ebc-b5ea-28b3a86bc735}',
 								   version: '1.0.0.1'})
@@ -152,7 +157,6 @@ class Installation_test < MiniTest::Unit::TestCase
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
 								   binary_table: [{ id: 'hello_world', file: 'CustomActionExe/hello_world.exe' }],
-								   debug: true,
 								   custom_actions: [ {binary_key: 'hello_world', exe_command: hello_world_path} ]} )
 	
 	install_msi(install_file) do |path|
@@ -169,7 +173,6 @@ class Installation_test < MiniTest::Unit::TestCase
 	files = ['CustomActionExe/hello_world.exe']
 	Wixgem::Wix.make_installation(install_file, 
 	                              {files: files,
-								   debug: true,
 								   modify_file_paths: {/CustomActionExe\// => ''},
 								   custom_actions: [ {file: 'hello_world.exe', exe_command: hello_world_path } ]} )
 	
@@ -179,5 +182,11 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(file), "#{file} should have been installed" )
 	  assert(File.exists?(hello_world_path), "If the custom action executed then #{hello_world_path} should exist" )
 	end								   
+  end
+  
+  def test_ui
+    msi = 'test/ui_installdir.msi'
+	Wixgem::Wix.make_installation(msi, {debug: true, files: ['rakefile.rb'], ui: 'WixUI_InstallDir'})
+  	install_msi(msi) { |installdir| }
   end
 end

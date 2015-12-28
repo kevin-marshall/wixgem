@@ -42,9 +42,10 @@ task :test => [:setup] do
 	cmd.execute	
   end
 end
+
 unless(admin?)
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-puts 'Running as non administrator. Will not be able to test installing the msi files!'
+puts 'No user interaction requred when running rakefile as an administrator           '
 puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 end
 

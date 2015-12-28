@@ -17,12 +17,7 @@ class FileAttributes_test < MiniTest::Unit::TestCase
       Wixgem::Wix.make_installation(value[0], value[1])
 	  assert(File.exists?(value[0]), "should create an installation file using: #{value[0]}")	  
    
-      if(admin?)
-	    install_msi(value[0]) do |install_path|
-	      #test_install(key, value[0], value[1], "test_file_attributes('#{value[0]}', #{value[1]})") 
-		  test_file_attributes(value[0], value[1])
-		end
-      end		
+	  install_msi(value[0]) { |install_path| test_file_attributes(value[0], value[1]) }
 	}
   end  
 end

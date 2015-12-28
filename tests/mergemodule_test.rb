@@ -3,8 +3,8 @@ require 'WindowsInstaller.rb'
 #require 'win32ole'
 
 require_relative '../lib/wixgem.rb'
-require_relative 'test_install.rb'
-#require_relative 'test_files_exist.rb'
+require_relative 'install_msi'
+require_relative 'test_files_exist.rb'
 #require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 
@@ -34,16 +34,11 @@ class MergeModule_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(value[0]), "should create merge module: #{value[0]}")
 	
 	  install_file = value[0].gsub(/msm/) { |s| s = 'msi' }
-      Wixgem::Wix.make_installation(install_file, {files: ["#{value[0]}"], debug: true})
+      Wixgem::Wix.make_installation(install_file, {files: ["#{value[0]}"]}) # , debug: true})
 	  
 	  assert(File.exists?(install_file), "should be able to create an installation file using: #{value[0]}")
     
-	  test_install(key, install_file, value[1]) 
-	  
-	  if(key == :test5)
-	    assert(File.exists?("#{value[0]}.wxs"), "should produce the debug files")
-	    expect(File.exists?("#{value[0]}.log"), "should produce the debug files")
-      end
+	  install_msi(install_file) { |install_dir| test_files_exist(install_file, value[1]) }
     }
   end  
   
@@ -61,27 +56,23 @@ class MergeModule_test < MiniTest::Unit::TestCase
     }
   end	
   
-  if(admin?)
-    def test_multiple_merge_module 
-      msi_file='test\\wixgem_multiple_merge_test1.msi'
-      merge1='test\\wixgem_multiple_merge_test1.msm'
-      merge2='test\\wixgem_multiple_merge_test2.msm'
+  def test_multiple_merge_module 
+    msi_file='test\\wixgem_multiple_merge_test1.msi'
+    merge1='test\\wixgem_multiple_merge_test1.msm'
+    merge2='test\\wixgem_multiple_merge_test2.msm'
 
-      Wixgem::Wix.make_mergemodule(merge1, ['rakefile.rb'])
-	  assert(File.exists?(merge1), "should be able to create two merge modules")
-      Wixgem::Wix.make_mergemodule(merge2, ['Gemfile'])
-	  assert(File.exists?(merge2), "should be able to create two merge modules")
+	Wixgem::Wix.debug=true
+    Wixgem::Wix.make_mergemodule(merge1, ['rakefile.rb'])
+	assert(File.exists?(merge1), "should be able to create two merge modules")
+    Wixgem::Wix.make_mergemodule(merge2, ['Gemfile'])
+	assert(File.exists?(merge2), "should be able to create two merge modules")
 		
-      Wixgem::Wix.make_installation(msi_file, [merge1, merge2])
-	  assert(File.exists?(msi_file),"should be able to create an installation file using: #{msi_file}")
+    Wixgem::Wix.make_installation(msi_file, [merge1, merge2])
+	assert(File.exists?(msi_file),"should be able to create an installation file using: #{msi_file}")
 	
-
-	  @installer.install_msi(msi_file)
-	    
-	  install_dir = "C:/Program Files (x86)/#{File.basename(msi_file, '.msi')}"
+	install_msi(msi_file) do |install_dir|	    
 	  assert(File.exists?("#{install_dir}/rakefile.rb"),"should install contents of merge module")
 	  assert(File.exists?("#{install_dir}/Gemfile"),"should install contents of merge module")
-	  @installer.uninstall_msi(msi_file) if(@installer.msi_installed?(msi_file))
-    end 
+	end
   end
 end

@@ -28,14 +28,11 @@ class CustomAction
 	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
 	return install_path
   end
-  def set_target_directory
+  def set_install_directory
 	product_elements = REXML::XPath.match(@xml_doc, "/Wix/Product")
 	return if(product_elements.nil? || (product_elements.size != 1))
 	
 	product_elements[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	product_elements[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Return' => 'check'}
-
-	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
   end
   def add(custom_action)
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))

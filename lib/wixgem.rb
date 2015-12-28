@@ -8,6 +8,12 @@ require_relative 'shortcut'
 require_relative 'custom_action'
 require_relative 'temp_directory'
 
+# Editor for wix Files WixEdit: http://http://wixedit.sourceforge.net/
+# Full list of Wix editors : http://robmensching.com/blog/posts/2007/11/20/wix-editors/
+# I guess SharpDevelop is good
+
+# Good web page for including the dialog https://www.packtpub.com/books/content/windows-installer-xml-wix-adding-user-interface
+
 module Wixgem
 
 class Wix
@@ -53,6 +59,48 @@ class Wix
     @logger = nil
   end
   
+  def self.manage_installdir(xml_doc, input)
+	product_target_elements = REXML::XPath.match(xml_doc, "/Wix/Product/Directory[@Id='TARGETDIR']")
+	if(!product_target_elements.nil? && product_target_elements.size == 1)
+	  targetdir = product_target_elements[0]
+	  installdir = targetdir.add_element 'Directory', { 'Id' => 'ProgramFilesFolder' }
+      installdir = installdir.add_element 'Directory', { 'Id' => "Dir_#{input[:manufacturer]}", 'Name' => input[:manufacturer] } if(input.has_key?(:manufacturer))
+	  installdir = installdir.add_element 'Directory', { 'Id' => 'INSTALLDIR', 'Name' => input[:product_name] }
+	else
+	  module_target_elements = REXML::XPath.match(xml_doc, "/Wix/Module/Directory[@Id='TARGETDIR']")
+	  targetdir = module_target_elements[0]
+	  targetdir.add_element 'Directory', { 'Id' => 'MergeRedirectFolder', 'FileSource' => '.' }
+	end
+	return xml_doc
+  end
+  
+  def self.manage_netframework(xml_doc, input)
+    wix = REXML::XPath.match(xml_doc, "/Wix")[0]
+    add_netfx_namespace = false   
+    if(input.key?(:requires_netframework))
+	  add_netfx_namespace=true
+	  fragment = wix.add_element 'Fragment'
+	  fragment.add_element 'PropertyRef', { 'Id' => input[:requires_netframework] }
+	  condition = fragment.add_element 'Condition', { 'Message' => "This application requires .NET Framework #{input[:requires_netframework]}. Please install the .NET Framework then run this installer again." }
+	  condition.text = "<![CDATA[Installed OR #{input[:requires_netframework]}]]>"
+    end
+	
+	wix.attributes['xmlns:netfx'] = 'https://schemas.microsoft.com/wix/NetFxExtension' if(add_netfx_namespace)
+    return xml_doc 
+  end
+  
+  def self.manage_ui(xml_doc, input)
+    product_elements = REXML::XPath.match(xml_doc, "/Wix/Product")
+
+	return if(product_elements.nil? || product_elements.size != 1)
+	return unless(input.key?(:ui))
+	
+	product = product_elements[0]
+	ui = product.add_element 'UIRef', { 'Id' => input[:ui] }
+	
+    return xml_doc
+  end
+
   def self.manage_upgrade(xml_doc, input)
 	products = REXML::XPath.match(xml_doc, '//Wix/Product')
 	return xml_doc if(products.length == 0)
@@ -75,7 +123,7 @@ class Wix
 	@product = elements[0]
 	return xml_doc if(@product.nil?)
 	
-	custom_actions.set_target_directory
+	custom_actions.set_install_directory
 	
 	input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
 
@@ -94,7 +142,7 @@ class Wix
 	}
 	return xml_doc if(merge_modules.length == 0)
 	
-	directory_root = REXML::XPath.match(xml_doc, '//Wix/Product/Directory')
+	directory_root = REXML::XPath.match(xml_doc, "//Directory[@Id='INSTALLDIR']")
 	if(directory_root.length == 0)
 		module_root = REXML::XPath.match(xml_doc, '//Wix/Module')
 		raise 'Merge modules can not be added to a merge module' unless(module_root.nil?)
@@ -226,7 +274,7 @@ class Wix
 	  files.reject! { |f| ingore_files.include?(f) }
 
 	  files.each do |file| 
-	    if(File.file?(file) && !ingore_files)
+	    if(File.file?(file))
   	      install_path = file
           if(input.has_key?(:modify_file_paths))
             input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
@@ -278,6 +326,11 @@ class Wix
   	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files) && input[:has_vb6_files])
 	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
 	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
+	if(input[:msi?])
+	  cmd = cmd.gsub(/-srd/, '-dr INSTALLDIR -srd') 
+	else
+	  cmd = cmd.gsub(/-srd/, '-dr MergeRedirectFolder -srd') 
+	end
 	return cmd
   end
 
@@ -326,7 +379,7 @@ class Wix
 
 	  File.open(filename, 'w') { |f| f.puts(xml_doc.to_s) }	
 	end
-	directory_fragments['.'] = 'TARGETDIR'
+	directory_fragments['.'] = 'INSTALLDIR'
 	
 	xml_doc = REXML::Document.new(File.read(wxs_file))
 
@@ -376,6 +429,7 @@ class Wix
 	end
 	
 	product_name = File.basename(wxs_file, '.wxs')
+	input[:product_name] = product_name unless(input.has_key?(:product_name))
     product_name = input[:product_name] if(input.has_key?(:product_name))
 	
     manufacturer = 'Not Set'
@@ -403,6 +457,7 @@ class Wix
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 	
 	xml_doc = REXML::Document.new(wxs_text)
+	
 	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
 	packages.each do |package| 
 		package.add_attribute('InstallScope', 'perMachine') if(input.has_key?(:all_users))
@@ -412,6 +467,9 @@ class Wix
 	    package.attributes['InstallPrivileges']= input[:install_priviledges] if(input.has_key?(:install_priviledges))
 	end 
 
+	xml_doc = manage_installdir(xml_doc, input)
+	xml_doc = manage_netframework(xml_doc, input)
+	#xml_doc = manage_ui(xml_doc, input)
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)
 	xml_doc = manage_msm_files(xml_doc)
@@ -425,14 +483,16 @@ class Wix
   	File.open(wxs_file, 'w') { |f| formatter.write(xml_doc, f) }	
   end
 
-  def self.create_output(wxs_file, output)
+  def self.create_output(wxs_file, input, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
 	candle_cmd = CMD.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	
 	log_wix_output(candle_cmd)
 	
-	light_cmd = CMD.new("\"#{install_path}/bin/light.exe\" -nologo -out \"#{output}\" \"#{wixobj_file}\"", { quiet: true })
+	cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
+    cmd_args = "-ext WixUIExtension -cultures:en-us #{cmd_args}" if(input.key?(:ui))
+	light_cmd = CMD.new("\"#{install_path}/bin/light.exe\" #{cmd_args}", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)
   end
@@ -449,7 +509,6 @@ class Wix
 	verify_input_keys(input)
 	  	
 	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
-    
 	start_logger if(@debug)
 	
 	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
@@ -460,6 +519,7 @@ class Wix
  
 	output_absolute_path = File.absolute_path(output)
 	input[:original_pwd] = Dir.pwd
+	input[:msi?] = output.include?('.msi')
 		
 	modify_binary_files(input)
 
@@ -470,7 +530,7 @@ class Wix
 	  
 		Dir.chdir(dir) do |current_dir|
 		  create_wxs_file(wxs_file, input, ext)
-	      create_output(wxs_file, output_absolute_path)
+	      create_output(wxs_file, input, output_absolute_path)
 		end
 	  rescue Exception => e
 		raise e

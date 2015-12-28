@@ -1,7 +1,7 @@
 require_relative ('../lib/file.rb')
+require_relative ('test_files_exist.rb')
 
 def test_file_attributes(msi_file, data)
-puts 'not getting here'
   product_name = File.basename(msi_file, File.extname(msi_file))
   product_name = data[:product_name] if(data.kind_of?(Hash) && data.has_key?(:product_name))
 

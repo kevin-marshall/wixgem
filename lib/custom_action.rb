@@ -33,9 +33,9 @@ class CustomAction
 	return if(product_elements.nil? || (product_elements.size != 1))
 	
 	product_elements[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
-	product_elements[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Property' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Execute' => 'firstSequence', 'Return' => 'check'}
+	product_elements[0].add_element 'CustomAction', { 'Id' => 'SetTARGETDIR', 'Directory' => 'TARGETDIR', 'Value' => "#{installion_path}", 'Return' => 'check'}
 
-	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'Before'=>'CostInitialize' }
+	custom_action = @install_execute_sequence.add_element 'Custom', { 'Action' => 'SetTARGETDIR', 'After'=>'InstallValidate' }
   end
   def add(custom_action)
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))
@@ -51,7 +51,7 @@ class CustomAction
 	  file_key = file_elements[0].attributes['Id']
 	end
 	
-	id = "custom_agction_#{SecureRandom.uuid.gsub(/-/,'')}"
+	id = "ca_#{SecureRandom.uuid.gsub(/-/,'')}"
 	id = custom_action[:id] if(custom_action.key?(:id))
 	
 	cmd_line = ''

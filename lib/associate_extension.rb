@@ -29,7 +29,7 @@ class AssociateExtension
 
     # MyApp.Document ProgID 
     #<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\MyApp.Document" Name="FriendlyTypeName" Value="!(loc.DescXYZ)" Type="string" />
-	file_parent.add_element 'RegistryValue', { 'Root' => 'HKLM', 'Key' => "SOFTWARE\\Classes\\#{File.basename(app, '.exe')}.Document\\shell\\open\\command", 
+	file_parent.add_element 'RegistryValue', { 'Root' => 'HKLM', 'Key' => "SOFTWARE\\Classes\\#{File.basename(app, '.exe')}.Document", 
 	                                           'Name' => 'Aim Project File', 'Value' => "[INSTALLDIR]#{app} \"%1\"", 'Type' => 'string' }
 
 	#<ProgId Id="MyApp.Document" Description="!(loc.DescXYZ)" Icon="filetype.ico" Advertise="yes">
@@ -41,6 +41,6 @@ class AssociateExtension
 	prog_id = file_parent.add_element 'ProgId', { 'Id' => "#{File.basename(app, '.exe')}.Document", 'Description' => "Aim project file", 
 	                                              'Advertise' => 'yes'}
     ext = prog_id.add_element 'Extension', { 'Id' => extension.gsub(/\./, '') }
-	ext.add_element 'Verb', { 'Id' => 'open', 'Command' => "[INSTALLDIR]#{app}", 'Argument' => "&quot;%1&quot;" }
+	ext.add_element 'Verb', { 'Id' => 'open', 'Command' => "[INSTALLDIR]#{app}", 'Argument' => "\"%1\"" }
   end
 end

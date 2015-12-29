@@ -13,8 +13,6 @@ The [WiX Toolset](http://wixtoolset.org) must be installed.
 ```ruby
 require 'wixgem'
 	
-WIX_TOOLSET_ROOT='path to root of Wix toolset'
-Wixgem::Wix.install_path = WIX_TOOLSET_ROOT
 Wixgen::Wix.make_installation('Product.msi', ['rakefile.rb']])
 
 Wixgen::Wix.make_installation('Product.msi', {product_name: 'productname',
@@ -31,8 +29,7 @@ Wixgen::Wix.make_installation('Product.msi', {modify_file_paths: {/\Atest_files\
 require 'wixgem'
 	
 WIX_TOOLSET_ROOT='path to root of Wix toolset'
-Wixgem::Wix.install_path = WIX_TOOLSET_ROOT
-Wixgen::Wix.make_mergemodule('Product.msi', ['rakefile.rb']])
+Wixgen::Wix.make_mergemodule('Product.msm', ['rakefile.rb']])
 
 ```
 An example rakefile.rb is included in the example directory of the gem.
@@ -42,7 +39,7 @@ An example rakefile.rb is included in the example directory of the gem.
 Wixgem will generate an installation or merge module from an array of files. The Wixgem also supports a 
 small set of optional arguments allowing the developer to customize the generated installation file. 
 
-#### Optional input hash arguments
+#### Optional input hash keys
 * **product_name**: String specifing the product name of the installation.
 * **manufacturer**: String specifing the manufacturer of the installation.
 * **version**:      String specifing the version of the installation. i.e. '1.1.0.0'
@@ -53,14 +50,32 @@ small set of optional arguments allowing the developer to customize the generate
 * **modify_file_paths**: A hash of regex objects to replacement string pairs. The regular expressions are applied to
                       the file paths allowing the developer to modify the relative location of the files in the installation.
 * **has_vb6_files**: Required if installation contains any ocx's or dll's compiled with Visual Basic 6.
-* **remove_existing_products**: A boolean value. If the value is true the installation will remove all existing 
-                             installations of the product before installing the product.
+* **remove_existing_products**: A boolean value. If the value is true the installation will remove the previous 
+                                installation of the product before installing the product.
 * **all_users**: String value perUser or perMachine. The default is perUser.
-* **suppress_registry_harvesting** Suppress registry harvesting. Can fix the Runtime Error E6034.		 
+* **suppress_registry_harvesting** Suppress's heat's registry harvesting. Can fix the Runtime Error E6034.		 
 * **suppress_COM_elements** Suppress COM elements.
 * **installer_version** Represents the minimum version of the Windows installer required to install
-                        this package. The default version is 4.0. Other valid versions are 2.0,
-						3.0, 3.5, 4.0, 4.5. 
+                        this package. The default version is 4.5. Other valid versions are 2.0,
+						3.0, 3.5, 4.0, 4.5.
+* **requires_netframework** Tests to see if the require netframework version is installed on the machine. The
+                            associated value specifies the netframework version. The net framework strings can
+                            be found at http://wixtoolset.org/documentation/manual/v3/customactions/wixnetfxextension.html							
+* **binary_table**  Key is associated with an array of hashes specifying a file and a binary key to place into the 
+                    binary table.
+* **custom_actions** Key is associated with an array of hashes specifying the arguments for custom actions.
+* ** shortcuts ** Key is associated with a hash specifying arguments to create shortcuts. Currently, 
+                  the only supported shortcut is a desktop shortcut.
+* ** extensions ** Key is associated with a hash to register executables with extensions.
+* ** com_self_register ** Is a key associated with an array of files com dll's/exe's to mark for self
+                          registration
+* ** ignore_files ** Is a key associated with an array of files to ignore when generating the installation. This
+                     key is useful for having files copied to the installation folder to generating the installation,
+					 but not adding the files to the installation. An example of usage is I had a COM dll causing 
+					 heat some problems, so I needed to add the dependency dll's to the install directory so heat could
+					 harvest the com registry entries, but heat was choking on adding the support dll to the 
+					 installation. Thus, I was able to create a merge module for the COM dll and another merge module for
+					 the supporting dlls.
 * **debug**: Boolean value. If debug is true the Product's wxs file and a log file are copied
              to the same directory as the output msi file. If you are familiar with WiX this can helpful
 			 if there is a problem.      

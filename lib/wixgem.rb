@@ -3,10 +3,11 @@ require 'rexml/document'
 require 'CMD'
 require 'SecureRandom'
 
-require_relative 'file'
-require_relative 'shortcut'
-require_relative 'custom_action'
-require_relative 'temp_directory'
+require_relative 'file.rb'
+require_relative 'shortcut.rb'
+require_relative 'custom_action.rb'
+require_relative 'temp_directory.rb'
+require_relative 'associate_extension.rb'
 
 # Editor for wix Files WixEdit: http://http://wixedit.sourceforge.net/
 # Full list of Wix editors : http://robmensching.com/blog/posts/2007/11/20/wix-editors/
@@ -127,6 +128,15 @@ class Wix
 	
 	input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
 
+	return xml_doc
+  end
+  
+  def self.manage_associate_extensions(xml_doc, input)
+    return xml_doc unless(input.key?(:extensions))
+
+	ext = AssociateExtension.new(xml_doc)
+	input[:extensions].each { |exe, file_ext| ext.associate(exe, file_ext) }
+	
 	return xml_doc
   end
   
@@ -443,7 +453,7 @@ class Wix
 
 	upgrade_code = ''
 	upgrade_code = input[:upgrade_code] if(input.has_key?(:upgrade_code))
-	
+ 	 	
 	wxs_text = File.read(wxs_file)
 
 	wxs_text = wxs_text.gsub(/SourceDir\\/) { |s| s = '.\\' }
@@ -456,6 +466,8 @@ class Wix
 	wxs_text = wxs_text.gsub(/Product Id=\"[^\"]+\"/) { |s| s = "Product Id=\"#{product_code}\"" } unless(product_code.empty?)
 	wxs_text = wxs_text.gsub(/UpgradeCode=\"[^\"]+\"/) { |s| s = "UpgradeCode=\"#{upgrade_code}\"" } unless(upgrade_code.empty?)
 	
+	File.open(wxs_file, 'w') { |f| f.write(wxs_text) }	
+
 	xml_doc = REXML::Document.new(wxs_text)
 	
 	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
@@ -477,6 +489,7 @@ class Wix
 	xml_doc = manage_shortcuts(xml_doc, input)
 	xml_doc = manage_self_register(xml_doc, input)
 	xml_doc = manage_binary_table(xml_doc, input)
+	xml_doc = manage_associate_extensions(xml_doc, input)
 		
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true 

@@ -118,11 +118,7 @@ class Wix
 
   def self.manage_custom_actions(xml_doc, input)
     custom_actions = CustomAction.new(xml_doc, input)
-	
- 	elements = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return xml_doc if(elements.nil? || (elements.length != 1))
-	@product = elements[0]
-	return xml_doc if(@product.nil?)
+	return xml_doc if(input[:custom_actions].nil?)
 		
 	input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
 

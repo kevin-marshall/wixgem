@@ -7,18 +7,6 @@ class CustomAction
   def initialize(xml_doc, input)
     @xml_doc = xml_doc
     @input = input
-
- 	elements = REXML::XPath.match(xml_doc, '//Wix/Product')
-	return if(elements.nil? || (elements.length != 1))
-	@product = elements[0] 
-	return if(@product.nil?)
-
- 	elements = REXML::XPath.match(xml_doc, '//InstallExecuteSequence')
-	if(elements.length == 1)
-	  @install_execute_sequence = elements[0]
-	else
-	  @install_execute_sequence = @product.add_element 'InstallExecuteSequence'
-	end
   end
   def add(custom_action)
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))
@@ -62,9 +50,24 @@ class CustomAction
 	else
 	  action.attributes['FileKey'] = file_key
 	end
+
+    install_execute_sequence = fragment.add_element 'InstallExecuteSequence'
+
+	custom_action[:before] = 'InstallFinalize' if(!custom_action.key?(:after) && !custom_action.key?(:before))
+	if(custom_action.key?(:after))
+ 	  action = install_execute_sequence.add_element 'Custom', { 'Action' => id, 'After' => custom_action[:after] }
+      action.text = condition
+	else
+ 	  action = install_execute_sequence.add_element 'Custom', { 'Action' => id, 'Before' => custom_action[:before] }
+      action.text = condition
+	end
 	
-	action = @install_execute_sequence.add_element 'Custom', { 'Action' => id, 'Before'=>'InstallFinalize' }
-    action.text = condition
+	control=nil
+	elements = REXML::XPath.match(@xml_doc, "/Wix/Product")
+	elements = REXML::XPath.match(@xml_doc, "/Wix/Module") if(elements.nil? || elements.size == 0)
+	
+	elements[0].add_element 'CustomActionRef', { 'Id' => id }
+
   end
 end
 

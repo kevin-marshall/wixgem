@@ -10,9 +10,10 @@ require_relative 'install_msi'
 	
 class CustomAction_test < MiniTest::Unit::TestCase
   def test_Installation
+    dir = File.absolute_path(File.dirname(__FILE__))
     output = { 
-	  test0: "#{File.dirname(__FILE__)}/test/binary_table.txt",
-	  test1: "#{File.dirname(__FILE__)}/test/file_after_install.txt",
+	  test0: "#{dir}/test/binary_table.txt",
+	  test1: "#{dir}/test/file_after_install.txt",
 	}
 
     test_arguments = {
@@ -36,7 +37,7 @@ class CustomAction_test < MiniTest::Unit::TestCase
 	  assert(File.exists?(test_data[:msi]), "Should have created an installation file: #{test_data[:msi]}") 
     
 	  install_msi(test_data[:msi], test_data[:input]) do |install_path| 
-	    assert(File.exists?(output[test_id], "Custom action should have created file: #{output[test_id]}")) 
+	    assert(File.exists?(output[test_id]), "Custom action should have created file: #{output[test_id]}") 
 	  end
 	end
   end  

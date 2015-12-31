@@ -123,9 +123,7 @@ class Wix
 	return xml_doc if(elements.nil? || (elements.length != 1))
 	@product = elements[0]
 	return xml_doc if(@product.nil?)
-	
-	custom_actions.set_install_directory
-	
+		
 	input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
 
 	return xml_doc
@@ -453,7 +451,10 @@ class Wix
 
 	upgrade_code = ''
 	upgrade_code = input[:upgrade_code] if(input.has_key?(:upgrade_code))
- 	 	
+
+	install_path = '[ProgramFilesFolder][ProductName]'
+	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Not Set')
+	
 	wxs_text = File.read(wxs_file)
 
 	wxs_text = wxs_text.gsub(/SourceDir\\/) { |s| s = '.\\' }
@@ -469,6 +470,10 @@ class Wix
 	File.open(wxs_file, 'w') { |f| f.write(wxs_text) }	
 
 	xml_doc = REXML::Document.new(wxs_text)
+	products = REXML::XPath.match(xml_doc, "/Wix/Product")
+	products.each do |product|
+	  product.add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{install_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
+	end
 	
 	packages = REXML::XPath.match(xml_doc, '//Wix/Product/Package')
 	packages.each do |package| 

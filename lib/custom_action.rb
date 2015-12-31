@@ -13,26 +13,12 @@ class CustomAction
 	@product = elements[0] 
 	return if(@product.nil?)
 
- 	elements = REXML::XPath.match(xml_doc, '//Wix/Product/InstallExecuteSequence')
+ 	elements = REXML::XPath.match(xml_doc, '//InstallExecuteSequence')
 	if(elements.length == 1)
 	  @install_execute_sequence = elements[0]
 	else
 	  @install_execute_sequence = @product.add_element 'InstallExecuteSequence'
 	end
-  end
-  def installion_path
-	manufacturer = 'Default Manufacturer'
-    manufacturer = @input[:manufacturer] if(@input.has_key?(:manufacturer))
-	
-	install_path = '[ProgramFilesFolder][ProductName]'
-	install_path = "[ProgramFilesFolder][Manufacturer]\\[ProductName]" unless(manufacturer == 'Default Manufacturer')
-	return install_path
-  end
-  def set_install_directory
-	product_elements = REXML::XPath.match(@xml_doc, "/Wix/Product")
-	return if(product_elements.nil? || (product_elements.size != 1))
-	
-	product_elements[0].add_element 'SetProperty', { 'Id' => 'ARPINSTALLLOCATION', 'Value' => "#{installion_path}", 'After' => 'CostFinalize', 'Sequence' => 'both' }	
   end
   def add(custom_action)
     unless(custom_action.key?(:file) || custom_action.key?(:binary_key))

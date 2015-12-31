@@ -145,45 +145,7 @@ class Installation_test < MiniTest::Unit::TestCase
 	  assert(!installer.msi_installed?(install_1_0),"#{install_1_0} should have been uninstalled during the installation of #{install_1_1}")
     end
   end
-  
-  def test_custom_action
-    install_file='test/wixgem_install_custom_action.msi'
-	files = ['all_tests.rb']
-	
-	hello_world_path="#{File.dirname(__FILE__)}/test/hello_world.txt"
-	hello_world_path=File.absolute_path(hello_world_path)
-	
-	File.delete(hello_world_path) if(File.exists?(hello_world_path))
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   binary_table: [{ id: 'hello_world', file: 'CustomActionExe/hello_world.exe' }],
-								   custom_actions: [ {binary_key: 'hello_world', exe_command: hello_world_path} ]} )
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/all_tests.rb"
-	  assert(File.exists?(file), "#{file} should have been installed" )
-	  assert(File.exists?(hello_world_path), "Custom action should have created #{hello_world_path}" )
-	  contents = File.read(hello_world_path)
-	  #puts contents
-	end								   
-	    
-	File.delete(hello_world_path) if(File.exists?(hello_world_path))
-
-	install_file='test/wixgem_install_custom_action1.msi'
-	files = ['CustomActionExe/hello_world.exe']
-	Wixgem::Wix.make_installation(install_file, 
-	                              {files: files,
-								   modify_file_paths: {/CustomActionExe\// => ''},
-								   custom_actions: [ {file: 'hello_world.exe', exe_command: hello_world_path } ]} )
-	
-	
-	install_msi(install_file) do |path|
-	  file="#{path}/hello_world.exe"
-	  assert(File.exists?(file), "#{file} should have been installed" )
-	  assert(File.exists?(hello_world_path), "If the custom action executed then #{hello_world_path} should exist" )
-	end								   
-  end
-  
+    
   def test_ui
     msi = 'test/ui_installdir.msi'
 	Wixgem::Wix.make_installation(msi, {debug: true, files: ['rakefile.rb'], ui: 'WixUI_InstallDir'})

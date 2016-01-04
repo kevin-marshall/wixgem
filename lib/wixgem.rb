@@ -339,7 +339,7 @@ class Wix
   end
 
   def self.execute_heat(input, cmd_line_options)		  
-	heat_cmd = CMD.new("\"#{install_path}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
+	heat_cmd = CMD.new("\"#{install_path.gsub(/\\/,'/')}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
 	heat_cmd.execute	
 	log_wix_output(heat_cmd)
   end
@@ -500,13 +500,13 @@ class Wix
   def self.create_output(wxs_file, input, output)
     wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	candle_cmd = CMD.new("\"#{install_path}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
+	candle_cmd = CMD.new("\"#{install_path.gsub(/\\/,'/')}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	
 	log_wix_output(candle_cmd)
 	
 	cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
-    cmd_args = "-ext WixUIExtension -cultures:en-us #{cmd_args}" if(input.key?(:ui))
-	light_cmd = CMD.new("\"#{install_path}/bin/light.exe\" #{cmd_args}", { quiet: true })
+    cmd_args = "-ext WixUIExtension -ext WixUtilExtension -cultures:en-us #{cmd_args}"
+	light_cmd = CMD.new("\"#{install_path.gsub(/\\/,'/')}/bin/light.exe\" #{cmd_args}", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)
   end

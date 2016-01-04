@@ -9,8 +9,8 @@ class CustomAction
     @input = input
   end
   def add(custom_action)
-    unless(custom_action.key?(:file) || custom_action.key?(:binary_key))
-      raise 'Currently, only supported custom actions work with installed executable or binary key' 
+    unless(custom_action.key?(:file) || custom_action.key?(:binary_key) || custom_action.key?(:property))
+      raise 'Currently, only supported custom actions work with installed executable, binary key, or property' 
 	end
 	
 	file_key=nil
@@ -44,13 +44,25 @@ class CustomAction
 	wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
 	fragment = wix_element.add_element 'Fragment'
 	
-	action = fragment.add_element 'CustomAction', { 'Id' => id, 'ExeCommand' =>  cmd_line, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
+	action = fragment.add_element 'CustomAction', { 'Id' => id, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
 	if(custom_action.key?(:binary_key))
 	  action.attributes['BinaryKey'] = custom_action[:binary_key]
 	else
 	  action.attributes['FileKey'] = file_key
 	end
+	
+	action.attributes['ExeCommand'] = cmd_line if(custom_action.key?(:exe_command))
 
+	action.attributes['DllEntry'] = custom_action[:dll_entry] if(custom_action.key?(:dll_entry))
+
+	if(custom_action.key?(:property))
+	  raise "Custom action property '#{custom_action[:property]} must have a value!" unless(custom_action.key?(:value))
+	  action.attributes.delete('ExeCommand')
+	  action.attributes.delete('Return')
+	  action.attributes['Property'] = custom_action[:property]
+	  action.attributes['Value'] = custom_action[:value]	  
+	end
+	
     install_execute_sequence = fragment.add_element 'InstallExecuteSequence'
 
 	custom_action[:before] = 'InstallFinalize' if(!custom_action.key?(:after) && !custom_action.key?(:before))

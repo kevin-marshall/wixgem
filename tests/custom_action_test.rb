@@ -19,16 +19,18 @@ class CustomAction_test < MiniTest::Unit::TestCase
 	  quiet_execution_ca: "#{dir}/test/write.exe"
 	}
 
+	execute_it_cmd = "\"[SystemFolder]xcopy.exe\" \"[SystemFolder]write.exe\" \"#{dir.gsub(/\//,'\\')}\\test\""
+	puts "exe: #{execute_it_cmd}"
     test_arguments = {
       test1: { msi: 'test/wixgem_custom_action_test1.msi', 
 	           input: {files: ['all_tests.rb'],
 	                   binary_table: [{ id: 'binary_table', file: 'CustomActionExe/hello_world.exe' }],
-	               custom_actions: [ {binary_key: 'binary_table', exe_command: output[:binary_table]} ]},
+	                   custom_actions: [ {binary_key: 'binary_table', exe_command: output[:binary_table]} ]},
 			   post_installation: [:binary_table]},
-	 test2: { msi: 'test/wixgem_custom_action_test2.msi',
-	           input: {files: ['CustomActionExe/hello_world.exe'],
-                       modify_file_paths: {/CustomActionExe\// => ''},
-                       custom_actions: [ {file: 'hello_world.exe', exe_command: output[:before_inst_finalize]} ]},
+	  test2: { msi: 'test/wixgem_custom_action_test2.msi',
+	          input: {files: ['CustomActionExe/hello_world.exe'],
+                      modify_file_paths: {/CustomActionExe\// => ''},
+                      custom_actions: [ {file: 'hello_world.exe', exe_command: output[:before_inst_finalize]} ]},
 			   post_installation: [:before_inst_finalize]},
 	  test3: { msi: 'test/wixgem_custom_action_test3.msi',
 	           input: {files: ['all_tests.rb'],
@@ -49,7 +51,7 @@ class CustomAction_test < MiniTest::Unit::TestCase
 	  test6: { msi: 'test/wixgem_custom_action_test6.msi',
 	           input: {files: ['CustomActionExe/hello_world.exe'],
                        modify_file_paths: {/CustomActionExe\// => ''},
-                       custom_actions: [{property: 'execute_it', value: '"[SystemFolder]xcopy.exe" "[SystemFolder]write.exe" "C:\Development\wrk\gitub\wixgem\tests\test"',  
+                       custom_actions: [{property: 'execute_it', value: execute_it_cmd,  
 					                     execute: 'immediate',  condition: 'NOT Installed AND NOT REMOVE'},
 										{id: 'execute_it', binary_key: 'WixCA', dll_entry: 'CAQuietExec', 
 					                     execute: 'deferred',

@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= '0.85.0'
+	s.version		= '0.86.0'
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.'
 	s.authors		= ["Kevin Marshall"]
@@ -26,11 +26,11 @@ Gem::Specification.new do |s|
 	s.files         = Dir["LICENSE","README.md","lib/**/*","example/**/*"]
 	s.license       = 'Apache 2.0'
 	s.require_path  = 'lib'
-	s.add_dependency 'execute', '~> 0.1.62'
+	s.add_dependency 'execute', '~> 0.1.63'
     s.add_development_dependency 'bundler', '~> 0'
 	s.add_development_dependency 'rake', '~> 0'
 	s.add_development_dependency 'rspec', '~> 0'
 	s.add_development_dependency 'dev', '~> 0'
-	s.add_development_dependency 'WindowsInstaller', '~> 0'
+	s.add_development_dependency 'WindowsInstaller', '~> 0.1.20'
 	s.add_development_dependency 'ocra', '~> 0'
 end

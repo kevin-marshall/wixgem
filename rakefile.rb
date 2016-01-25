@@ -1,7 +1,7 @@
 require 'dev'
 require 'rbconfig'
 require_relative 'lib/admin.rb'
-require 'cmd'
+require 'execute'
 
 WIX_VERSION='3.9'
 
@@ -23,12 +23,12 @@ end
 
 task :build => [:pre_build] do
   Dir.chdir('example') do
-    cmd = CMD.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
+    cmd = Execute.new("#{RbConfig::CONFIG['bindir']}/rake.bat")
     cmd.execute	
   end
   
   Dir.chdir('tests/CustomActionExe') do
-    cmd = CMD.new('ocra hello_world.rb', {echo_output: false})
+    cmd = Execute.new('ocra hello_world.rb', {echo_output: false})
     cmd.execute	
   end
 end
@@ -38,7 +38,7 @@ task :test => [:setup] do
   Dir.chdir('tests') do
 	MSBuild.get_build_commands 'COMObject/COMObject.sln'
   
-    cmd = CMD.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb", {echo_output: false})
+    cmd = Execute.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb", {echo_output: false})
 	cmd.execute	
   end
 end

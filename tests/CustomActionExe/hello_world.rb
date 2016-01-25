@@ -1,10 +1,10 @@
-require 'cmd'
+require 'execute'
 
 executable = ENV['OCRA_EXECUTABLE']
 executable = $0 if(executable.nil?)
 
 def admin?
-  cmd = CMD.new('net session')
+  cmd = Execute.new('net session')
   cmd[:ignore_exit_code] = true
   cmd[:quiet] = true
   cmd.execute

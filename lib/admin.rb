@@ -1,7 +1,7 @@
-require 'cmd.rb'
+require 'execute'
 
 def admin?
-  cmd = CMD.new('net session')
+  cmd = Execute.new('net session')
   cmd[:ignore_exit_code] = true
   cmd[:quiet] = true
   cmd.execute

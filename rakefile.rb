@@ -3,16 +3,13 @@ require 'rbconfig'
 require_relative 'lib/admin.rb'
 require 'execute'
 
-WIX_VERSION='3.9'
-
 CLEAN.include('example/*.wxs','tests/test/**','tests/wixgem_install*.*', 'tests/rakefile.rb', 'tests/Gemfile')
-
-SVN_EXPORTS={"OpenSource/WixToolset/#{WIX_VERSION}" => "https://deps.googlecode.com/svn/trunk/WixToolset/#{WIX_VERSION}"}
 
 task :commit => [:add]
 
 task :setup do
 	FileUtils.chmod('a-w', 'tests/test_files/ReadOnly.txt')
+	raise 'Wixtoolset must be installed' if(ENV['WIX'].nil?)
 end
 
 task :add => [:clean]

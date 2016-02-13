@@ -21,6 +21,7 @@ class Shortcut
 	return xml_doc
   end
   
+  private
   def create_shortcut_element(file_element)
     shortcut_element = file_element.add_element 'Shortcut'
 	

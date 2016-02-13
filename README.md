@@ -54,10 +54,9 @@ small set of optional arguments allowing the developer to customize the generate
                                 installation of the product before installing the product.
 * **all_users**: String value perUser or perMachine. The default is perUser.
 * **suppress_registry_harvesting** Suppress's heat's registry harvesting. Can fix the Runtime Error E6034.		 
-* **suppress_COM_elements** Suppress COM elements.
+* **suppress_COM_elements** Suppress COM elements, Heat's -scom
 * **installer_version** Represents the minimum version of the Windows installer required to install
-                        this package. The default version is 4.5. Other valid versions are 2.0,
-						3.0, 3.5, 4.0, 4.5.
+                        this package. The default version is 4.5 i.e. NETFRAMEWORK45
 * **requires_netframework** Tests to see if the require netframework version is installed on the machine. The
                             associated value specifies the netframework version. The net framework strings can
                             be found at http://wixtoolset.org/documentation/manual/v3/customactions/wixnetfxextension.html							

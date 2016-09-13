@@ -21,10 +21,12 @@ class MergeModule_test < MiniTest::Unit::TestCase
   
   def test_merge_module    
     test_arguments = {
-      test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
-	  test2: ['test/wixgem_merge_test2.msm', ['Gemfile']],
-	  test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
-	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/9.0/*")]
+      #test1: ['test/wixgem_merge_test1.msm', ['rakefile.rb']],
+	  #test2: ['test/wixgem_merge_test2.msm', ['Gemfile']],
+	  #test3: ['test/wixgem_merge_test3.msm', ['rakefile.rb', 'Gemfile']],
+	  test4: ['test/wixgem_merge_test4.msm', Dir.glob("test_files/9.0/*")],
+	  test5: ['test/wixgem_merge_test5.msm', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_win10_crt: true, requires_netframework: 'NETFRAMEWORK35'}]
+	  
     }
   
     test_arguments.each { |key, value| 

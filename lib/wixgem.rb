@@ -90,6 +90,21 @@ class Wix
     return xml_doc 
   end
   
+  def self.manage_win10Crt(xml_doc, input)
+    wix = REXML::XPath.match(xml_doc, "/Wix")[0]
+    if(input.key?(:requires_win10_crt) && input[:requires_win10_crt])
+	  fragment = wix.add_element 'Fragment'
+	  
+	  property = fragment.add_element 'Property', { 'Id' => 'UCRTINSTALLED' }
+	  search = property.add_element 'DirectorySearch', { 'Id' => 'SearchForUCRT', 'Path' => '[SystemFolder]', 'Depth' => '0' }
+	  search.add_element 'FileSearch', { 'Id' => 'UCRT_FileSearch', 'Name' => 'ucrtbase.dll', 'MinVersion' => '10.0.10240.16389' }
+	  condition = fragment.add_element 'Condition', { 'Message' => 'Installation requires Universal CRT to be installed.' }
+	  condition.text = "<![CDATA[Installed OR UCRTINSTALLED]]>"
+	end
+	
+    return xml_doc 
+  end
+
   def self.manage_ui(xml_doc, input)
     product_elements = REXML::XPath.match(xml_doc, "/Wix/Product")
 
@@ -482,6 +497,7 @@ class Wix
 
 	xml_doc = manage_installdir(xml_doc, input)
 	xml_doc = manage_netframework(xml_doc, input)
+	xml_doc = manage_win10Crt(xml_doc, input)
 	#xml_doc = manage_ui(xml_doc, input)
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)

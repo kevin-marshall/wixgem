@@ -96,7 +96,9 @@ class Wix
 	  property = product.add_element 'Property', { 'Id' => 'WIN10_CRT_PRESENT' }
 	  search = property.add_element 'DirectorySearch', { 'Id' => 'SystemFolderDriverVersion', 'Path' => '[SystemFolder]' }
 	  search.add_element 'FileSearch', { 'Name' => 'ucrtbase.dll' }
-	  condition = product.add_element 'Condition', { 'Message' => 'Requires Universal CRT see Windows Update KB2999226' }
+	  
+	  msg = 'Requires Universal CRT see Windows Update KB2999226. Windows update should have installed the Universal CRT. Download and install from https://www.microsoft.com/en-us/download/details.aspx?id=48145'
+	  condition = product.add_element 'Condition', { 'Message' => msg }
 	  condition.text = "<![CDATA[Installed OR WIN10_CRT_PRESENT]]>"
  	end
 	

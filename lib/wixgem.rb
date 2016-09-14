@@ -76,31 +76,29 @@ class Wix
   end
   
   def self.manage_netframework(xml_doc, input)
-    wix = REXML::XPath.match(xml_doc, "/Wix")[0]
-    add_netfx_namespace = false   
     if(input.key?(:requires_netframework))
-	  add_netfx_namespace=true
-	  fragment = wix.add_element 'Fragment'
-	  fragment.add_element 'PropertyRef', { 'Id' => input[:requires_netframework] }
-	  condition = fragment.add_element 'Condition', { 'Message' => "This application requires .NET Framework #{input[:requires_netframework]}. Please install the .NET Framework then run this installer again." }
+	  wix = REXML::XPath.match(xml_doc, "/Wix")[0]
+	  wix.attributes['xmlns:netfx'] = 'https://schemas.microsoft.com/wix/NetFxExtension'
+
+	  product = REXML::XPath.match(xml_doc, "/Wix/Product")[0]
+	  product.add_element 'PropertyRef', { 'Id' => input[:requires_netframework] }
+	  condition = product.add_element 'Condition', { 'Message' => "This application requires .NET Framework #{input[:requires_netframework]}. Please install the .NET Framework then run this installer again." }
 	  condition.text = "<![CDATA[Installed OR #{input[:requires_netframework]}]]>"
     end
 	
-	wix.attributes['xmlns:netfx'] = 'https://schemas.microsoft.com/wix/NetFxExtension' if(add_netfx_namespace)
     return xml_doc 
   end
   
   def self.manage_win10_crt(xml_doc, input)
-    wix = REXML::XPath.match(xml_doc, "/Wix")[0]
     if(input.key?(:requires_win10_crt))
-	  fragment = wix.add_element 'Fragment'
-	  
-	  property = fragment.add_element 'Property', { 'Id' => 'WIN10_CRT_PRESENT' }
-	  search = property.add_element 'DirectorySearch', { 'Id' => 'FileSearch_WIN10_CRT_PRESENT', 'Path' => '[SystemFolder]', 'Depth' => '0' }
-	  search.add_element 'FileSearch', { 'Id' => 'FileSearch_WIN10_CRT_PRESENT', 'Name' => 'ucrtbase.dll', 'MinVersion' => '10.0.10240.16389' }
-	  condition = fragment.add_element 'Condition', { 'Message' => 'Requires Universal CRT see Windows Update KB2999226' }
+	  product = REXML::XPath.match(xml_doc, "/Wix/Product")[0]
+
+	  property = product.add_element 'Property', { 'Id' => 'WIN10_CRT_PRESENT' }
+	  search = property.add_element 'DirectorySearch', { 'Id' => 'SystemFolderDriverVersion', 'Path' => '[SystemFolder]' }
+	  search.add_element 'FileSearch', { 'Name' => 'ucrtbase.dll' }
+	  condition = product.add_element 'Condition', { 'Message' => 'Requires Universal CRT see Windows Update KB2999226' }
 	  condition.text = "<![CDATA[Installed OR WIN10_CRT_PRESENT]]>"
-	end
+ 	end
 	
     return xml_doc 
   end
@@ -497,7 +495,7 @@ class Wix
 
 	xml_doc = manage_installdir(xml_doc, input)
 	xml_doc = manage_netframework(xml_doc, input)
-	#xml_doc = manage_win10_crt(xml_doc, input)
+	xml_doc = manage_win10_crt(xml_doc, input)
 	#xml_doc = manage_ui(xml_doc, input)
 	xml_doc = manage_custom_actions(xml_doc, input)
 	xml_doc = manage_upgrade(xml_doc,input)
@@ -511,6 +509,10 @@ class Wix
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true 
   	File.open(wxs_file, 'w') { |f| formatter.write(xml_doc, f) }	
+	str = File.read(wxs_file)
+	str = str.gsub(/&lt;/,'<')
+	str = str.gsub(/&gt;/,'>')
+  	File.open(wxs_file, 'w') { |f| f.puts(str) }	
   end
 
   def self.create_output(wxs_file, input, output)
@@ -521,7 +523,7 @@ class Wix
 	log_wix_output(candle_cmd)
 	
 	cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
-    cmd_args = "-ext WixUIExtension -ext WixUtilExtension -cultures:en-us #{cmd_args}"
+    cmd_args = "-ext WixNetfxExtension -ext WixUIExtension -ext WixUtilExtension -cultures:en-us #{cmd_args}"
 	light_cmd = Execute.new("\"#{install_path.gsub(/\\/,'/')}/bin/light.exe\" #{cmd_args}", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)

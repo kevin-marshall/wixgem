@@ -32,6 +32,8 @@ class Installation_test < MiniTest::Unit::TestCase
 	  test8: ['test/wixgem_install_heat_problem_dll.msi', {suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
 	  test9: ['test/wixgem_install_test9.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
 	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test11: ['test/wixgem_install_test11.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_win10_crt: true}],
+	  test12: ['test/wixgem_install_test12.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_netframework: 'NETFRAMEWORK40FULL'}]
     }
 	
     test_arguments.each do |key, value| 

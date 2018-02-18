@@ -6,14 +6,15 @@ require_relative '../lib/wixgem.rb'
 require_relative '../lib/file.rb'
 require_relative 'install_msi.rb'
 
-class MultipleProductInstallation_test < MiniTest::Unit::TestCase
+class MultipleProductInstallation_test < Minitest::Test
   def setup
-	FileUtils.cp('../rakefile.rb', '.') unless(File.exists?('rakefile.rb'))
-	FileUtils.cp('../Gemfile', '.') unless(File.exists?('Gemfile'))
+	  FileUtils.cp('../rakefile.rb', '.') unless(File.exists?('rakefile.rb'))
+	  FileUtils.cp('../Gemfile', '.') unless(File.exists?('Gemfile'))
   end
   def teardown
     File.delete('rakefile.rb')
     File.delete('Gemfile')
+    sleep(0.5)
   end
 
   def test_side_by_side_installations

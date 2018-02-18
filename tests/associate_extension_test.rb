@@ -4,7 +4,7 @@ require 'win32/registry'
 require_relative '../lib/wixgem.rb'
 require_relative 'install_msi.rb'
 
-class AssociationExtension_test < MiniTest::Unit::TestCase
+class AssociationExtension_test < Minitest::Test
   def test_associate_extension
 	msi = 'test/wixgem_associate_file1.msi'
     Wixgem::Wix.make_installation(msi, {debug: true, files: ['CustomActionExe/hello_world.exe'], extensions: {'CustomActionExe/hello_world.exe' => '.ext'}})

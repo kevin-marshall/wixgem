@@ -5,7 +5,7 @@ require_relative 'test_file_attributes.rb'
 require_relative 'install_msi.rb'
 require_relative '../lib/admin.rb'
 
-class FileAttributes_test < MiniTest::Unit::TestCase
+class FileAttributes_test < Minitest::Test
   def test_attributes
     test_arguments = {
 	  test100: ['test/wixgem_read_only_test.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/*')}],

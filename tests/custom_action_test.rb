@@ -8,7 +8,7 @@ require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 require_relative 'install_msi.rb'
 	
-class CustomAction_test < MiniTest::Unit::TestCase
+class CustomAction_test < Minitest::Test
   def test_installation
     dir = File.absolute_path(File.dirname(__FILE__))
     output = { 

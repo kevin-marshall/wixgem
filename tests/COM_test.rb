@@ -7,7 +7,7 @@ require 'win32ole'
 require_relative '../lib/admin.rb'
 require_relative 'test_msi.rb'
 
-class COMInstaller_test < MiniTest::Unit::TestCase
+class COMInstaller_test < Minitest::Test
 
   def test_harvest_registry
     if(admin?)

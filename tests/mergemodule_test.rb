@@ -8,7 +8,7 @@ require_relative 'test_files_exist.rb'
 #require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 
-class MergeModule_test < MiniTest::Unit::TestCase
+class MergeModule_test < Minitest::Test
   def setup
     @installer = WindowsInstaller.new
 	FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))

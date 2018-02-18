@@ -8,15 +8,16 @@ require_relative 'test_file_attributes.rb'
 require_relative 'assert_exception.rb'
 require_relative 'install_msi'
 	
-class Installation_test < MiniTest::Unit::TestCase
+class Installation_test < Minitest::Test
   def setup
-	@installer = WindowsInstaller.new
-	FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
-	FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
+	  @installer = WindowsInstaller.new
+	  FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
+	  FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
   end
   def teardown
     File.delete('rakefile.rb')
-    File.delete('Gemfile')
+		File.delete('Gemfile')
+		sleep(0.5)
   end
   
   def test_installation

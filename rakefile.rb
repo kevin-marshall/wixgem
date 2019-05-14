@@ -33,17 +33,17 @@ end
 
 task :test => [:setup] do
   Dir.chdir('tests') do
-	MSBuild.get_build_commands 'COMObject/COMObject.sln'
-  
+	  MSBuild.get_build_commands 'COMObject/COMObject.sln'
+	  MSBuild.get_build_commands 'WindowsService/WindowsService.sln'
     cmd = Execute.new("#{RbConfig::CONFIG['bindir']}/ruby.exe all_tests.rb", {echo_output: false})
-	cmd.execute	
+	  cmd.execute	
   end
 end
 
 unless(admin?)
-puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-puts 'No user interaction requred when running rakefile as an administrator           '
-puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+  puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+  puts 'No user interaction requred when running rakefile as an administrator           '
+  puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 end
 
 # Yard command line for realtime feed back of Readme.md modifications

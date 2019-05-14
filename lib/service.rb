@@ -14,9 +14,12 @@ class Service
 	  raise "Service #{@file} does not exist" unless(File.exists?(@file))
 	
 	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='.\\#{@file.gsub(/\//,'\\')}']")
-      raise "Service #{@file} does not match a 'File' element with a 'Source' attribute in the wix generated wix file" if(file_elements.length == 0)
+    raise "Service #{@file} does not match a 'File' element with a 'Source' attribute in the wix generated wix file" if(file_elements.length == 0)
       
-	  create_service_element(file_elements[0])
+    service_exe = file_elements[0]
+    service_exe.attributes['KeyPath']='yes'
+
+	  create_service_element(service_exe)
 	
 	  return xml_doc
   end

@@ -43,12 +43,12 @@ class Service
     service_element.attributes['Start'] = 'demand'
     service_element.attributes['Type'] = 'ownProcess'
 
-    service_control = parent_element.add_element 'ServiceControl'
-    service_control.attributes['Id'] = "ServiceControl_#{SecureRandom.uuid.gsub(/-/,'')}"
-    service_control.attributes['Name'] = service[:name]
+    service_control_element = parent_element.add_element 'ServiceControl'
+    service_control_element.attributes['Id'] = "ServiceControl_#{SecureRandom.uuid.gsub(/-/,'')}"
+    service_control_element.attributes['Name'] = service[:name]
 
     service.each { |attribute, value| service_element.attributes[symbol_to_id(attribute)] = value }
-    service_control.each { |attribute, value| service_control.attributes[symbol_to_id(attribute)] = value }    
+    service_control.each { |attribute, value| service_control_element.attributes[symbol_to_id(attribute)] = value }    
 
 	  return service_element
   end

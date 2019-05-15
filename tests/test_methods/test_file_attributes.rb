@@ -1,5 +1,5 @@
-require_relative ('../lib/file.rb')
-require_relative ('test_files_exist.rb')
+require_relative '../../lib/file.rb'
+require_relative 'test_files_exist.rb'
 
 def test_file_attributes(msi_file, data)
   product_name = File.basename(msi_file, File.extname(msi_file))
@@ -23,8 +23,8 @@ def test_file_attributes(msi_file, data)
   file_map.each { |file,installed_file| 	
     installed_path = "C:/Program Files (x86)/#{install_sub_dir}/#{file_map[file]}"
 
-	raise "File #{file} does not exists!" unless(File.exists?(file))
-	raise "File #{installed_file} does not exists!" unless(File.exists?(installed_path))
-	raise "File read only attribute differs between #{file} and #{installed_path}" unless(File.read_only?(file) == File.read_only?(installed_path))
+	  raise "File #{file} does not exists!" unless(File.exists?(file))
+	  raise "File #{installed_file} does not exists!" unless(File.exists?(installed_path))
+	  raise "File read only attribute differs between #{file} and #{installed_path}" unless(File.read_only?(file) == File.read_only?(installed_path))
   }
 end

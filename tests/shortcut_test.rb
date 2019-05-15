@@ -1,8 +1,8 @@
 require 'minitest/autorun'
 require_relative '../lib/wixgem.rb'
 require_relative '../lib/file.rb'
-require_relative 'install_msi.rb'
-require_relative 'test_shortcut.rb'
+require_relative 'test_methods/install_msi.rb'
+require_relative 'test_methods/test_shortcut.rb'
 
 class Shortcut_test < Minitest::Test
   def test_creating_shortcuts

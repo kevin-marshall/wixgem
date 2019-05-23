@@ -9,8 +9,8 @@ class CustomAction
     @input = input
   end
   def add(custom_action)
-    unless(custom_action.key?(:file) || custom_action.key?(:binary_key) || custom_action.key?(:property))
-      raise 'Currently, only supported custom actions work with installed executable, binary key, or property' 
+    unless(custom_action.key?(:file) || custom_action.key?(:binary_key) || custom_action.key?(:property) || custom_action.key?(:directory))
+      raise 'Currently, only supported custom actions work with installed executable, binary key, property, or directory' 
 	  end
 	
 	  file_key=nil

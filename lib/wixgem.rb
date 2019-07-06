@@ -191,9 +191,9 @@ class Wix
 
 	    if(File.read_only?(absolute_path))
 	      install_path = ".\\#{self.modify_file_path(input, file).gsub(/\//,'\\')}"
-		    install_path = install_path.gsub(/\.\\\\/,'.\\')
-		    file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
-		    file_elements[0].attributes['ReadOnly'] = 'yes' if(file_elements.length == 1)
+		  install_path = install_path.gsub(/\.\\\\/,'.\\')
+		  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='#{install_path}']")
+		  file_elements[0].attributes['ReadOnly'] = 'yes' if(file_elements.length == 1)
 	    end
 	  end
 	
@@ -531,66 +531,71 @@ class Wix
   end
 
   def self.create_output(wxs_file, input, output)
-    wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
+	wixobj_file = "#{File.basename(wxs_file,'.wxs')}.wixobj"
 	
-	  candle_cmd = Execute.new("\"#{install_path.gsub(/\\/,'/')}/bin/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
-	  candle_cmd.execute	
-	  log_wix_output(candle_cmd)
+	wix_install_path=install_path.gsub(/\\/,'/');
+	wix_bin_dir = "#{wix_install_path}/bin"
+	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
+	raise "Unable to locate candle.exe. Expecting to have a sub directory bin or tools in the wix installtion directory: #{wix_install_path}" unless(Dir.exists?(wix_bin_dir))
 	
-	  cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
+	candle_cmd = Execute.new("\"#{wix_bin_dir}/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
+	candle_cmd.execute	
+	log_wix_output(candle_cmd)
+	
+	cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
     cmd_args = "-ext WixNetfxExtension -ext WixUIExtension -ext WixUtilExtension -cultures:en-us #{cmd_args}"
-	  light_cmd = Execute.new("\"#{install_path.gsub(/\\/,'/')}/bin/light.exe\" #{cmd_args}", { quiet: true })
-	  light_cmd.execute
-	  log_wix_output(light_cmd)
+	light_cmd = Execute.new("\"#{wix_bin_dir}/light.exe\" #{cmd_args}", { quiet: true })
+	light_cmd.execute
+	log_wix_output(light_cmd)
   end
 
   def self.verify_input_keys(input)
-	  input[:files].reject! { |f| File.directory?(f) }
+	input[:files].reject! { |f| File.directory?(f) }
 
     [:files,:ignore_files].each { |key| raise "Hash key #{key} cannot be nil" if(input.has_key?(key) && input[key].nil?)}	
   end
   
   def self.create_package(output, input)
   	raise 'WIX path is not set! Install Wixtoolset or assign with Wixgem::Wix.install_path = <path to wix toolset' if(self.install_path.nil?)
-	  input = { files: input } unless(input.kind_of?(Hash))
-	  verify_input_keys(input)
+	input = { files: input } unless(input.kind_of?(Hash))
+	verify_input_keys(input)
 	  	
-	  @debug = input[:debug] if(!@debug && input.has_key?(:debug))
-	  start_logger if(@debug)
+	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
+	start_logger if(@debug)
 	
-	  FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
+	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
 	
-	  ext = File.extname(output)
+	ext = File.extname(output)
   	basename = File.basename(output, ext)
-	  FileUtils.rm(output) if(File.exists?(output))
+	FileUtils.rm(output) if(File.exists?(output))
  
-	  output_absolute_path = File.absolute_path(output)
-	  input[:original_pwd] = Dir.pwd
-	  input[:msi?] = output.include?('.msi')
+	output_absolute_path = File.absolute_path(output)
+	input[:original_pwd] = Dir.pwd
+	input[:msi?] = output.include?('.msi')
 		
-	  modify_binary_files(input)
+	modify_binary_files(input)
 
-	  temp_directory do |dir|
-	    wxs_file = "#{basename}.wxs"	    
-	    begin
-		    copy_install_files(dir, input)
+	temp_directory do |dir|
+	  wxs_file = "#{basename}.wxs"	    
+	  begin
+		copy_install_files(dir, input)
 	  
-		    Dir.chdir(dir) do |current_dir|
-		      create_wxs_file(wxs_file, input, ext)
-	        create_output(wxs_file, input, output_absolute_path)
-		    end
-	    rescue Exception => e
-		    raise e
-	    ensure
-	      FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
-	      File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
-	    end	  
-	  end
+		Dir.chdir(dir) do |current_dir|
+		  create_wxs_file(wxs_file, input, ext)
+	      create_output(wxs_file, input, output_absolute_path)
+		end
+	  rescue Exception => e
+		raise e
+	  ensure
+	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
+	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
+	  end	  
+	end
 	
-	  pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
-	  FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
+	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
+	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
 	
-	  end_logger if(@debug)
+	end_logger if(@debug)
     end
   end
 end

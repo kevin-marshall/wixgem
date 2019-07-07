@@ -356,20 +356,24 @@ class Wix
   
   def self.modify_heat_commandline(input, cmd)
   	cmd = cmd.gsub(/-srd/, '-svb6 -srd') if(input.has_key?(:has_vb6_files) && input[:has_vb6_files])
-	  cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
-	  cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
-	  if(input[:msi?])
-	    cmd = cmd.gsub(/-srd/, '-dr INSTALLDIR -srd') 
-	  else
-	    cmd = cmd.gsub(/-srd/, '-dr MergeRedirectFolder -srd') 
-	  end
-	  return cmd
+	cmd = cmd.gsub(/-srd/, '-sreg -srd') if(input.has_key?(:suppress_registry_harvesting) && input[:suppress_registry_harvesting])
+	cmd = cmd.gsub(/-srd/, '-scom -srd') if(input.has_key?(:suppress_COM_elements) && input[:suppress_COM_elements])
+	if(input[:msi?])
+	  cmd = cmd.gsub(/-srd/, '-dr INSTALLDIR -srd') 
+	else
+	  cmd = cmd.gsub(/-srd/, '-dr MergeRedirectFolder -srd') 
+	end
+	return cmd
   end
 
-  def self.execute_heat(input, cmd_line_options)		  
-	  heat_cmd = Execute.new("\"#{install_path.gsub(/\\/,'/')}/bin/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
-	  heat_cmd.execute	
-	  log_wix_output(heat_cmd)
+  def self.execute_heat(input, cmd_line_options)	
+	wix_install_path=install_path.gsub(/\\/,'/');
+	wix_bin_dir = "#{wix_install_path}/bin"
+	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
+
+	heat_cmd = Execute.new("\"#{wix_bin_dir}/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
+	heat_cmd.execute	
+	log_wix_output(heat_cmd)
   end
   
   def self.execute_heat_file(wxs_file, input, template_option)

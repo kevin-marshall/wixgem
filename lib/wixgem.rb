@@ -79,7 +79,7 @@ class Wix
   def self.manage_netframework(xml_doc, input)
     if(input.key?(:requires_netframework))
 	    wix = REXML::XPath.match(xml_doc, "/Wix")[0]
-	    wix.attributes['xmlns:netfx'] = 'https://schemas.microsoft.com/wix/NetFxExtension'
+	    wix.attributes['xmlns:NetFX'] = 'https://schemas.microsoft.com/wix/NetFxExtension'
 
 	    product = REXML::XPath.match(xml_doc, "/Wix/Product")[0]
 	    product.add_element 'PropertyRef', { 'Id' => input[:requires_netframework] }
@@ -221,7 +221,29 @@ class Wix
 	
 	  return xml_doc
   end
+
+  def self.manage_users(xml_doc,input)
+	return xml_doc unless(input.has_key?(:users))
   
+	input[:users].each do |username, user_hash|
+	  user = User.new(username, user_hash)
+	  xml_doc = user.create(xml_doc)
+	end
+  
+	return xml_doc
+  end
+  
+  def self.manage_services(xml_doc,input)
+	return xml_doc unless(input.has_key?(:services))
+	  
+	  input[:services].each do |service_hash|
+	  service = Service.new(service_hash)
+	  xml_doc = service.create(xml_doc)
+	end
+  
+	return xml_doc
+ end
+
   def self.manage_self_register(xml_doc, input)
 	  return xml_doc unless(input.has_key?(:com_self_register))
 	  input[:com_self_register].each do |file|
@@ -522,8 +544,9 @@ class Wix
 	  xml_doc = manage_shortcuts(xml_doc, input)
 	  xml_doc = manage_self_register(xml_doc, input)
 	  xml_doc = manage_binary_table(xml_doc, input)
-		xml_doc = manage_associate_extensions(xml_doc, input)
-		xml_doc = manage_services(xml_doc, input)
+	  xml_doc = manage_associate_extensions(xml_doc, input)
+	  xml_doc = manage_services(xml_doc, input)
+	  xml_doc = manage_users(xml_doc, input)
 		
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true 
@@ -542,12 +565,14 @@ class Wix
 	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
 	raise "Unable to locate candle.exe. Expecting to have a sub directory bin or tools in the wix installtion directory: #{wix_install_path}" unless(Dir.exists?(wix_bin_dir))
 	
-	candle_cmd = Execute.new("\"#{wix_bin_dir}/candle.exe\" -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
+
+	ext_args = "-ext WixUtilExtension -ext WixNetfxExtension -ext WixUIExtension"
+	candle_cmd = Execute.new("\"#{wix_bin_dir}/candle.exe\" #{ext_args} -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	
 	log_wix_output(candle_cmd)
 	
 	cmd_args = "-nologo -out \"#{output}\" \"#{wixobj_file}\""
-    cmd_args = "-ext WixNetfxExtension -ext WixUIExtension -ext WixUtilExtension -cultures:en-us #{cmd_args}"
+    cmd_args = "#{ext_args} -cultures:en-us #{cmd_args}"
 	light_cmd = Execute.new("\"#{wix_bin_dir}/light.exe\" #{cmd_args}", { quiet: true })
 	light_cmd.execute
 	log_wix_output(light_cmd)

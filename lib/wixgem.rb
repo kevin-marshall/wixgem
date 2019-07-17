@@ -9,6 +9,7 @@ require_relative 'custom_action.rb'
 require_relative 'temp_directory.rb'
 require_relative 'associate_extension.rb'
 require_relative 'service.rb'
+require_relative 'user.rb'
 
 # Editor for wix Files WixEdit: http://http://wixedit.sourceforge.net/
 # Full list of Wix editors : http://robmensching.com/blog/posts/2007/11/20/wix-editors/

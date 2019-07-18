@@ -22,19 +22,31 @@ class Service
     service_exe_element = file_elements[0]
     service_exe_element.attributes['KeyPath']='yes'
 
-	  create_service_element(service_exe_element)
+	  create_service_element(xml_doc, service_exe_element)
 	
 	  return xml_doc
   end
   
   private
-  def create_service_element(service_exe_element)
+  def create_service_element(xml_doc, service_exe_element)
     parent_element = service_exe_element.parent
     
     service = @hash[:service]
     service_control = {}
     service_control = @hash[:service_control] if(@hash.has_key?(:service))
 
+    if(service.key?(:logonasservice))
+      wix = REXML::XPath.match(xml_doc, "/Wix")[0]
+      wix.add_attribute('xmlns:Util', 'http://schemas.microsoft.com/wix/UtilExtension')
+      
+      user_element = parent_element.add_element 'Util:User'
+      user_element.attributes['Id'] = "logon_as_service_#{SecureRandom.uuid.gsub(/-/,'')}"
+      user_element.add_attribute('Domain', service[:domain]) if(service.key?(:domain))
+      user_element.add_attribute('Name', service[:name])
+      user_element.add_attribute('LogonAsService', service[:logonasservice])
+      user_element.add_attribute('CreateUser', 'no')
+      user_element.add_attribute('UpdateIfExists', 'yes')
+    end 
     service_element = parent_element.add_element('ServiceInstall')
 
     service_element.attributes['Id'] = "Service_#{SecureRandom.uuid.gsub(/-/,'')}"

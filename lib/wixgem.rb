@@ -9,7 +9,6 @@ require_relative 'custom_action.rb'
 require_relative 'temp_directory.rb'
 require_relative 'associate_extension.rb'
 require_relative 'service.rb'
-require_relative 'user.rb'
 
 # Editor for wix Files WixEdit: http://http://wixedit.sourceforge.net/
 # Full list of Wix editors : http://robmensching.com/blog/posts/2007/11/20/wix-editors/
@@ -223,17 +222,6 @@ class Wix
 	  return xml_doc
   end
 
-  def self.manage_users(xml_doc,input)
-	return xml_doc unless(input.has_key?(:users))
-  
-	input[:users].each do |username, user_hash|
-	  user = User.new(username, user_hash)
-	  xml_doc = user.create(xml_doc)
-	end
-  
-	return xml_doc
-  end
-  
   def self.manage_services(xml_doc,input)
 	return xml_doc unless(input.has_key?(:services))
 	  
@@ -547,7 +535,6 @@ class Wix
 	  xml_doc = manage_binary_table(xml_doc, input)
 	  xml_doc = manage_associate_extensions(xml_doc, input)
 	  xml_doc = manage_services(xml_doc, input)
-	  xml_doc = manage_users(xml_doc, input)
 		
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true 

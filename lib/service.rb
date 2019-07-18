@@ -36,13 +36,22 @@ class Service
     service_control = @hash[:service_control] if(@hash.has_key?(:service))
 
     if(service.key?(:logonasservice))
+      raise ':logonasservice requires an :account element' unless(service.key?(:account))
+      
       wix = REXML::XPath.match(xml_doc, "/Wix")[0]
       wix.add_attribute('xmlns:Util', 'http://schemas.microsoft.com/wix/UtilExtension')
-      
+
       user_element = parent_element.add_element 'Util:User'
+ 
+      account = service[:account].gsub(/\\/, '/')
+      if(account.include?('/'))
+        words = account.split('/')
+        user_element.add_attribute('Domain', words[0])
+        
+        account = words[1]
+      end
       user_element.attributes['Id'] = "logon_as_service_#{SecureRandom.uuid.gsub(/-/,'')}"
-      user_element.add_attribute('Domain', service[:domain]) if(service.key?(:domain))
-      user_element.add_attribute('Name', service[:name])
+      user_element.add_attribute('Name', account)
       user_element.add_attribute('LogonAsService', service[:logonasservice])
       user_element.add_attribute('CreateUser', 'no')
       user_element.add_attribute('UpdateIfExists', 'yes')

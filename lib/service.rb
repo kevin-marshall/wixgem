@@ -46,9 +46,9 @@ class Service
       user_element.add_attribute('LogonAsService', service[:logonasservice])
       user_element.add_attribute('CreateUser', 'no')
       user_element.add_attribute('UpdateIfExists', 'yes')
-      
+
       service.delete(:logonasservice)
-      service.delete(:logonasservice) if(service.key?(:domain))
+      service.delete(:domain) if(service.key?(:domain))
     end 
     service_element = parent_element.add_element('ServiceInstall')
 

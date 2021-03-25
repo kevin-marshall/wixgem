@@ -15,7 +15,7 @@
 #
 Gem::Specification.new do |s|
 	s.name			= 'wixgem'
-	s.version		= '0.107.0'
+	s.version		= '0.108.0'
 	s.summary		= 'Simple Ruby interface to facilitate working with Wix Toolset'
 	s.description	= 'Simple Ruby interface to facilitate creating and compiling windows installation files with the Wix Toolset.'
 	s.authors		= ["Kevin Marshall"]
@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'bundler', '~> 0'
 	s.add_development_dependency 'rake', '~> 0'
 	s.add_development_dependency 'rspec', '~> 0'
-	s.add_development_dependency 'dev', '~> 0'
+	s.add_development_dependency 'raykit', '~> 0'
 	s.add_development_dependency 'win32-service', '~> 0'
 	s.add_development_dependency 'WindowsInstaller', '~> 0.1.25'
 	s.add_development_dependency 'ocra', '~> 0'

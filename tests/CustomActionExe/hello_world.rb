@@ -1,15 +1,9 @@
-require 'execute'
-
 executable = ENV['OCRA_EXECUTABLE']
 executable = $0 if(executable.nil?)
 
 def admin?
-  cmd = Execute.new('net session')
-  cmd[:ignore_exit_code] = true
-  cmd[:quiet] = true
-  cmd.execute
-  return true if(cmd[:exit_code] == 0)
-  return false
+  rights=%x[whoami /priv]
+  return rights.include?('SeCreateGlobalPrivilege')
 end
 
 text = ''

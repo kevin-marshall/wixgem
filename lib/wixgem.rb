@@ -281,43 +281,43 @@ class Wix
   end
   
   def self.copy_install_files(directory, input)
-	  files = files(input)
+	files = files(input)
 
-	  missing_files = []
-	  files.each do |file| 
-	    if(File.file?(file))
+	missing_files = []
+	files.each do |file| 
+	  if(File.exists?(file))
    	    install_path = file
         if(input.has_key?(:modify_file_paths))
           input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
         end
-		    raise "Invalid relative installation path: #{install_path}" if(install_path.include?(':'))
+		raise "Invalid relative installation path: #{install_path}" if(install_path.include?(':'))
 
    	    install_path = "#{directory}/#{install_path}"		
-		    FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
-		    FileUtils.cp(file, install_path, { preserve: true })
-	    elsif(!File.exists?(file))
-	      missing_files.insert(missing_files.length, file)
-	    end
+		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
+		FileUtils.cp(file, install_path, preserve: true)
+	  elsif(!File.exists?(file))
+	    missing_files.insert(missing_files.length, file)
 	  end
+	end
 
     if(@debug)	
-	    if(files.length > 0)
-			  max_path = files.max { |a, b| a.length <=> b.length }
-			  columen_size = max_path.length + 10
-		  end
+	  if(files.length > 0)
+		max_path = files.max { |a, b| a.length <=> b.length }
+		columen_size = max_path.length + 10
+	  end
 	  
-	    ingore_files = self.ignore_files(input)
-	    if(input.has_key?(:ignore_files))
-	      @logger << "------------------------------------ ignoring files -----------------------------------" unless(@logger.nil?)
-			  input[:ignore_files].each { |file| @logger << file }
-	    end
+	  ingore_files = self.ignore_files(input)
+	  if(input.has_key?(:ignore_files))
+	    @logger << "------------------------------------ ignoring files -----------------------------------" unless(@logger.nil?)
+		input[:ignore_files].each { |file| @logger << file }
+	  end
 
-	    @logger << "------------------------------------ Installation Paths -----------------------------------" unless(@logger.nil?)
-	    @logger << "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']  unless(@logger.nil?)
-	    files.reject! { |f| ingore_files.include?(f) }
+	  @logger << "------------------------------------ Installation Paths -----------------------------------" unless(@logger.nil?)
+	  @logger << "%-#{columen_size}s %s\n" % ['File path', 'Installation Path']  unless(@logger.nil?)
+	  files.reject! { |f| ingore_files.include?(f) }
 
-	    files.each do |file| 
-	      if(File.file?(file))
+	  files.each do |file| 
+	    if(File.exists?(file))
   	      install_path = file
           if(input.has_key?(:modify_file_paths))
             input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
@@ -325,22 +325,22 @@ class Wix
 	        @logger << "%-#{columen_size}s %s\n" % [file, install_path]  unless(@logger.nil?)
         end
       end	  
-	    @logger << "-------------------------------------------------------------------------------------------" unless(@logger.nil?)
-	  end
+	  @logger << "-------------------------------------------------------------------------------------------" unless(@logger.nil?)
+	end
 
-	  raise 'No files were given to wixgem' if(files.length == 0)
+	raise 'No files were given to wixgem' if(files.length == 0)
 
-	  if(missing_files.length > 0)
-	    missing_files_str = ''
-	    missing_files.each { |f| 
-	      if(missing_files_str.empty?)
-	        missing_files_str = f 
-		    else
-	        missing_files_str = "#{missing_files_str}, #{f}" 
-		    end
-	    }
-	    raise "Wixgem missing files: #{missing_files_str}" 
-	  end
+	if(missing_files.length > 0)
+	  missing_files_str = ''
+	  missing_files.each { |f| 
+	    if(missing_files_str.empty?)
+	      missing_files_str = f 
+		else
+	      missing_files_str = "#{missing_files_str}, #{f}" 
+		end
+	  }
+	  raise "Wixgem missing files: #{missing_files_str}" 
+    end
   end
 
   def self.modify_binary_files(input)

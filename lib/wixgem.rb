@@ -410,7 +410,7 @@ class Wix
 	  
 	    filename = wxs_file
 	    if(install_files.index(file) == 0)
-        execute_heat(input, "file \"#{windows_path}\" -v #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{filename}\"")
+        execute_heat(input, "file \"#{windows_path}\" -v #{template_option} -cg InstallationFiles -gg -nologo -srd -o  \"#{filename}\"")
 	    else
 		    filename = File.basename(wxs_file).gsub('.wxs', "-#{wxs_files.length}.wxs") 
 		    execute_heat(input, "file \"#{windows_path}\" -v -template fragment -gg -nologo -srd -o  \"#{filename}\"")
@@ -461,7 +461,7 @@ class Wix
   end
   
   def self.execute_heat_dir(wxs_file, input, template_option)
-	  execute_heat(input,"dir . #{template_option} -cg InstallionFiles -gg -nologo -srd -o  \"#{wxs_file}\"")
+	  execute_heat(input,"dir . #{template_option} -cg InstallationFiles -gg -nologo -srd -o  \"#{wxs_file}\"")
   end
   
   def self.create_wxs_file(wxs_file, input, ext)

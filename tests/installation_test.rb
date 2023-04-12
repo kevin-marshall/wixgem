@@ -22,19 +22,18 @@ class Installation_test < Minitest::Test
   
   def test_installation
     test_arguments = {
-      test0: ['wixgem_install_test1.msi', ['rakefile.rb']],
       test1: ['test/wixgem_install_test1.msi', ['rakefile.rb']],
-	    test2: ['test/wixgem_install_test2.msi', {manufacturer: 'Musco', files: ['Gemfile']}], 
-	    test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
-	    test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
-	    test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
-	    test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
-	    test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
-	    test8: ['test/wixgem_install_heat_problem_dll.msi', {suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
-	    test9: ['test/wixgem_install_test9.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
-	    test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}],
-	    test11: ['test/wixgem_install_test11.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_win10_crt: true}],
-	    test12: ['test/wixgem_install_test12.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_netframework: 'NETFRAMEWORK40FULL'}]
+	  test2: ['test/wixgem_install_test2.msi', {manufacturer: 'Musco', files: ['Gemfile']}], 
+	  test3: ['test/wixgem_install_test3.msi', ['rakefile.rb', 'Gemfile']],
+	  test4: ['test/wixgem_install_test4.msi', {version: '1.1.2.3', files: ['Gemfile']}],
+	  test5: ['test/wixgem_install_test5.msi', {product_code: '{4528ae5a-c7fa-40a6-a70e-ac8135f1114c}', files: ['Gemfile']}],
+	  test6: ['test/wixgem_install_test6.msi', {upgrade_code: '{1d5df00a-c18d-4897-95e6-8c936dd19647}', files: ['Gemfile']}],
+	  test7: ['test/wixgem_install_test7.msi', {product_name: 'test_productname', files: ['Gemfile']}],
+	  test8: ['test/wixgem_install_heat_problem_dll.msi', {suppress_registry_harvesting: true, files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test9: ['test/wixgem_install_test9.msi', {modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), suppress_registry_harvesting: true}],
+	  test10: ['test/wixgem_install_test10.msi', {debug: true, modify_file_paths: {/\Atest_files\// => ''}, files: Dir.glob('test_files/**/*'), ignore_files: ['test_files/heat_com_reg_problem/zlib.dll']}],
+	  test11: ['test/wixgem_install_test11.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_win10_crt: true}],
+      test12: ['test/wixgem_install_test12.msi', {debug: true, files: ['rakefile.rb', 'Gemfile'], requires_netframework: 'NETFRAMEWORK40FULL'}]
     }
 	
     test_arguments.each do |key, value| 

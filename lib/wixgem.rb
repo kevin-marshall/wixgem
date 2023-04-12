@@ -553,7 +553,6 @@ class Wix
 	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
 	raise "Unable to locate candle.exe. Expecting to have a sub directory bin or tools in the wix installtion directory: #{wix_install_path}" unless(Dir.exists?(wix_bin_dir))
 	
-
 	ext_args = "-ext WixUtilExtension -ext WixNetfxExtension -ext WixUIExtension"
 	candle_cmd = Execute.new("\"#{wix_bin_dir}/candle.exe\" #{ext_args} -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
 	candle_cmd.execute	

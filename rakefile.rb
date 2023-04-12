@@ -3,7 +3,8 @@ require 'rbconfig'
 require_relative 'lib/admin.rb'
 require 'execute'
 
-CLEAN.include('example/*.wxs','tests/test/**','tests/wixgem_install*.*', 'tests/rakefile.rb', 'tests/Gemfile')
+CLEAN.include('example/*.{wxs,msi,msm}','tests/test/**','tests/wixgem_install*.*', 'tests/Gemfile',
+              'tests/**/bin','tests/**/obj', 'tests/**/*.exe')
 
 task :commit => [:add,:test]
 

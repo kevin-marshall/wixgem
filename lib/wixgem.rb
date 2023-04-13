@@ -6,6 +6,7 @@ require 'SecureRandom'
 require_relative 'file.rb'
 require_relative 'shortcut.rb'
 require_relative 'custom_action.rb'
+require_relative 'registry_key.rb'
 require_relative 'temp_directory.rb'
 require_relative 'associate_extension.rb'
 require_relative 'service.rb'
@@ -134,13 +135,22 @@ class Wix
 
   def self.manage_custom_actions(xml_doc, input)
     custom_actions = CustomAction.new(xml_doc, input)
-	  return xml_doc if(input[:custom_actions].nil?)
+	return xml_doc if(input[:custom_actions].nil?)
 		
-	  input[:custom_actions].each { |ca| custom_actions.add(ca) } if(input.key?(:custom_actions))
+	input[:custom_actions].each { |ca| custom_actions.add(ca) }
 
-	  return xml_doc
+	return xml_doc
   end
-  
+
+  def self.manage_registry_keys(xml_doc, input)
+	return xml_doc if(input[:set_registry_keys].nil?)
+
+	registry_keys = RegistryKey.new(xml_doc, input)
+	input[:set_registry_keys].each { |rk| registry_keys.add(rk) }
+
+    return xml_doc
+  end
+ 
   def self.manage_associate_extensions(xml_doc, input)
     return xml_doc unless(input.key?(:extensions))
 
@@ -270,7 +280,7 @@ class Wix
     files = input
     files = input[:files] if(input.kind_of?(Hash))
 		
-		return files
+	return files
   end
 
   def self.ignore_files(input)
@@ -527,6 +537,7 @@ class Wix
 	  xml_doc = manage_win10_crt(xml_doc, input)
 	  #xml_doc = manage_ui(xml_doc, input)
 	  xml_doc = manage_custom_actions(xml_doc, input)
+	  xml_doc = manage_registry_keys(xml_doc, input)
 	  xml_doc = manage_upgrade(xml_doc,input)
 	  xml_doc = manage_msm_files(xml_doc)
 	  xml_doc = manage_read_only_files(xml_doc,input)
@@ -603,6 +614,7 @@ class Wix
 	  rescue Exception => e
 		raise e
 	  ensure
+		puts "debug path: #{output_absolute_path}" if(@debug)
 	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
 	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
 	  end	  

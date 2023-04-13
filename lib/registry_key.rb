@@ -1,81 +1,39 @@
-require 'rexml/document'
-require 'SecureRandom'
+##require 'rexml/document'
+#require 'SecureRandom'
 
-module Wixgem
+#module Wixgem
 
-class CustomAction
+# https://support.firegiant.com/hc/en-us/articles/230912127-RegistryKey-and-RegistryValue-elements
+class RegistryKey
   def initialize(xml_doc, input)
     @xml_doc = xml_doc
     @input = input
   end
-  def add(custom_action)
-    unless(custom_action.key?(:file) || custom_action.key?(:binary_key) || custom_action.key?(:property) || custom_action.key?(:directory))
-      raise 'Currently, only supported custom actions work with installed executable, binary key, property, or directory' 
-	  end
-	
-	  file_key=nil
-	  if(custom_action.key?(:file))
-      install_path = ".\\#{custom_action[:file].gsub(/\//,'\\')}"
-	    file_elements = REXML::XPath.match(@xml_doc, "//File[@Source='#{install_path}']")
-	    raise "Unable to locate installation file '#{custom_action[:file]} for custom action'" if(file_elements.nil? || (file_elements.size == 0))
-	
-	    file_key = file_elements[0].attributes['Id']
-	  end
-	
-	  id = "ca_#{SecureRandom.uuid.gsub(/-/,'')}"
-	  id = custom_action[:id] if(custom_action.key?(:id))
+  def add(registry_key)
+    unless(registry_key.key?(:root) && registry_key.key?(:key) && registry_key.key?(:value))
+      raise 'Registry key must have root, key, and value elements' 
+	end
+
+	key_value = registry_key[:value]
+    unless(key_value.key?(:name) || key_value.key?(:value) || key_value.key?(:type))
+		raise 'Registry value must have name, value, and type elements' 
+	end
+
+	registry_keys_component = REXML::XPath.match(@xml_doc, "//Component[@Id='RegistryKeys']")
+	if(registry_keys_component.size == 0)
+		puts "Here"
+		wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
+		fragment = wix_element.add_element 'Fragment'
+		component_group = fragment.add_element 'ComponentGroup'
+		component_group.attributes['Id'] = "rk_#{SecureRandom.uuid.gsub(/-/,'')}"
+		component = component_group.add_element 'Component'
+		component.attributes['Id'] = 'RegistryKeys'
+		component.attributes['Directory'] = 'INSTALLDIR'
+	else
+		puts "component: #{registry_keys_component.to_s}"
+	end
 		
-	  impersonate = 'yes'
-	  impersonate = custom_action[:impersonate] if(custom_action.key?(:impersonate))
-	
-	  condition='NOT Installed AND NOT REMOVE'
-	  condition='1' if(custom_action.key?(:binary_key))
-	  condition = custom_action[:condition] if(custom_action.key?(:condition))
-	
-	  execute='deferred'
-	  execute = custom_action[:execute] if(custom_action.key?(:execute))
-	
-	  ret='check'
-	  ret = custom_action[:return] if(custom_action.key?(:return))
-	
-	  wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
-	  fragment = wix_element.add_element 'Fragment'
-	
-	  action = fragment.add_element 'CustomAction', { 'Id' => id, 'Impersonate' => impersonate, 'Return' => ret, 'HideTarget' => 'no', 'Execute' => execute }
-	  if(custom_action.key?(:binary_key))
-	    action.attributes['BinaryKey'] = custom_action[:binary_key]
-	  else
-	    action.attributes['FileKey'] = file_key
-	  end
-
-		action.attributes['Directory'] = custom_action[:directory] if(custom_action.key?(:directory))
-  	action.attributes['ExeCommand'] = custom_action[:exe_command] if(custom_action.key?(:exe_command))
-	  action.attributes['DllEntry'] = custom_action[:dll_entry] if(custom_action.key?(:dll_entry))
-
-	  if(custom_action.key?(:property))
-	    raise "Custom action property '#{custom_action[:property]} must have a value!" unless(custom_action.key?(:value))
-	    action.attributes.delete('ExeCommand')
-	    action.attributes.delete('Return')
-	    action.attributes['Property'] = custom_action[:property]
-	    action.attributes['Value'] = custom_action[:value]	  
-	  end
-	
-    install_execute_sequence = fragment.add_element 'InstallExecuteSequence'
-
-	  custom_action[:before] = 'InstallFinalize' if(!custom_action.key?(:after) && !custom_action.key?(:before))
- 	  if(custom_action.key?(:after))
- 	    action = install_execute_sequence.add_element 'Custom', { 'Action' => id, 'After' => custom_action[:after] }
-      action.text = condition
- 	  else
- 	    action = install_execute_sequence.add_element 'Custom', { 'Action' => id, 'Before' => custom_action[:before] }
-      action.text = condition
-	  end
-	
-	  control=nil
-	  elements = REXML::XPath.match(@xml_doc, "/Wix/Product")
-	  elements = REXML::XPath.match(@xml_doc, "/Wix/Module") if(elements.nil? || elements.size == 0)
-	
-	  elements[0].add_element 'CustomActionRef', { 'Id' => id }
-  end
-end
+	registry_key_element = component.add_element 'RegistryKey', { 'Root' => registry_key[:root], 'Key' => registry_key[:key], 'ForceDeleteOnUninstall' => 'yes' }
+	value_element = registry_key_element.add_element 'RegistryValue', { 'Name' => key_value[:name], 'Value' => key_value[:value], 'Type' => key_value[:type] }
+   end
 end

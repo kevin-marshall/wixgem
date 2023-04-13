@@ -48,8 +48,8 @@ class CustomAction
 	    action.attributes['FileKey'] = file_key
 	  end
 
-		action.attributes['Directory'] = custom_action[:directory] if(custom_action.key?(:directory))
-  	action.attributes['ExeCommand'] = custom_action[:exe_command] if(custom_action.key?(:exe_command))
+	  action.attributes['Directory'] = custom_action[:directory] if(custom_action.key?(:directory))
+  	  action.attributes['ExeCommand'] = custom_action[:exe_command] if(custom_action.key?(:exe_command))
 	  action.attributes['DllEntry'] = custom_action[:dll_entry] if(custom_action.key?(:dll_entry))
 
 	  if(custom_action.key?(:property))

@@ -8,9 +8,9 @@ class RegistryKey_test < Minitest::Test
   def test_set_registry_key
 	msi = 'test/wixgem_registry_keys_file.msi'
 
-	key = 'Software\\Microsoft\\DirectX\\UserGpuPreferences'
+	key = "SOFTWARE\\Microsoft\\DirectX\\UserGpuPreferences"
     #install_path = "#{File.dirname(__FILE__)}\\test\\write.exe"
-	install_path = "C:\\Development\\wrk\\github\\wixgem\\tests\\test\\write.exe"
+	install_path = "[ARPINSTALLLOCATION]"
 	
 	Wixgem::Wix.make_installation(msi, 
 		{ debug: true, set_registry_keys: 

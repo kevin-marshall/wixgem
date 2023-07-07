@@ -22,10 +22,10 @@ class Services_test < Minitest::Test
     ]
 
     test_arguments.each { |test| 
-	    File.delete(test[:msi]) if(File.exists?(test[:msi]))
+	    File.delete(test[:msi]) if(File.exist?(test[:msi]))
 	
       Wixgem::Wix.make_installation(test[:msi], test[:wix_hash])
-	    assert(File.exists?(test[:msi]), "should create an installation file using: #{test[:msi]}")	  
+	    assert(File.exist?(test[:msi]), "should create an installation file using: #{test[:msi]}")	  
    
       install_msi(test[:msi]) { |install_dir| test_service(test[:msi], test[:wix_hash]) } 
       sleep(0.5)

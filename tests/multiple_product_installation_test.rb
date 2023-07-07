@@ -8,8 +8,8 @@ require_relative 'test_methods/install_msi.rb'
 
 class MultipleProductInstallation_test < Minitest::Test
   def setup
-	  FileUtils.cp('../rakefile.rb', '.') unless(File.exists?('rakefile.rb'))
-	  FileUtils.cp('../Gemfile', '.') unless(File.exists?('Gemfile'))
+	  FileUtils.cp('../rakefile.rb', '.') unless(File.exist?('rakefile.rb'))
+	  FileUtils.cp('../Gemfile', '.') unless(File.exist?('Gemfile'))
   end
   def teardown
     File.delete('rakefile.rb')

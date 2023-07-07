@@ -60,23 +60,23 @@ class CustomAction_test < Minitest::Test
     }
 	
     test_arguments.each do |test_id, test_data| 
-	    File.delete(test_data[:msi]) if(File.exists?(test_data[:msi]))
-	    output.each { |k,f| File.delete(f) if(File.exists?(f)) }
+	    File.delete(test_data[:msi]) if(File.exist?(test_data[:msi]))
+	    output.each { |k,f| File.delete(f) if(File.exist?(f)) }
 	
       Wixgem::Wix.make_installation(test_data[:msi], test_data[:input])
-	    assert(File.exists?(test_data[:msi]), "Test #{test_id}: Should have created an installation file: #{test_data[:msi]}") 
+	    assert(File.exist?(test_data[:msi]), "Test #{test_id}: Should have created an installation file: #{test_data[:msi]}") 
     
 	    install_msi(test_data[:msi], test_data[:input]) do |install_path| 
 	      if(test_data.key?(:post_installation))
 		      test_data[:post_installation].each do |key|
-	        assert(File.exists?(output[key]), "Test #{test_id}: Custom action should have created file: #{output[key]}") 
+	        assert(File.exist?(output[key]), "Test #{test_id}: Custom action should have created file: #{output[key]}") 
 		    end
 		  end
 	end
 	    
 	if(test_data.key?(:post_uninstall))
 		test_data[:post_uninstall].each do |key|
-	    assert(File.exists?(output[key]), "Test #{test_id}: Custom action should have created file: #{output[key]}") 
+	    assert(File.exist?(output[key]), "Test #{test_id}: Custom action should have created file: #{output[key]}") 
 		end
   end
 end
@@ -116,24 +116,24 @@ def test_merge_module
   }
 	
   test_arguments.each do |test_id, test_data| 
-	  File.delete(test_data[:msi]) if(File.exists?(test_data[:msi]))
-	  output.each { |k,f| File.delete(f) if(File.exists?(f)) }
+	  File.delete(test_data[:msi]) if(File.exist?(test_data[:msi]))
+	  output.each { |k,f| File.delete(f) if(File.exist?(f)) }
 	
     Wixgem::Wix.make_mergemodule(test_data[:msm], test_data[:msm_input])
     Wixgem::Wix.make_installation(test_data[:msi], test_data[:msi_input])
-	  assert(File.exists?(test_data[:msi]), "Should have created an installation file: #{test_data[:msi]}") 
+	  assert(File.exist?(test_data[:msi]), "Should have created an installation file: #{test_data[:msi]}") 
     
 	  install_msi(test_data[:msi], test_data[:input]) do |install_path| 
 	    if(test_data.key?(:post_installation))
 		    test_data[:post_installation].each do |key|
-	        assert(File.exists?(output[key]), "Custom action should have created file: #{output[key]}") 
+	        assert(File.exist?(output[key]), "Custom action should have created file: #{output[key]}") 
 		    end
 		  end
 	  end
 	    
     if(test_data.key?(:post_uninstall))
 	    test_data[:post_uninstall].each do |key|
-	      assert(File.exists?(output[key]), "Custom action should have created file: #{output[key]}") 
+	      assert(File.exist?(output[key]), "Custom action should have created file: #{output[key]}") 
 	    end
     end
 	end

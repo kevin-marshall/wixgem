@@ -48,11 +48,11 @@ def test_files_exist(msi_file, data)
   
   file_array.each { |file| 
     full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
-	raise "#{full_path} not installed." unless(File.exists?(full_path))
+	raise "#{full_path} not installed." unless(File.exist?(full_path))
   }
   
   ignored_files(data).each { |file|
     full_path = "C:/Program Files (x86)/#{relative_install_dir}/#{file}"
-	raise "#{full_path} should not be installed." if(File.exists?(full_path))
+	raise "#{full_path} should not be installed." if(File.exist?(full_path))
   }
 end

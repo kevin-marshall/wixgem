@@ -2,7 +2,7 @@ require 'win32ole'
 
 class File
   def self.read_only?(path)
-    raise "'#{path}' does not exist" unless(File.exists?(path))
+    raise "'#{path}' does not exist" unless(File.exist?(path))
 	
 	  fso = WIN32OLE.new('Scripting.FileSystemObject')
     raise 'Failed to create Scripting.FileSystemObject' if(fso.nil?)

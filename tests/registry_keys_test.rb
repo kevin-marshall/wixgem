@@ -14,9 +14,9 @@ class RegistryKey_test < Minitest::Test
 	Wixgem::Wix.make_installation(msi, 
 		{ debug: true, set_registry_keys: 
 			[{root: 'HKCU', key: key, 
-			  value: { name: install_path, value: 'GpuPreference=2;', type: 'string'}}],
+			  value: { name: '[ARPINSTALLLOCATION]', value: 'GpuPreference=2;', type: 'string'}}],
 			  files: ['test_files/ReadOnly.txt']})
-	assert(File.exists?(msi), "should create an installation file using: #{msi}")
+	assert(File.exist?(msi), "should create an installation file using: #{msi}")
 
 	install_msi(msi) do |installdir|
 	  entry = Win32::Registry::HKEY_CURRENT_USER.open(key, Win32::Registry::KEY_READ)

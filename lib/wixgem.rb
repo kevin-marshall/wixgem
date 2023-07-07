@@ -197,7 +197,7 @@ class Wix
 	
 	  install_files.each do |file| 
 	    absolute_path = file
-	    absolute_path = "#{input[:original_pwd]}/#{file}" unless(File.exists?(file))
+	    absolute_path = "#{input[:original_pwd]}/#{file}" unless(File.exist?(file))
 
 	    if(File.read_only?(absolute_path))
 	      install_path = ".\\#{self.modify_file_path(input, file).gsub(/\//,'\\')}"
@@ -295,7 +295,7 @@ class Wix
 
 	missing_files = []
 	files.each do |file| 
-	  if(File.exists?(file))
+	  if(File.exist?(file))
    	    install_path = file
         if(input.has_key?(:modify_file_paths))
           input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
@@ -303,9 +303,9 @@ class Wix
 		raise "Invalid relative installation path: #{install_path}" if(install_path.include?(':'))
 
    	    install_path = "#{directory}/#{install_path}"		
-		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exists?(File.dirname(install_path)))
+		FileUtils.mkpath(File.dirname(install_path)) unless(Dir.exist?(File.dirname(install_path)))
 		FileUtils.cp(file, install_path, preserve: true)
-	  elsif(!File.exists?(file))
+	  elsif(!File.exist?(file))
 	    missing_files.insert(missing_files.length, file)
 	  end
 	end
@@ -327,7 +327,7 @@ class Wix
 	  files.reject! { |f| ingore_files.include?(f) }
 
 	  files.each do |file| 
-	    if(File.exists?(file))
+	    if(File.exist?(file))
   	      install_path = file
           if(input.has_key?(:modify_file_paths))
             input[:modify_file_paths].each { |regex, replacement_string| install_path = install_path.gsub(regex, replacement_string) }
@@ -390,7 +390,7 @@ class Wix
   def self.execute_heat(input, cmd_line_options)	
 	wix_install_path=install_path.gsub(/\\/,'/');
 	wix_bin_dir = "#{wix_install_path}/bin"
-	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
+	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exist?(wix_bin_dir))
 
 	heat_cmd = Execute.new("\"#{wix_bin_dir}/heat.exe\" #{modify_heat_commandline(input, cmd_line_options)}", { quiet: true })
 	heat_cmd.execute	
@@ -561,8 +561,8 @@ class Wix
 	
 	wix_install_path=install_path.gsub(/\\/,'/');
 	wix_bin_dir = "#{wix_install_path}/bin"
-	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exists?(wix_bin_dir))
-	raise "Unable to locate candle.exe. Expecting to have a sub directory bin or tools in the wix installtion directory: #{wix_install_path}" unless(Dir.exists?(wix_bin_dir))
+	wix_bin_dir = "#{wix_install_path}/tools" unless(Dir.exist?(wix_bin_dir))
+	raise "Unable to locate candle.exe. Expecting to have a sub directory bin or tools in the wix installtion directory: #{wix_install_path}" unless(Dir.exist?(wix_bin_dir))
 	
 	ext_args = "-ext WixUtilExtension -ext WixNetfxExtension -ext WixUIExtension"
 	candle_cmd = Execute.new("\"#{wix_bin_dir}/candle.exe\" #{ext_args} -out \"#{wixobj_file}\" \"#{wxs_file}\"", { quiet: true })
@@ -590,11 +590,11 @@ class Wix
 	@debug = input[:debug] if(!@debug && input.has_key?(:debug))
 	start_logger if(@debug)
 	
-	FileUtils.mkpath(File.dirname(output)) unless(Dir.exists?(File.dirname(output)))
+	FileUtils.mkpath(File.dirname(output)) unless(Dir.exist?(File.dirname(output)))
 	
 	ext = File.extname(output)
   	basename = File.basename(output, ext)
-	FileUtils.rm(output) if(File.exists?(output))
+	FileUtils.rm(output) if(File.exist?(output))
  
 	output_absolute_path = File.absolute_path(output)
 	input[:original_pwd] = Dir.pwd
@@ -615,13 +615,13 @@ class Wix
 		raise e
 	  ensure
 		puts "debug path: #{output_absolute_path}" if(@debug)
-	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exists?("#{dir}/#{wxs_file}") && @debug)
+	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exist?("#{dir}/#{wxs_file}") && @debug)
 	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
 	  end	  
 	end
 	
 	pdb_file = output_absolute_path.gsub(ext,'.wixpdb')
-	FileUtils.rm(pdb_file) if(File.exists?(pdb_file))
+	FileUtils.rm(pdb_file) if(File.exist?(pdb_file))
 	
 	end_logger if(@debug)
     end

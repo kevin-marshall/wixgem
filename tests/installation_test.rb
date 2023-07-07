@@ -11,8 +11,8 @@ require_relative 'test_methods/install_msi'
 class Installation_test < Minitest::Test
   def setup
 	  @installer = WindowsInstaller.new
-	  FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exists?('rakefile.rb'))
-	  FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exists?('Gemfile'))
+	  FileUtils.cp('../rakefile.rb', 'rakefile.rb') unless(File.exist?('rakefile.rb'))
+	  FileUtils.cp('../Gemfile', 'Gemfile') unless(File.exist?('Gemfile'))
   end
   def teardown
     File.delete('rakefile.rb')
@@ -37,10 +37,10 @@ class Installation_test < Minitest::Test
     }
 	
     test_arguments.each do |key, value| 
-	    File.delete(value[0]) if(File.exists?(value[0]))
+	    File.delete(value[0]) if(File.exist?(value[0]))
 	
       Wixgem::Wix.make_installation(value[0], value[1])
-	    assert(File.exists?(value[0]), "Should have created an installation file: #{value[0]}") 
+	    assert(File.exist?(value[0]), "Should have created an installation file: #{value[0]}") 
     
 	    hash = (value[1].is_a?(Hash)) ? value[1] : nil
 	    install_msi(value[0], hash) { |install_path| test_files_exist(value[0], value[1]) }

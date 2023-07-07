@@ -14,7 +14,7 @@ class Service
     raise "Service hash is required to have a :name key" unless(@hash[:service].has_key?(:name))
 
     service_exe = @hash[:service_exe]
-    raise "Service #{file} does not exist" unless(File.exists?(service_exe))
+    raise "Service #{file} does not exist" unless(File.exist?(service_exe))
     
     file_elements = REXML::XPath.match(xml_doc, "//File[@Source='.\\#{service_exe.gsub(/\//,'\\')}']")
     raise "Service #{@file} does not match a 'File' element with a 'Source' attribute in the wix generated wix file" if(file_elements.length == 0)

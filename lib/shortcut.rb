@@ -11,7 +11,7 @@ class Shortcut
   end
   
   def create(xml_doc)
-	  raise "Shortcut #{@file} does not exist" unless(File.exists?(@file))
+	  raise "Shortcut #{@file} does not exist" unless(File.exist?(@file))
 	
 	  file_elements = REXML::XPath.match(xml_doc, "//File[@Source='.\\#{@file.gsub(/\//,'\\')}']")
 	  raise "Shortcut #{@file} does not match a 'File' element with a 'Source' attribute in the wix generated wix file" if(file_elements.length == 0)

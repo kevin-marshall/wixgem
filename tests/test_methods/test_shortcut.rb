@@ -19,7 +19,7 @@ def test_shortcut(file, wix_hash, shortcut)
   shortcut_name = "#{shortcut[:name]}.lnk"
   shortcut_path = "#{get_shortcut_path(wix_hash, shortcut)}/#{shortcut_name}"
   #puts "Path: #{shortcut_path}"
-  raise "#{shortcut_path} does not exist" unless(File.exists?(shortcut_path))
+  raise "#{shortcut_path} does not exist" unless(File.exist?(shortcut_path))
 end
 
 def test_shortcuts(msi, wix_hash)

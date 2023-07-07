@@ -17,7 +17,7 @@ class COMInstaller_test < Minitest::Test
  	  installation_hash = { debug: true, all_users: 'perMachine', files: ['COMObject/bin/Release/COMObject.dll'],  modify_file_paths: {/.+Release\// => ''}}
 
       Wixgem::Wix.make_installation(installation_file, installation_hash)
-	  assert(File.exists?(installation_file), "should create an installation file using: #{installation_file}")	  
+	  assert(File.exist?(installation_file), "should create an installation file using: #{installation_file}")	  
     
 	  test_msi(installation_file) do
         test_files_exist(installation_file, installation_hash)
@@ -41,7 +41,7 @@ class COMInstaller_test < Minitest::Test
 						   suppress_registry_harvesting: true}
 
       Wixgem::Wix.make_installation(installation_file, installation_hash)
-	  assert(File.exists?(installation_file), "should create an installation file using: #{installation_file}")	  
+	  assert(File.exist?(installation_file), "should create an installation file using: #{installation_file}")	  
 #    
 #	  test_msi(installation_file) do
 #        test_files_exist(installation_file, installation_hash)

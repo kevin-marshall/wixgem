@@ -19,8 +19,8 @@ class RegistryKey
 		raise 'Registry value must have name, value, and type elements' 
 	end
 
-	registry_keys_component = REXML::XPath.match(@xml_doc, "//Component[@Id='RegistryKeys']")
-	if(registry_keys_component.size == 0)
+	#registry_keys_component = REXML::XPath.match(@xml_doc, "//Component[@Id='RegistryKeys']")
+	#if(registry_keys_component.size == 0)
 		wix_element = REXML::XPath.match(@xml_doc, "/Wix")[0]
 		fragment = wix_element.add_element 'Fragment'
 		component_group = fragment.add_element 'ComponentGroup'
@@ -30,12 +30,13 @@ class RegistryKey
 		component_ref = default_feature[0].add_element 'ComponentGroupRef', 'Id' => component_group.attributes['Id']
 
 		component = component_group.add_element 'Component'
-		component.attributes['Id'] = 'RegistryKeys'
+		component.attributes['Id'] = "RegistryKey_#{SecureRandom.uuid.gsub(/-/,'')}"
 		component.attributes['Directory'] = 'INSTALLDIR'
-	else
-		puts "component: #{registry_keys_component.to_s}"
-	end
-		
+	#else
+		#puts "component: #{registry_keys_component.to_s}"
+	#	component = registry_keys_component[0]
+	#end
+
 	registry_key_element = component.add_element 'RegistryKey', { 'Root' => registry_key[:root], 'Key' => registry_key[:key] }
 	value_element = registry_key_element.add_element 'RegistryValue', { 'Action' => 'write', 'Name' => key_value[:name], 'Value' => key_value[:value], 'Type' => key_value[:type] }
    end

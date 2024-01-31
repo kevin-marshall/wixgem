@@ -616,7 +616,7 @@ class Wix
 	  ensure
 		puts "debug path: #{output_absolute_path}" if(@debug)
 	    FileUtils.cp("#{dir}/#{wxs_file}", "#{output_absolute_path}.wxs") if(File.exist?("#{dir}/#{wxs_file}") && @debug)
-	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug &!@logger.nil?)
+	    File.open("#{output_absolute_path}.log", 'w') { |f| f.puts(@logger) } if(@debug & !@logger.nil?)
 	  end	  
 	end
 	
